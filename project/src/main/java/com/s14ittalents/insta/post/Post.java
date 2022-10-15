@@ -1,8 +1,7 @@
 package com.s14ittalents.insta.post;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.Data;
-import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;

@@ -16,7 +16,13 @@ public class PostController {
     }
 
     @GetMapping("/{id:[0-9]+}")
+    @ResponseBody
     Post getPost(@PathVariable long id) {
-        return postRepository.findById(id);
+        Post post = postRepository.findById(id);
+        if (post == null){
+            throw new RuntimeException();
+        }
+        System.out.println(post);
+        return post;
     }
 }

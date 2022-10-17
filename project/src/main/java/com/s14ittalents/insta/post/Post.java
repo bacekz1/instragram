@@ -29,6 +29,6 @@ public class Post {
     Set<Comment> comments;
     
     @ManyToOne
-    @JoinColumn(name = "used_id")
+    @JoinColumn(name = "user_id")
     private User owner;
 }

@@ -1,6 +1,7 @@
 package com.s14ittalents.insta.post;
 
 import com.s14ittalents.insta.comment.Comment;
+import com.s14ittalents.insta.user.User;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -26,4 +27,8 @@ public class Post {
     private boolean is_deleted;
     @OneToMany(mappedBy = "comment")
     Set<Comment> comments;
+    
+    @ManyToOne
+    @JoinColumn(name = "used_id")
+    private User owner;
 }

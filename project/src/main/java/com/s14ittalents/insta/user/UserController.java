@@ -14,8 +14,8 @@ public class UserController {
     private ModelMapper modelMapper;
 
     @GetMapping
-    UserDTO getUser(@PathVariable String username) {
-        UserDTO dto = modelMapper.map(userRepository.findByUsername(username), UserDTO.class);
+    UserNoPasswordDTO getUser(@PathVariable String username) {
+        UserNoPasswordDTO dto = modelMapper.map(userRepository.findByUsername(username), UserNoPasswordDTO.class);
         return dto;
     }
     

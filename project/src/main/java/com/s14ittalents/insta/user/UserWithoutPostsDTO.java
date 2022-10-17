@@ -3,7 +3,7 @@ package com.s14ittalents.insta.user;
 import lombok.Data;
 
 @Data
-public class UserDTO {
+public class UserWithoutPostsDTO {
     private long id;
     private boolean activity_status;
     private String username;

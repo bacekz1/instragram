@@ -1,11 +1,13 @@
 package com.s14ittalents.insta.user;
 
+import com.s14ittalents.insta.post.Post;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -67,5 +69,7 @@ public class User {
     @Column
     private boolean is_deleted;
     
+    @OneToMany(mappedBy = "owner")
+    List<Post> posts;
     
 }

@@ -1,6 +1,8 @@
 package com.s14ittalents.insta.post;
 
+import com.s14ittalents.insta.exception.ExceptionController;
 import com.s14ittalents.insta.exception.DataNotFoundException;
+import com.s14ittalents.insta.exception.NoAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -6,7 +6,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.Positive;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Data
@@ -16,9 +16,6 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column
-    @Positive(message = "user_id should be positive num")
-    private long user_id;
-    @Column
     private String caption;
     @Column
     @Positive(message = "location_id should be positive num")
@@ -26,9 +23,9 @@ public class Post {
     @Column
     private boolean is_deleted;
     @OneToMany(mappedBy = "comment")
-    Set<Comment> comments;
-    
+    List<Comment> comments;
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @Positive(message = "user_id should be positive num")
     private User owner;
 }

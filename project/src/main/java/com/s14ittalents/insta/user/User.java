@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,11 +30,11 @@ public class User {
     
     @Column
     @NonNull
-    @Min(value = 5)
+    @Size(min = 3, max = 20)
     private String username;
     
     @Column
-    @Min(value = 8)
+    @Size(min = 3, max = 20)
     private String password;
     
     @Column

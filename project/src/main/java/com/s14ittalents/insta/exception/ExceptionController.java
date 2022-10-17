@@ -1,18 +1,17 @@
 package com.s14ittalents.insta.exception;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @ControllerAdvice
 public abstract class ExceptionController extends ResponseEntityExceptionHandler {
@@ -33,12 +32,16 @@ public abstract class ExceptionController extends ResponseEntityExceptionHandler
     }
     @ExceptionHandler(value = {ConstraintViolationException.class})
     protected ResponseEntity<Object> handleConstraintAnnotations(ConstraintViolationException ex, WebRequest request) {
+        String errorMessage = new ArrayList<>(ex.getConstraintViolations()).get(0).getMessage();
         exceptionDTO.setTime(LocalDateTime.now());
         exceptionDTO.setStatus(HttpStatus.EXPECTATION_FAILED.value());
-        exceptionDTO.setMessage(ex.getMessage());
+        exceptionDTO.setMessage(errorMessage);
         return handleExceptionInternal(ex, exceptionDTO,
                 new HttpHeaders(), HttpStatus.EXPECTATION_FAILED, request);
     }
+
+
+
 
     private ResponseEntity<Object> buildErr(Exception ex, HttpStatus status, WebRequest request) {
         ex.printStackTrace();

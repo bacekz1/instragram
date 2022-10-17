@@ -3,21 +3,27 @@ package com.s14ittalents.insta.comment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/comment")
 public class CommentController {
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentService commentService;
+//
+//    @GetMapping({"/{id:[0-9]+}"})
+//    Comment getComment(@RequestBody @PathVariable long id) {
+//        return commentService.getComment(id);
+//    }
 
     @GetMapping({"/{id:[0-9]+}"})
-    Comment getComment(@PathVariable long id) {
-        return commentRepository.findById(id);
+    List<CommentWithRepliesDTO> getCommentWithReplies(@RequestBody @PathVariable long id) {
+        return commentService.getCommentWithReplies(id);
     }
-
-    @PostMapping
-    Comment createComment(@RequestBody Comment comment) {
-        System.out.println(comment.getReply_id());
-        return commentRepository.save(comment);
-    }
+//
+//    @PostMapping
+//    Comment createComment(@RequestBody Comment comment) {
+//        return commentRepository.save(comment);
+//    }
 
 }

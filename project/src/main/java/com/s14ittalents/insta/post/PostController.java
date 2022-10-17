@@ -1,5 +1,6 @@
 package com.s14ittalents.insta.post;
 
+import com.s14ittalents.insta.exception.Constant;
 import com.s14ittalents.insta.exception.ExceptionController;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.NoAuthException;
@@ -24,6 +25,6 @@ public class PostController {
     @ResponseBody
     Post getPost(@PathVariable long id) {
         Optional<Post> post = postRepository.findById(id);
-        return post.orElseThrow(() -> new DataNotFoundException("Data not found"));
+        return post.orElseThrow(() -> new DataNotFoundException(Constant.DATA_NOT_FOUND));
     }
 }

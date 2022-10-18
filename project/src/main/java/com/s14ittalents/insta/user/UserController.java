@@ -23,6 +23,10 @@ public class UserController{
         return userService.createUser(user);
     }
     
+    @PostMapping("/login")
+    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user) {
+        return userService.loginUser(user);
+    }
     
 }
 

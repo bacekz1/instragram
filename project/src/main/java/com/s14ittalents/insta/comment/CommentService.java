@@ -23,11 +23,13 @@ public class CommentService {
         return comment.stream()
                 .map(comment1 -> modelMapper.map(comment1, CommentWithRepliesDTO.class))
                 .collect(Collectors.toList());
-
-
     }
+//
+//    public Comment getComment(long id) {
+//        return commentRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.DATA_NOT_FOUND));
+//    }
 
-    public Comment getComment(long id) {
-        return commentRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.DATA_NOT_FOUND));
-    }
+//    public CreateCommentDTO createComment (Comment comment){
+//        commentRepository.save(comment);
+//    }
 }

@@ -1,12 +1,13 @@
 package com.s14ittalents.insta.comment;
 
+import com.s14ittalents.insta.exception.DataNotFoundException;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/comment")
 public class CommentController {
     @Autowired
     private CommentService commentService;
@@ -16,13 +17,13 @@ public class CommentController {
 //        return commentService.getComment(id);
 //    }
 
-    @GetMapping({"/{id:[0-9]+}"})
+    @GetMapping({"/comment/{id:[0-9]+}"})
     List<CommentWithRepliesDTO> getCommentWithReplies(@RequestBody @PathVariable long id) {
         return commentService.getCommentWithReplies(id);
     }
-//
-//    @PostMapping
-//    Comment createComment(@RequestBody Comment comment) {
+
+//    @PostMapping("/post{id}")
+//    CreateCommentDTO createComment(@PathVariable long id, @RequestBody CreateCommentDTO comment) {
 //        return commentRepository.save(comment);
 //    }
 

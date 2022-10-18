@@ -3,16 +3,12 @@ package com.s14ittalents.insta.comment;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.s14ittalents.insta.post.Post;
 import lombok.Data;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -28,7 +24,7 @@ public class Comment {
     private Post post;
     @Column
     @Positive(message = "owner_id should be positive num")
-    private long owner_id;
+    private long ownerId;
     @Column
     private String comment;
     @ManyToOne()
@@ -37,5 +33,5 @@ public class Comment {
     @OneToMany(mappedBy = "reply")
     List<Comment> replies;
     @Column
-    private boolean is_deleted;
+    private boolean isDeleted;
 }

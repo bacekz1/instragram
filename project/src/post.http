@@ -1,7 +1,11 @@
-POST http://localhost:8080/post
-Content-Type: application/json
+GET http://localhost:8080/comment/30
 
-{
-"user_id" : "1",
-"caption" : "test"
-}
+GET http://localhost:8080/jfjdf
+
+#POST http://localhost:8080/post
+#Content-Type: application/json
+#
+#{
+#"user_id" : "1",
+#"caption" : "test"
+#}

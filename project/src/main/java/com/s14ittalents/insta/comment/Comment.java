@@ -29,8 +29,8 @@ public class Comment {
     private String comment;
     @ManyToOne()
     @JoinColumn(name = "reply_id")
-    Comment reply;
-    @OneToMany(mappedBy = "reply")
+    Comment replyId;
+    @OneToMany(mappedBy = "replyId")
     List<Comment> replies;
     @Column
     private boolean isDeleted;

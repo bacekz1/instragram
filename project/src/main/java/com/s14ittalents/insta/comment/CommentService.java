@@ -29,7 +29,9 @@ public class CommentService {
 //        return commentRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.DATA_NOT_FOUND));
 //    }
 
-//    public CreateCommentDTO createComment (Comment comment){
-//        commentRepository.save(comment);
-//    }
+    public CreateCommentDTO createComment(CreateCommentDTO dto) {
+        Comment comment = modelMapper.map(dto, Comment.class);
+        Comment createdComment = commentRepository.save(comment);
+        return modelMapper.map(createdComment, CreateCommentDTO.class);
+    }
 }

@@ -43,6 +43,11 @@ public abstract class ExceptionController extends ResponseEntityExceptionHandler
     ResponseEntity<Object> handleNoAuthorisation(Exception ex, WebRequest request) {
         return buildErr(ex, HttpStatus.UNAUTHORIZED, request);
     }
+    
+    @ExceptionHandler(value = {UserNotCreatedException.class})
+    ResponseEntity<Object> handleNoUserCreation(Exception ex, WebRequest request) {
+        return buildErr(ex, HttpStatus.EXPECTATION_FAILED, request);
+    }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})
     protected ResponseEntity<Object> handleConstraintAnnotations(ConstraintViolationException ex, WebRequest request) {

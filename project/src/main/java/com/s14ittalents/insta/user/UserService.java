@@ -1,8 +1,35 @@
 package com.s14ittalents.insta.user;
 
-import com.s14ittalents.insta.exception.ExceptionController;
+import com.s14ittalents.insta.exception.DataNotFoundException;
+import com.s14ittalents.insta.exception.UserNotCreatedException;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class UserService extends ExceptionController {
+import java.util.Optional;
+
+@Service
+public class UserService{
     
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    private ModelMapper modelMapper;
     
+    UserNoPasswordDTO getUserByUsername(String username) {
+        Optional<User> user = Optional.of(userRepository.findByUsername(username)
+                .orElseThrow(() -> new DataNotFoundException("User not found")));
+        return modelMapper.map(user, UserNoPasswordDTO.class);
     }
+    
+    UserNoPasswordDTO createUser(UserRegisterDTO user) {
+        if (user.getPassword()==user.getConfirm_password()) {
+            userRepository.save(modelMapper.map(user, User.class));
+            return modelMapper.map(user, UserNoPasswordDTO.class);
+        }
+        else {
+            throw new UserNotCreatedException("Passwords do not match");
+        }
+    }
+    
+}

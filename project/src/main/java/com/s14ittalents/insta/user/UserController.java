@@ -1,30 +1,28 @@
 package com.s14ittalents.insta.user;
 
 import com.s14ittalents.insta.exception.DataNotFoundException;
-import com.s14ittalents.insta.exception.ExceptionController;
-import org.modelmapper.ModelMapper;
+import com.s14ittalents.insta.exception.UserNotCreatedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/{username}")
-public class UserController extends ExceptionController {
-    
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    private ModelMapper modelMapper;
+import java.util.Optional;
 
-    @GetMapping
+@RestController
+public class UserController{
+    @Autowired
+    private UserService userService;
+    
+    
+    @GetMapping("/{username}")
     UserNoPasswordDTO getUser(@PathVariable String username) {
-        
-        UserNoPasswordDTO dto = modelMapper.map(userRepository.findByUsername(username), UserNoPasswordDTO.class);
-        return dto;
+        return userService.getUserByUsername(username);
     }
     
-    @PostMapping
-    User createUser(@RequestBody User user) {
-        System.out.println(user.getUsername());
-        return userRepository.save(user);
+    @PostMapping("/registration")
+    UserNoPasswordDTO createUser(@RequestBody UserRegisterDTO user) {
+        return userService.createUser(user);
     }
+    
+    
 }
+

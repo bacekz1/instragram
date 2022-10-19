@@ -28,4 +28,7 @@ public class Post {
     @JoinColumn(name = "user_id")
     @Positive(message = "user_id should be positive num")
     private User owner;
+    
+    @ManyToMany(mappedBy = "likedPosts")
+    private List<User> likes;
 }

@@ -49,5 +49,18 @@ public class UserController{
         String ip = req.getRemoteAddr();
         };
      */
+    
+    /*PostMapping("/{username}/profile_picture"){
+    --url params - form data -come as key value - req get param
+    @RequestParam("profile_picture") MultipartFile file
+    multipart resolver
+    
+    //upload to files (make unique name) user id + timestamp
+    //get the file name
+    //upload filename to user.profile_picture
+    
+    }
+    
+     */
 }
 

@@ -7,12 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
 
 @Service
 public class UserService{
     
+
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -34,11 +39,23 @@ public class UserService{
         }
     }
     
-    UserOnlyMailAndUsernameDTO loginUser(UserLoginDTO user) {
+    UserOnlyMailAndUsernameDTO loginUser(UserLoginDTO user, HttpSession session, HttpServletRequest request) {
         Optional<User> user1 = Optional.of(userRepository.findByEmailAndPasswordOrUsernameAndPassword
                 (user.getUsername(), user.getPassword(), user.getUsername(), user.getPassword())
                 .orElseThrow(() -> new DataNotFoundException("User not found")));
+        session.setAttribute("logged", true);
+        session.setAttribute("id", user1.get().getId());
+        System.out.println(session.getAttribute("id"));
+        session.setAttribute(REMOTE_IP, request.getRemoteAddr());
+        request.getRemoteHost();
         return modelMapper.map(user1, UserOnlyMailAndUsernameDTO.class);
     }
+    //loginUser(n,int id) {
+
+        
+        // check also if ip matches
+        //servlet request get remote host req.getSession
+        
+    //};
     
 }

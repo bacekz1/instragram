@@ -6,6 +6,7 @@ import com.s14ittalents.insta.exception.UserNotCreatedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 @RestController
@@ -25,9 +26,28 @@ public class UserController{
     }
     
     @PostMapping("/login")
-    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user) {
+    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user, HttpSession session) {
+        session.setAttribute("logged", true);
         return userService.loginUser(user);
     }
     
+    @PostMapping("/logout")
+    void logoutUser(HttpSession session) {
+        session.invalidate();
+    }
+    /*
+    if get logged user id >  -> throw new BadRequestException("you are already logged in");
+    
+    
+    logUser(HttpSession session,int id) {
+        session.setAttribute("logged", true);
+        session.setAttribute("id", id);
+        sessiom.setAttribute("REMOTE_IP", request.getRemoteAddr());
+        
+        // check also if ip matches
+        -servlet request get remote host teq.getSession
+        String ip = req.getRemoteAddr();
+        };
+     */
 }
 

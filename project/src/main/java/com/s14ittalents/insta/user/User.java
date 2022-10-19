@@ -72,5 +72,23 @@ public class User {
     
     @OneToMany(mappedBy = "owner")
     List<Post> posts;
+    /*
+    From lecture:
     
+    Way 1 - Basic Many to many - only one column in joined table with foreign keys
+    user is responsible to connection many to many
+    @ManyToMany
+    @JoinTable(name = "like_post",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    List<PostWithoutOwnerDTO> likedPosts;
+    userRepository.save(user);
+    
+    user as owning has to do edit both tales
+    posts.save()- would not work if user is owning
+    
+    
+    @ManyToMany(mappedBy = "likedPosts")
+    depends which is the owning side
+     */
 }

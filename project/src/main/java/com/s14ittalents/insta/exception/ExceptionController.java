@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -21,7 +22,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @ControllerAdvice
-public abstract class ExceptionController extends ResponseEntityExceptionHandler {
+@RestController
+public class ExceptionController extends ResponseEntityExceptionHandler {
     @Autowired
     ExceptionDTO exceptionDTO;
 
@@ -43,9 +45,9 @@ public abstract class ExceptionController extends ResponseEntityExceptionHandler
     ResponseEntity<Object> handleNoAuthorisation(Exception ex, WebRequest request) {
         return buildErr(ex, HttpStatus.UNAUTHORIZED, request);
     }
-    
+
     @ExceptionHandler(value = {UserNotCreatedException.class})
-    ResponseEntity<Object> handleNoUserCreation(Exception ex, WebRequest request) {
+    ResponseEntity<Object> handleNoUserCreation(UserNotCreatedException ex, WebRequest request) {
         return buildErr(ex, HttpStatus.EXPECTATION_FAILED, request);
     }
 

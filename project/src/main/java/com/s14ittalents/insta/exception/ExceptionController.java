@@ -30,7 +30,10 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
     ResponseEntity<Object> handleDataNotFound(DataNotFoundException ex, WebRequest request) {
         return buildErr(ex, HttpStatus.NOT_FOUND, request);
     }
-
+    @ExceptionHandler(value = {BadRequestException.class})
+    ResponseEntity<Object> handelBadRequestException(BadRequestException ex, WebRequest request) {
+        return buildErr(ex, HttpStatus.NOT_FOUND, request);
+    }
     @ExceptionHandler(value = {Exception.class})
     ResponseEntity<Object> handleAnyException(Exception ex, WebRequest request) {
         return buildErr(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);

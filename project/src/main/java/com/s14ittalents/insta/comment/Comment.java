@@ -32,6 +32,6 @@ public class Comment {
     Comment replyId;
     @OneToMany(mappedBy = "replyId")
     List<Comment> replies;
-    @Column
-    private boolean isDeleted;
+    @Column(name = "is_deleted")
+    private boolean deleted;
 }

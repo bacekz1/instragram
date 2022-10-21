@@ -5,7 +5,9 @@ import com.s14ittalents.insta.user.User;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -20,8 +22,8 @@ public class Post {
     @Column
     @Positive(message = "location_id should be positive num")
     private Long locationId;
-    @Column
-    private boolean isDeleted;
+    @Column(name = "is_deleted")
+    private boolean deleted;
     @OneToMany(mappedBy = "comment")
     List<Comment> comments;
     @ManyToOne
@@ -30,4 +32,9 @@ public class Post {
 
     @ManyToMany(mappedBy = "likedPosts")
     private List<User> likes;
+    @Column
+    private LocalDateTime expirationTime;
+    @Column
+    @NotNull
+    private LocalDateTime createdTime;
 }

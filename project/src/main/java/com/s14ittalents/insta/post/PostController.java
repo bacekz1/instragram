@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/post")
@@ -19,6 +20,8 @@ public class PostController {
     @PostMapping
     Post createPost(@RequestBody Post post, HttpSession httpSession) {
         long userId = (long) httpSession.getAttribute("id");
+        post.setCreatedTime(LocalDateTime.now());
+        post.setExpirationTime(LocalDateTime.now().plusDays(1));
         postService.createPost(post, userId);
         return post;
     }
@@ -26,10 +29,11 @@ public class PostController {
     @GetMapping("/{id:[0-9]+}")
     @ResponseBody
     PostWithoutOwnerDTO getPost(@PathVariable long id) {
+
         return postService.getPost(id);
     }
 
-    @PostMapping("post/{id:[0-9]+}/like")
+    @PostMapping("{id:[0-9]+}/like")
     PostWithoutOwnerDTO likePost(@PathVariable long id, HttpSession session) {
         return modelMapper.map(postService.likePost(id, session), PostWithoutOwnerDTO.class);
     }

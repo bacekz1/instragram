@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,63 +17,67 @@ import java.util.List;
 @Data
 @Table(name = "users")
 public class User {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    
+
     @Column
-    private boolean activity_status;
-    
+    private boolean activityStatus;
+
     @Column
     @NonNull
     private String email;
-    
+
     @Column
     @NonNull
     @Size(min = 3, max = 20)
     private String username;
-    
+
     @Column
     @Size(min = 3, max = 20)
     private String password;
-    
+
     @Column
-    private String first_name;
-    
+    private String firstName;
+
     @Column
-    private String last_name;
-    
+    private String lastName;
+
     @Column
     @Max(value = 200)
     private String bio;
-    
+
     @Column
-    private LocalDateTime date_of_birth;
-    
+    private LocalDateTime dateOfBirth;
+
     @Column
-    private String phone_num;
-    
+    private String phoneNum;
+
     @Column
     private String gender;
-    
+
     @Column
-    private String profile_picture;
-    
-    
+    private String profilePicture;
+
+    @Column(name = "is_verified")
+    private boolean verified;
+
+    @Column(name = "is_private")
+    private boolean privateAccount;
+    @Column(name = "is_banned")
+    private boolean banned;
+
+    @Column(name = "is_deleted")
+    private boolean deleted;
+
     @Column
-    private boolean isVerified;
-    //further extension - is_private
-    
-    @Column
-    private boolean isBanned;
-    
-    @Column
-    private boolean isDeleted;
-    
+    @NotNull
+    LocalDateTime createdAt;
+
     @OneToMany(mappedBy = "owner")
     List<Post> posts;
-    
+
     @ManyToMany
     @JoinTable(name = "like_post",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -8,10 +8,10 @@ public class UserNoPasswordDTO {
     private boolean activity_status;
     private String username;
     private String email;
-    private String first_name;
-    private String last_name;
-    private String profile_picture;
+    private String firstName;
+    private String lastName;
+    private String profilePicture;
     private String bio;
     private String gender;
-    private String phone_num;
+    private String phoneNum;
 }

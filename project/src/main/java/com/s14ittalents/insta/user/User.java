@@ -61,14 +61,14 @@ public class User {
     
     
     @Column
-    private boolean is_verified;
+    private boolean isVerified;
     //further extension - is_private
     
     @Column
-    private boolean is_banned;
+    private boolean isBanned;
     
     @Column
-    private boolean is_deleted;
+    private boolean isDeleted;
     
     @OneToMany(mappedBy = "owner")
     List<Post> posts;

@@ -19,16 +19,15 @@ public class Post {
     private String caption;
     @Column
     @Positive(message = "location_id should be positive num")
-    private Long location_id;
+    private Long locationId;
     @Column
-    private boolean is_deleted;
+    private boolean isDeleted;
     @OneToMany(mappedBy = "comment")
     List<Comment> comments;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @Positive(message = "user_id should be positive num")
     private User owner;
-    
+
     @ManyToMany(mappedBy = "likedPosts")
     private List<User> likes;
 }

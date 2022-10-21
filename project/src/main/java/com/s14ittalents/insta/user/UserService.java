@@ -30,7 +30,7 @@ public class UserService{
     }
     
     UserNoPasswordDTO createUser(UserRegisterDTO user) {
-        if (Objects.equals(user.getPassword(), user.getConfirm_password())) {
+        if (Objects.equals(user.getPassword(), user.getConfirmPassword())) {
             userRepository.save(modelMapper.map(user, User.class));
             return modelMapper.map(user, UserNoPasswordDTO.class);
         }

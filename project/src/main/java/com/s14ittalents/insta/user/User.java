@@ -83,6 +83,10 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
     List<Post> likedPosts;
+
+
+    @ManyToMany(mappedBy = "personTags")
+    private List<Post> postList;
     /*
     From lecture:
     

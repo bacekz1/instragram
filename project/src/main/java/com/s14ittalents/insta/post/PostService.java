@@ -1,36 +1,32 @@
 package com.s14ittalents.insta.post;
 
-import com.s14ittalents.insta.exception.BadRequestException;
-import com.s14ittalents.insta.exception.Constant;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.NoAuthException;
+import com.s14ittalents.insta.hashtag.Hashtag;
 import com.s14ittalents.insta.user.User;
-import com.s14ittalents.insta.user.UserRepository;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.s14ittalents.insta.util.AbstractService;
+import com.s14ittalents.insta.util.Helper;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Optional;
 
 import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
-public class PostService {
-
-
-    @Autowired
-    PostRepository postRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    ModelMapper modelMapper;
+public class PostService extends AbstractService {
 
     public Post createPost(Post post, long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        user.orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND));
-        post.setOwner(user.get());
+        post.setOwner(getUserById(userId));
+        List<Hashtag> hashtags = Helper.findHashTags(post.getCaption()).stream().map(h -> new Hashtag(h)).toList();
+        List<User> users = Helper.findPersonTags(post.getCaption()).stream()
+                .map(tag -> userRepository.findByUsername(tag.replaceAll("@","")))
+                .filter(Optional::isPresent).map(Optional::get).toList();
+        System.out.println(users.size());
+        post.getHashtags().addAll(hashtags);
+        post.getPersonTags().addAll(users);
         return postRepository.save(post);
     }
 

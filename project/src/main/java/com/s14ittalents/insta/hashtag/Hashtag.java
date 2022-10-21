@@ -1,18 +1,31 @@
 package com.s14ittalents.insta.hashtag;
 
-import lombok.Data;
+import com.s14ittalents.insta.post.Post;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
-@Entity
-@Data
-@Table(name = "hashtags")
+@Entity(name = "hashtags")
+@NoArgsConstructor
+@Setter
+@Getter
 public class Hashtag {
+
+    public Hashtag(String tagName) {
+        this.tagName = tagName;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column
-    @NotEmpty
     private String tagName;
+
+    @ManyToMany(mappedBy = "hashtags")
+    private List<Post> postList;
+
 }
+

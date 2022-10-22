@@ -1,5 +1,6 @@
 package com.s14ittalents.insta.user;
 
+import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.NoAuthException;
 import com.s14ittalents.insta.exception.UserNotCreatedException;
@@ -8,8 +9,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -84,6 +88,32 @@ public class UserService extends AbstractService {
 
     public boolean checkPasswordMatch(User user, String password) {
         return bCryptPasswordEncoder.matches(password, user.getPassword());
+    }
+    
+    public String updateProfilePicture(String uname, MultipartFile file) {
+        try {
+            User user = userRepository.findByUsername(uname).orElseThrow(() -> new DataNotFoundException("User not found"));
+            String ext = Objects.requireNonNull(file.getOriginalFilename()).
+                    substring(file.getOriginalFilename().lastIndexOf("."));
+            String name = "uploads" + File.separator + "pfp" + File.separator + user.getUsername()
+                    + File.separator + System.nanoTime() + "." + ext;
+            File f = new File(name);
+            if(!f.exists()) {
+                Files.copy(file.getInputStream(), f.toPath());
+            }
+            else{
+                throw new BadRequestException("The file already exists");
+            }
+            if(user.getProfilePicture() != null){
+                File old = new File(user.getProfilePicture());
+                old.delete();
+            }
+            user.setProfilePicture(name);
+            userRepository.save(user);
+            return name;
+        } catch (IOException e) {
+            throw new BadRequestException("Something went wrong");
+        }
     }
     //loginUser(n,int id) {
 

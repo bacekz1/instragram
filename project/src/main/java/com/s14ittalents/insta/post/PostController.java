@@ -30,13 +30,20 @@ public class PostController {
     @GetMapping("/{id:[0-9]+}")
     @ResponseBody
     PostWithoutOwnerDTO getPost(@PathVariable long id) {
-
         return postService.getPost(id);
+    }
+
+    @PutMapping("/{id:[0-9]+}")
+    @ResponseBody
+    PostWithoutOwnerDTO updatePost(@PathVariable long id, @RequestBody PostUpdateDTO postUpdate) {
+//        int userId = httpSession.getAttribute()
+        //TODO
+        return postService.updatePost(id, postUpdate);
     }
 
     @PostMapping("{id:[0-9]+}/like")
     PostWithoutOwnerDTO likePost(@PathVariable long id, HttpSession session, HttpServletRequest request) {
-        return modelMapper.map(postService.likePost(id, session,request), PostWithoutOwnerDTO.class);
+        return modelMapper.map(postService.likePost(id, session, request), PostWithoutOwnerDTO.class);
     }
     /*
             if new session is set - its from another client/ file with requests/ can make APIHttp  or Postman

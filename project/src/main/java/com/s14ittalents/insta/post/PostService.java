@@ -91,7 +91,7 @@ public class PostService extends AbstractService {
             User user = userRepository.findById(uid).orElseThrow(() -> new DataNotFoundException("User not found"));
             String ext = Objects.requireNonNull(file.getOriginalFilename()).
                     substring(file.getOriginalFilename().lastIndexOf("."));
-            if(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg") || ext.equals(".mp4")) {
+            if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg") || ext.equals(".mp4"))) {
                 throw new BadRequestException("Invalid file type");
             }
             String name = "uploads" + File.separator + "post_contents"

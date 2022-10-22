@@ -95,6 +95,9 @@ public class UserService extends AbstractService {
             User user = userRepository.findByUsername(uname).orElseThrow(() -> new DataNotFoundException("User not found"));
             String ext = Objects.requireNonNull(file.getOriginalFilename()).
                     substring(file.getOriginalFilename().lastIndexOf("."));
+            if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg"))) {
+                throw new BadRequestException("Invalid file type");
+            }
             String name = "uploads" + File.separator + "pfp" + File.separator + user.getUsername()
                     + File.separator + System.nanoTime() + "." + ext;
             File f = new File(name);

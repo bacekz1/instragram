@@ -159,17 +159,5 @@ public final class Helper {
         return personTagList;
     }
     
-    public static int getLoggedUserId(HttpSession session, HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        if (session.isNew()) {
-            throw new NoAuthException("You have to login");
-            //in login set logged true and write the id of user
-        }
-        if ((!session.getAttribute("logged").equals(true)) || session.getAttribute("logged") == null
-                || session.getAttribute(REMOTE_IP).equals(ip)) {
-            throw new NoAuthException("You have to login");
-        }
-        return (int) session.getAttribute("id");
-    }
 
 }

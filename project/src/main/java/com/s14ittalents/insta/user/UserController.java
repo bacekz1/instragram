@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/users")
 public class UserController{
     @Autowired
     private UserService userService;
@@ -21,9 +22,14 @@ public class UserController{
         return userService.getUserByUsername(username);
     }
 
-    @PostMapping("/registration")
+    @PostMapping()
     UserNoPasswordDTO createUser(@RequestBody UserRegisterDTO user) {
         return userService.createUser(user);
+    }
+    @PutMapping()
+    UserNoPasswordDTO updateUser(@RequestBody UserUpdateDTO user, HttpSession session, HttpServletRequest req) {
+        int userId = (int) session.getAttribute("userId");
+        return userService.updateUser(user, userId, session,req);
     }
     
     @PostMapping("/login")

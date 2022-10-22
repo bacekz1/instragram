@@ -2,6 +2,7 @@ package com.s14ittalents.insta.user;
 
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.UserNotCreatedException;
+import com.s14ittalents.insta.util.AbstractService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,14 @@ import java.util.Optional;
 import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
 
 @Service
-public class UserService{
+public class UserService extends AbstractService {
     
 
     @Autowired
     UserRepository userRepository;
     @Autowired
     private ModelMapper modelMapper;
+    
     
     UserNoPasswordDTO getUserByUsername(String username) {
         Optional<User> user = Optional.of(userRepository.findByUsername(username)
@@ -49,6 +51,22 @@ public class UserService{
         session.setAttribute(REMOTE_IP, request.getRemoteAddr());
         request.getRemoteHost();
         return modelMapper.map(user1, UserOnlyMailAndUsernameDTO.class);
+    }
+    
+    public UserNoPasswordDTO updateUser(UserUpdateDTO user, long userId,HttpSession session, HttpServletRequest req) {
+        User user1 = getUserById(userId);
+        if (getLoggedUserId(session,req) == userId) {
+            user1.setFirstName(user.getFirstName());
+            user1.setLastName(user.getLastName());
+            user1.setEmail(user.getEmail());
+            user1.setUsername(user.getUsername());
+            user1.setPassword(user.getPassword());
+            userRepository.save(user1);
+            return modelMapper.map(user1, UserNoPasswordDTO.class);
+        }
+        else {
+            throw new DataNotFoundException("User not found");
+        }
     }
     //loginUser(n,int id) {
 

@@ -8,6 +8,7 @@ import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -60,6 +61,18 @@ public class UserController extends AbstractController {
     @PostMapping("/logout")
     void logoutUser(HttpSession session) {
         session.invalidate();
+    }
+    
+    
+    @PostMapping("/{username}/pfp")
+    public String uploadProfilePicture(@PathVariable String username
+            , @RequestParam(value = "file") MultipartFile file
+            , HttpSession session) {
+        if(getLoggedUserId()>0){
+            return userService.updateProfilePicture(username, file);
+        }else {
+            throw new BadRequestException("Something went wrong");
+        }
     }
     /*
     if get logged user id >  -> throw new BadRequestException("you are already logged in");

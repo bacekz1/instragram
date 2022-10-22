@@ -7,10 +7,13 @@ import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.s14ittalents.insta.exception.Constant.*;
@@ -81,5 +84,23 @@ public class PostService extends AbstractService {
         post.get().getLikes().forEach(a ->
                 System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
         return post.get().getLikes().size();
+    }
+    
+    public String uploadPostContent(long uid, MultipartFile file) {
+        //todo connect multiple upload post content to post
+        try {
+            User user = userRepository.findById(uid).orElseThrow(() -> new DataNotFoundException("User not found"));
+            String ext = Objects.requireNonNull(file.getOriginalFilename()).
+                    substring(file.getOriginalFilename().lastIndexOf("."));
+            if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg") || ext.equals(".mp4"))) {
+                throw new BadRequestException("Invalid file type");
+            }
+            String name = "uploads" + File.separator + "post_contents"
+                    + File.separator + user.getUsername() + File.separator + System.nanoTime() + "." + ext;
+            File f = new File(name);
+            return name;
+        } catch (Exception e) {
+            throw new BadRequestException("Something went wrong");
+        }
     }
 }

@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 
@@ -34,8 +35,8 @@ public class PostController {
     }
 
     @PostMapping("{id:[0-9]+}/like")
-    PostWithoutOwnerDTO likePost(@PathVariable long id, HttpSession session) {
-        return modelMapper.map(postService.likePost(id, session), PostWithoutOwnerDTO.class);
+    PostWithoutOwnerDTO likePost(@PathVariable long id, HttpSession session, HttpServletRequest request) {
+        return modelMapper.map(postService.likePost(id, session,request), PostWithoutOwnerDTO.class);
     }
     /*
             if new session is set - its from another client/ file with requests/ can make APIHttp  or Postman

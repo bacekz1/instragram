@@ -20,7 +20,11 @@ public class CommentController {
     List<CommentWithRepliesDTO> getCommentWithReplies(@RequestBody @PathVariable long id) {
         return commentService.getCommentWithReplies(id);
     }
-
+    
+    @PostMapping("comment/{id:[0-9]+}/")
+    Comment likeComment(@RequestBody @PathVariable long id, HttpSession session) {
+        return commentService.likeComment(id, session);
+    }
     @PostMapping("/post/{id}")
     CreateCommentDTO createComment(@PathVariable long id, @RequestBody CreateCommentDTO dto, HttpSession session) {
         int userId = 2;
@@ -28,5 +32,6 @@ public class CommentController {
         dto.setPostId(id);
         return commentService.createComment(dto);
     }
-
+    
+    
 }

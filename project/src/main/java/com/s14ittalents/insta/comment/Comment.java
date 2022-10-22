@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.s14ittalents.insta.post.Post;
+import com.s14ittalents.insta.user.User;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -34,4 +35,10 @@ public class Comment {
     List<Comment> replies;
     @Column(name = "is_deleted")
     private boolean deleted;
+    @ManyToMany(mappedBy = "likedComments")
+    private List<User> likes;
+    
+    public Comment get() {
+        return this;
+    }
 }

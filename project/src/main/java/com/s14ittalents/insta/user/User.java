@@ -1,5 +1,6 @@
 package com.s14ittalents.insta.user;
 
+import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.post.Post;
 import lombok.*;
 
@@ -83,6 +84,12 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
     List<Post> likedPosts;
+    
+    @ManyToMany
+    @JoinTable(name = "like_comments",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    List<Comment> likedComments;
 
 
     @ManyToMany(mappedBy = "personTags")

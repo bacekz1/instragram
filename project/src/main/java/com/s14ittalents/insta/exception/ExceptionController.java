@@ -46,7 +46,7 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {UserNotCreatedException.class})
     ResponseEntity<Object> handleNoUserCreation(UserNotCreatedException ex, WebRequest request) {
-        return buildErr(ex, HttpStatus.EXPECTATION_FAILED, request);
+        return buildErr(ex, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})
@@ -57,10 +57,10 @@ public class ExceptionController extends ResponseEntityExceptionHandler {
 
         String errorMessage = new ArrayList<>(ex.getConstraintViolations()).get(0).getMessage();
         exceptionDTO.setTime(LocalDateTime.now());
-        exceptionDTO.setStatus(HttpStatus.EXPECTATION_FAILED.value());
+        exceptionDTO.setStatus(HttpStatus.BAD_REQUEST.value());
         exceptionDTO.setMessage(errorMessage);
         return handleExceptionInternal(ex, exceptionDTO,
-                new HttpHeaders(), HttpStatus.EXPECTATION_FAILED, request);
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     private ResponseEntity<Object> buildErr(Exception ex, HttpStatus status, WebRequest request) {

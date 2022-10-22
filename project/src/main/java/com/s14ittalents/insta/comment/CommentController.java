@@ -1,10 +1,14 @@
 package com.s14ittalents.insta.comment;
 
+import com.s14ittalents.insta.exception.NoAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+
+import static com.s14ittalents.insta.util.AbstractService.getLoggedUserId;
 
 @RestController
 public class CommentController {
@@ -21,9 +25,14 @@ public class CommentController {
         return commentService.getCommentWithReplies(id);
     }
     
-    @PostMapping("comment/{id:[0-9]+}/")
-    Comment likeComment(@RequestBody @PathVariable long id, HttpSession session) {
-        return commentService.likeComment(id, session);
+    @PostMapping("/comment/{id:[0-9]+}")
+    int likePost(@PathVariable long id, HttpSession session, HttpServletRequest request) {
+        long userId = getLoggedUserId(session,request);
+        if(userId<=0){
+            throw new NoAuthException("You are not logged in");
+        }else {
+            return commentService.likeComment(id, userId);
+        }
     }
     @PostMapping("/post/{id}")
     CreateCommentDTO createComment(@PathVariable long id, @RequestBody CreateCommentDTO dto, HttpSession session) {

@@ -7,10 +7,9 @@ import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import com.s14ittalents.insta.util.Helper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +17,8 @@ import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public class PostService extends AbstractService {
+    @Autowired
+    PostRepository postRepository;
 
     public Post createPost(Post post, long userId) {
         post.setOwner(getUserById(userId));
@@ -25,7 +26,6 @@ public class PostService extends AbstractService {
         List<User> users = Helper.findPersonTags(post.getCaption()).stream()
                 .map(tag -> userRepository.findByUsername(tag.replaceAll("@","")))
                 .filter(Optional::isPresent).map(Optional::get).toList();
-        System.out.println(users.size());
         post.getHashtags().addAll(hashtags);
         post.getPersonTags().addAll(users);
         return postRepository.save(post);
@@ -37,22 +37,26 @@ public class PostService extends AbstractService {
         return modelMapper.map(post, PostWithoutOwnerDTO.class);
     }
 
-    public Post likePost(long id, HttpSession session, HttpServletRequest req) {
-        if (getLoggedUserId(session, req) == -1) {
+    public int likePost(long id, long userId) {
             Optional<Post> post = postRepository.findByIdAndDeletedIsFalse(id);
-            post.orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND));
+            if (post.isEmpty()){
+                throw new DataNotFoundException(POST_NOT_FOUND);
+            }
+            Optional<User> user = userRepository.findById(userId);
+            if (user.isEmpty()){
+                throw new DataNotFoundException(USER_NOT_FOUND);
+            }
 
-            post.get().getLikes().add(userRepository.findById((long) session.getAttribute("id"))
-                    .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND)));
-            getUserById((long) session.getAttribute("id")).getLikedPosts().add(post.get());
-            post.get().getLikes().forEach(a -> System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
-            postRepository.save(post.get());
-            userRepository.save(getUserById((long) session.getAttribute("id")));
-            post.get().getLikes().forEach(a -> System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
-            return post.get();
-
-        } else {
-            throw new NoAuthException("You have to login to like a post");
+            if(post.get().getLikes().contains(user.get())) {
+                post.get().getLikes().remove(getUserById(userId));
+            } else {
+                post.get().getLikes().add(getUserById(userId));
+            }
+            post.get().getLikes().forEach(a ->
+                    System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
+            userRepository.save(getUserById(userId));
+            post.get().getLikes().forEach(a ->
+                    System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
+            return post.get().getLikes().size();
         }
     }
-}

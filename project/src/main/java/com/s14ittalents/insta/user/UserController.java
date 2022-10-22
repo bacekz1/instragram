@@ -1,20 +1,26 @@
 package com.s14ittalents.insta.user;
 
+import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.ExceptionController;
 import com.s14ittalents.insta.exception.UserNotCreatedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
+import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
+
 @RestController
 @RequestMapping("/users")
 public class UserController{
     @Autowired
     private UserService userService;
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     @GetMapping("/{username}")
@@ -33,9 +39,21 @@ public class UserController{
     }
     
     @PostMapping("/login")
-    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user, HttpSession session, HttpServletRequest request) {
-        //UserOnlyMailAndUsernameDTO userDTO = userService.loginUser(user);
-        return userService.loginUser(user,session,request);
+    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user
+            , HttpSession session, HttpServletRequest request) {
+        Optional<User> user1 = Optional.of(userService.userRepository.findByUsername(user.getUsername())
+                .orElseGet(() -> userService.userRepository.findByEmail(user.getUsername())
+                        .orElseThrow(() -> new DataNotFoundException("User not found"))));
+        if(session.getAttribute("logged") != null) {
+            throw new UserNotCreatedException("You are already logged in");
+        }
+        UserOnlyMailAndUsernameDTO user2 = userService.loginUser(user1
+                .orElseThrow(() -> new BadRequestException("Try again")), user.getPassword());
+        session.setAttribute("logged", true);
+        session.setAttribute("id", user1.get().getId());
+        System.out.println(session.getAttribute("id"));
+        session.setAttribute(REMOTE_IP, request.getRemoteAddr());
+        return user2;
     }
     
     @PostMapping("/logout")

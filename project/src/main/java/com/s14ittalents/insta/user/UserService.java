@@ -1,19 +1,20 @@
 package com.s14ittalents.insta.user;
 
 import com.s14ittalents.insta.exception.DataNotFoundException;
+import com.s14ittalents.insta.exception.NoAuthException;
 import com.s14ittalents.insta.exception.UserNotCreatedException;
 import com.s14ittalents.insta.util.AbstractService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
-
-import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
 
 @Service
 public class UserService extends AbstractService {
@@ -22,7 +23,9 @@ public class UserService extends AbstractService {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     
     
     UserNoPasswordDTO getUserByUsername(String username) {
@@ -32,8 +35,23 @@ public class UserService extends AbstractService {
     }
     
     UserNoPasswordDTO createUser(UserRegisterDTO user) {
+        userRepository.findByUsername(user.getUsername())
+                .ifPresent(u -> {
+                    throw new UserNotCreatedException("Username already exists");
+                });
+        userRepository.findByEmail(user.getEmail())
+                .ifPresent(u -> {
+                    throw new UserNotCreatedException("Email already exists");
+                });
         if (Objects.equals(user.getPassword(), user.getConfirmPassword())) {
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            if(user.getProfilePicture() == null) {
+                user.setProfilePicture("default_profile_picture" + File.separator
+                        + "default_profile_picture.jpg");
+            }
+            user.setCreatedAt(LocalDateTime.now());
             userRepository.save(modelMapper.map(user, User.class));
+            user.setId(userRepository.findByUsername(user.getUsername()).get().getId());
             return modelMapper.map(user, UserNoPasswordDTO.class);
         }
         else {
@@ -41,16 +59,11 @@ public class UserService extends AbstractService {
         }
     }
     
-    UserOnlyMailAndUsernameDTO loginUser(UserLoginDTO user, HttpSession session, HttpServletRequest request) {
-        Optional<User> user1 = Optional.of(userRepository.findByEmailAndPasswordOrUsernameAndPassword
-                (user.getUsername(), user.getPassword(), user.getUsername(), user.getPassword())
-                .orElseThrow(() -> new DataNotFoundException("User not found")));
-        session.setAttribute("logged", true);
-        session.setAttribute("id", user1.get().getId());
-        System.out.println(session.getAttribute("id"));
-        session.setAttribute(REMOTE_IP, request.getRemoteAddr());
-        request.getRemoteHost();
-        return modelMapper.map(user1, UserOnlyMailAndUsernameDTO.class);
+    UserOnlyMailAndUsernameDTO loginUser(User user, String password) {
+            if(bCryptPasswordEncoder.matches(password, user.getPassword())){
+                return modelMapper.map(user, UserOnlyMailAndUsernameDTO.class);
+            }
+            throw new NoAuthException("Wrong credentials!");
     }
     
     public UserNoPasswordDTO updateUser(UserUpdateDTO user, long userId,HttpSession session, HttpServletRequest req) {
@@ -67,6 +80,16 @@ public class UserService extends AbstractService {
         else {
             throw new DataNotFoundException("User not found");
         }
+    }
+    
+    public User encodePassword(User user, String password) {
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+        userRepository.save(user);
+        return user;
+    }
+    
+    public boolean checkPasswordMatch(User user, String password) {
+        return bCryptPasswordEncoder.matches(password, user.getPassword());
     }
     //loginUser(n,int id) {
 

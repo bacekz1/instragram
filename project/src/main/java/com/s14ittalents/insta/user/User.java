@@ -36,7 +36,7 @@ public class User {
     private String username;
 
     @Column
-    @Size(min = 3, max = 20)
+    @Size(min = 3, max = 80)
     private String password;
 
     @Column
@@ -46,7 +46,7 @@ public class User {
     private String lastName;
 
     @Column
-    @Max(value = 200)
+    @Size(max = 200)
     private String bio;
 
     @Column

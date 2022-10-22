@@ -35,10 +35,10 @@ public class UserController extends AbstractController {
     }
     @PutMapping()
     UserNoPasswordDTO updateUser(@RequestBody UserUpdateDTO user) {
-        int userId = getLoggedUserId();
+        long userId = getLoggedUserId();
         return userService.updateUser(user, userId);
     }
-    
+
     @PostMapping("/login")
     UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user
             , HttpSession session, HttpServletRequest request) {

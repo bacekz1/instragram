@@ -63,7 +63,7 @@ public class UserService extends AbstractService {
         throw new NoAuthException("Wrong credentials!");
     }
 
-    public UserNoPasswordDTO updateUser(UserUpdateDTO user, int userId) {
+    public UserNoPasswordDTO updateUser(UserUpdateDTO user, long userId) {
         User user1 = getUserById(userId);
         checkPermission(userId, user1);
         user1.setFirstName(user.getFirstName());

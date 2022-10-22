@@ -41,7 +41,12 @@ public abstract class AbstractService {
     }
 
     protected Post findPost(long id) {
-        return postRepository.findByIdAndDeletedIsFalse(id)
+        return postRepository.findByIdAndDeletedIsFalseAndExpirationTimeIsNull(id)
+                .orElseThrow(() -> new DataNotFoundException(Constant.POST_NOT_FOUND));
+    }
+
+    protected Post findStory(long id) {
+        return postRepository.findByIdAndDeletedIsFalseAndExpirationTimeNotNullAndCreatedTimeIsNotNull(id)
                 .orElseThrow(() -> new DataNotFoundException(Constant.POST_NOT_FOUND));
     }
 
@@ -80,7 +85,7 @@ public abstract class AbstractService {
     If a person is logged in this should return a positive non-null id value which can be used to both get
     the user and to check if the user is logged in
      */
-    protected static void checkPermission(int userId, Ownerable owner) {
+    protected static void checkPermission(long userId, Ownerable owner) {
         if (owner.ownerId() != userId){
             throw new NoAuthException(PERMISSION_DENIED);
         }

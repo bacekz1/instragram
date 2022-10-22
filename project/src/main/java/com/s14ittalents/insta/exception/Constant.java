@@ -7,5 +7,6 @@ public class Constant {
     public static final String POST_NOT_FOUND = "Post not found";
 
     public static final String ACCESS_INVALID_POST = "Access invalid post";
-    public static final String PERMISSION_DENIED = "permission denied";
+    public static final String PERMISSION_DENIED = "Permission denied";
+    public static final String INVALID_DATA = "Invalid data";
 }

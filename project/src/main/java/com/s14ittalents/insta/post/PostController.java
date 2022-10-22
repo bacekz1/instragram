@@ -5,6 +5,9 @@ import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 
 @RestController
 @RequestMapping("/post")
@@ -13,7 +16,7 @@ public class PostController extends AbstractController {
     PostService postService;
 
     @PostMapping
-    Post createPost(@RequestBody Post post) {
+    PostWithoutOwnerDTO createPost(@RequestBody Post post) {
         long userId = getLoggedUserId();
         return postService.createPost(post, userId);
     }
@@ -28,13 +31,13 @@ public class PostController extends AbstractController {
     @PutMapping("/{postId:[0-9]+}")
     @ResponseBody
     PostWithoutOwnerDTO updatePost(@PathVariable long postId, @RequestBody PostUpdateDTO postUpdate) {
-        int userId = getLoggedUserId();
+        long userId = getLoggedUserId();
         return postService.updatePost(postId, postUpdate, userId);
     }
 
     @DeleteMapping("/{postId:[0-9]+}")
     boolean deletePost(@PathVariable long postId) {
-        int userId = getLoggedUserId();
+        long userId = getLoggedUserId();
         if (userId <= 0) {
             throw new NoAuthException("You are not logged in");
         }

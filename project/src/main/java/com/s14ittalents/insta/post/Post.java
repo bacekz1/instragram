@@ -4,7 +4,6 @@ import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.hashtag.Hashtag;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.Ownerable;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.30, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.31, for Linux (x86_64)
 --
 -- Host: localhost    Database: instagram
 -- ------------------------------------------------------
--- Server version	8.0.30
+-- Server version	8.0.31
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -118,7 +118,7 @@ CREATE TABLE `hashtags` (
   `tag_name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `tag_name_UNIQUE` (`tag_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,7 +127,7 @@ CREATE TABLE `hashtags` (
 
 LOCK TABLES `hashtags` WRITE;
 /*!40000 ALTER TABLE `hashtags` DISABLE KEYS */;
-INSERT INTO `hashtags` VALUES (1,'food');
+INSERT INTO `hashtags` VALUES (2,'#kur'),(1,'food');
 /*!40000 ALTER TABLE `hashtags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -155,7 +155,7 @@ CREATE TABLE `hashtags_posts` (
 
 LOCK TABLES `hashtags_posts` WRITE;
 /*!40000 ALTER TABLE `hashtags_posts` DISABLE KEYS */;
-INSERT INTO `hashtags_posts` VALUES (3,1);
+INSERT INTO `hashtags_posts` VALUES (3,1),(14,2),(15,2);
 /*!40000 ALTER TABLE `hashtags_posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -265,7 +265,7 @@ CREATE TABLE `person_tag` (
 
 LOCK TABLES `person_tag` WRITE;
 /*!40000 ALTER TABLE `person_tag` DISABLE KEYS */;
-INSERT INTO `person_tag` VALUES (1,3),(1,4);
+INSERT INTO `person_tag` VALUES (1,3),(1,4),(1,14),(1,15);
 /*!40000 ALTER TABLE `person_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -281,14 +281,14 @@ CREATE TABLE `post` (
   `user_id` int NOT NULL,
   `caption` varchar(2200) DEFAULT NULL,
   `location_id` int DEFAULT NULL,
-  `expiration_time` datetime NOT NULL,
+  `expiration_time` datetime DEFAULT NULL,
   `is_deleted` tinyint NOT NULL,
   `created_time` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `post_user_fk` (`user_id`),
   KEY `location_id_idx` (`location_id`),
   CONSTRAINT `post_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -297,7 +297,7 @@ CREATE TABLE `post` (
 
 LOCK TABLES `post` WRITE;
 /*!40000 ALTER TABLE `post` DISABLE KEYS */;
-INSERT INTO `post` VALUES (3,1,'hi',1,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(4,2,'hello',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(5,1,'wow',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(6,1,'woww',NULL,'2022-10-22 16:43:49',0,'2022-10-21 16:43:49'),(7,1,'woww',NULL,'2022-10-22 16:44:21',0,'2022-10-21 16:44:21'),(8,1,'woww',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21');
+INSERT INTO `post` VALUES (3,1,'hi',1,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(4,2,'hello',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(5,1,'wow',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(6,1,'woww',NULL,'2022-10-22 16:43:49',0,'2022-10-21 16:43:49'),(7,1,'woww',NULL,'2022-10-22 16:44:21',0,'2022-10-21 16:44:21'),(8,1,'woww',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(14,4,'#kur @khbkhbjkbh @pe6o ',NULL,'2022-10-23 22:04:36',0,'2022-10-22 22:04:36'),(15,4,'#kur @khbkhbjkbh @pe6o ',NULL,NULL,0,'2022-10-22 22:24:39');
 /*!40000 ALTER TABLE `post` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -389,7 +389,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`) /*!80000 INVISIBLE */
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -398,7 +398,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,0,'bksdv@ubef.com','pe6o',NULL,NULL,'adf','1999-01-01','07','m','',1,'123',0,0,'2022-10-21 23:33:24',0),(2,0,'busdfb@bsukdfb.com','go6o',NULL,NULL,NULL,'1998-02-02','02','m','',1,'test',0,0,'2022-10-21 23:33:26',0),(3,0,'wefw4r24r@efw4.com','hillow',NULL,NULL,'wew','2022-10-19','3855843','m',NULL,1,'123456',0,0,'2022-10-21 23:32:26',0);
+INSERT INTO `users` VALUES (1,0,'bksdv@ubef.com','pe6o',NULL,NULL,'adf','1999-01-01','07','m','',1,'123',0,0,'2022-10-21 23:33:24',0),(2,0,'busdfb@bsukdfb.com','go6o',NULL,NULL,NULL,'1998-02-02','02','m','',1,'test',0,0,'2022-10-21 23:33:26',0),(3,0,'wefw4r24r@efw4.com','hillow',NULL,NULL,'wew','2022-10-19','3855843','m',NULL,1,'123456',0,0,'2022-10-21 23:32:26',0),(4,0,'email@email.com','user1234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture/default_profile_picture.jpg',0,'$2a$10$DUWpSsq4lNDDIZPXa8x/..bc/QfegJs9H3Ff/hlPkDsq5hpfi6Xja',0,0,'2022-10-22 21:38:20',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -411,4 +411,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-22 15:11:44
+-- Dump completed on 2022-10-22 22:42:11

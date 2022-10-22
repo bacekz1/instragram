@@ -1,6 +1,7 @@
 package com.s14ittalents.insta.post;
 
 import com.s14ittalents.insta.comment.Comment;
+import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
@@ -17,14 +18,15 @@ import static com.s14ittalents.insta.exception.Constant.*;
 @Service
 public class PostService extends AbstractService {
 
-
-    public Post createPost(Post post, long userId) {
+    public PostWithoutOwnerDTO createPost(Post post, long userId) {
+        if (post.getExpirationTime() != null){
+            throw new BadRequestException(INVALID_DATA);
+        }
         post.setOwner(getUserById(userId));
         post.setCreatedTime(LocalDateTime.now());
-        post.setExpirationTime(LocalDateTime.now().plusDays(1));
         addHashtags(post);
         addPersonTags(post);
-        return postRepository.save(post);
+        return modelMapper.map(postRepository.save(post), PostWithoutOwnerDTO.class);
     }
 
     public PostWithoutOwnerDTO getPost(long id) {
@@ -32,7 +34,7 @@ public class PostService extends AbstractService {
         return modelMapper.map(post, PostWithoutOwnerDTO.class);
     }
 
-    public PostWithoutOwnerDTO updatePost(long posId, PostUpdateDTO postUpdate, int userId) {
+    public PostWithoutOwnerDTO updatePost(long posId, PostUpdateDTO postUpdate, long userId) {
         Post post = findPost(posId);
         checkPermission(userId, post);
         post.setCaption(postUpdate.getCaption());
@@ -46,7 +48,7 @@ public class PostService extends AbstractService {
 
 
     @Transactional
-    public boolean deletePost(long postId, int userId) {
+    public boolean deletePost(long postId, long userId) {
         Post post = findPost(postId);
         checkPermission(userId, post);
         List<Comment> comments = commentRepository.findByPostId(postId).stream().toList();
@@ -59,7 +61,7 @@ public class PostService extends AbstractService {
     }
 
     public int likePost(long id, long userId) {
-        Optional<Post> post = postRepository.findByIdAndDeletedIsFalse(id);
+        Optional<Post> post = postRepository.findByIdAndDeletedIsFalseAndExpirationTimeIsNull(id);
         if (post.isEmpty()) {
             throw new DataNotFoundException(POST_NOT_FOUND);
         }

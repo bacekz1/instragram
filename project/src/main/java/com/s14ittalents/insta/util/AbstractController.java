@@ -14,7 +14,7 @@ public abstract class AbstractController {
     @Autowired
     protected HttpServletRequest request;
 
-    protected int getLoggedUserId() {
+    protected long getLoggedUserId() {
         String ip = request.getRemoteAddr();
         if (session.isNew()) {
             throw new NoAuthException("You have to login");
@@ -28,6 +28,6 @@ public abstract class AbstractController {
                 || session.getAttribute("id").equals(0)) {
             throw new NoAuthException("You have to login");
         }
-        return (int) session.getAttribute("id");
+        return (long) session.getAttribute("id");
     }
 }

@@ -139,12 +139,12 @@ DROP TABLE IF EXISTS `hashtags_posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `hashtags_posts` (
-  `id` int NOT NULL,
+  `post_hashtag_id` int NOT NULL,
   `tag_id` int NOT NULL,
-  UNIQUE KEY `fk_hashtag_post_post_unique` (`id`,`tag_id`),
-  KEY `post_id_idx` (`id`),
+  UNIQUE KEY `fk_hashtag_post_post_unique` (`post_hashtag_id`,`tag_id`),
+  KEY `post_id_idx` (`post_hashtag_id`),
   KEY `tag_id_idx` (`tag_id`),
-  CONSTRAINT `fk_id_post` FOREIGN KEY (`id`) REFERENCES `post` (`id`),
+  CONSTRAINT `fk_id_post` FOREIGN KEY (`post_hashtag_id`) REFERENCES `post` (`id`),
   CONSTRAINT `fk_tag_id_post` FOREIGN KEY (`tag_id`) REFERENCES `hashtags` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -249,13 +249,13 @@ DROP TABLE IF EXISTS `person_tag`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `person_tag` (
-  `user_id` int NOT NULL,
-  `post_id` int NOT NULL,
-  UNIQUE KEY `post_id_unique` (`user_id`,`post_id`),
-  KEY `user_id_idx` (`user_id`),
-  KEY `post_id_idx` (`post_id`),
-  CONSTRAINT `post_id_fk` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`),
-  CONSTRAINT `user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  `user_tag_id` int NOT NULL,
+  `post_persontag_id` int NOT NULL,
+  UNIQUE KEY `post_id_unique` (`user_tag_id`,`post_persontag_id`),
+  KEY `user_id_idx` (`user_tag_id`),
+  KEY `post_id_idx` (`post_persontag_id`),
+  CONSTRAINT `post_id_fk` FOREIGN KEY (`post_persontag_id`) REFERENCES `post` (`id`),
+  CONSTRAINT `user_id_fk` FOREIGN KEY (`user_tag_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -389,7 +389,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`) /*!80000 INVISIBLE */
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -398,7 +398,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,0,'bksdv@ubef.com','pe6o',NULL,NULL,'adf','1999-01-01','07','m','',1,'123',0,0,'0000-00-00 00:00:00',0),(2,0,'busdfb@bsukdfb.com','go6o',NULL,NULL,NULL,'1998-02-02','02','m','',1,'test',0,0,'0000-00-00 00:00:00',0);
+INSERT INTO `users` VALUES (1,0,'bksdv@ubef.com','pe6o',NULL,NULL,'adf','1999-01-01','07','m','',1,'123',0,0,'2022-10-21 23:33:24',0),(2,0,'busdfb@bsukdfb.com','go6o',NULL,NULL,NULL,'1998-02-02','02','m','',1,'test',0,0,'2022-10-21 23:33:26',0),(3,0,'wefw4r24r@efw4.com','hillow',NULL,NULL,'wew','2022-10-19','3855843','m',NULL,1,'123456',0,0,'2022-10-21 23:32:26',0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -411,4 +411,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-21 17:24:11
+-- Dump completed on 2022-10-22 15:11:44

@@ -13,6 +13,7 @@ import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
 
 @Service
-public class AbstractService {
+public abstract class AbstractService {
     @Autowired
     protected UserRepository userRepository;
     @Autowired
@@ -36,7 +37,7 @@ public class AbstractService {
 
     @Autowired
     protected ModelMapper modelMapper;
-
+    
     protected User getUserById(long id) {
         return userRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
     }
@@ -91,7 +92,7 @@ public class AbstractService {
                 || session.getAttribute("logged") == null
                 || !(session.getAttribute(REMOTE_IP).equals(ip))
                 || session.getAttribute("id") == null
-                || session.getAttribute("id") == ""
+                || session.getAttribute("id").equals("")
                 || session.getAttribute("id").equals(0)) {
             throw new NoAuthException("You have to login");
         }

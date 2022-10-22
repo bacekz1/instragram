@@ -3,7 +3,11 @@ package com.s14ittalents.insta.post;
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.hashtag.Hashtag;
 import com.s14ittalents.insta.user.User;
+import com.s14ittalents.insta.util.Ownerable;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,9 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
 @Table(name = "post")
-public class Post {
+public class Post implements Ownerable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -52,4 +58,9 @@ public class Post {
             joinColumns = { @JoinColumn(name = "post_persontag_id") },
             inverseJoinColumns = { @JoinColumn(name = "user_tag_id") })
         private List<User> personTags = new ArrayList<>();
+
+    @Override
+    public long ownerId() {
+       return owner.getId();
+    }
 }

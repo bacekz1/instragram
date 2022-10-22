@@ -13,16 +13,14 @@ import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
+import static com.s14ittalents.insta.exception.Constant.PERMISSION_DENIED;
+
 
 @Service
 public abstract class AbstractService {
@@ -82,20 +80,10 @@ public abstract class AbstractService {
     If a person is logged in this should return a positive non-null id value which can be used to both get
     the user and to check if the user is logged in
      */
-    public static int getLoggedUserId(HttpSession session, HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        if (session.isNew()) {
-            throw new NoAuthException("You have to login");
-            //in login set logged true and write the id of user
+    protected static void checkPermission(int userId, Ownerable owner) {
+        if (owner.ownerId() != userId){
+            throw new NoAuthException(PERMISSION_DENIED);
         }
-        if (!(session.getAttribute("logged").equals(true))
-                || session.getAttribute("logged") == null
-                || !(session.getAttribute(REMOTE_IP).equals(ip))
-                || session.getAttribute("id") == null
-                || session.getAttribute("id").equals("")
-                || session.getAttribute("id").equals(0)) {
-            throw new NoAuthException("You have to login");
-        }
-        return (int) session.getAttribute("id");
     }
+
 }

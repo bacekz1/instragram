@@ -2,6 +2,7 @@ package com.s14ittalents.insta.user;
 
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.post.Post;
+import com.s14ittalents.insta.util.Ownerable;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Table(name = "users")
-public class User {
+public class User implements Ownerable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -94,6 +95,11 @@ public class User {
 
     @ManyToMany(mappedBy = "personTags")
     private List<Post> postList;
+
+    @Override
+    public long ownerId() {
+        return id;
+    }
     /*
     From lecture:
     

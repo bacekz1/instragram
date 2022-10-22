@@ -4,6 +4,7 @@ import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.ExceptionController;
 import com.s14ittalents.insta.exception.UserNotCreatedException;
+import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
 
 @RestController
 @RequestMapping("/users")
-public class UserController{
+public class UserController extends AbstractController {
     @Autowired
     private UserService userService;
     @Autowired
@@ -33,9 +34,9 @@ public class UserController{
         return userService.createUser(user);
     }
     @PutMapping()
-    UserNoPasswordDTO updateUser(@RequestBody UserUpdateDTO user, HttpSession session, HttpServletRequest req) {
-        int userId = (int) session.getAttribute("userId");
-        return userService.updateUser(user, userId, session,req);
+    UserNoPasswordDTO updateUser(@RequestBody UserUpdateDTO user) {
+        int userId = getLoggedUserId();
+        return userService.updateUser(user, userId);
     }
     
     @PostMapping("/login")

@@ -1,54 +1,52 @@
 package com.s14ittalents.insta.post;
 
-import org.modelmapper.ModelMapper;
+import com.s14ittalents.insta.exception.NoAuthException;
+import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/post")
-public class PostController {
+public class PostController extends AbstractController {
     @Autowired
     PostService postService;
-    @Autowired
-    ModelMapper modelMapper;
 
     @PostMapping
-    Post createPost(@RequestBody Post post, HttpSession httpSession) {
-        long userId = (long) httpSession.getAttribute("id");
-        post.setCreatedTime(LocalDateTime.now());
-        post.setExpirationTime(LocalDateTime.now().plusDays(1));
-        postService.createPost(post, userId);
-        return post;
+    Post createPost(@RequestBody Post post) {
+        long userId = getLoggedUserId();
+        return postService.createPost(post, userId);
     }
 
     @GetMapping("/{id:[0-9]+}")
     @ResponseBody
     PostWithoutOwnerDTO getPost(@PathVariable long id) {
-
+        getLoggedUserId();
         return postService.getPost(id);
     }
 
-    @PutMapping("/{id:[0-9]+}")
+    @PutMapping("/{postId:[0-9]+}")
     @ResponseBody
-    PostWithoutOwnerDTO updatePost(@PathVariable long id, @RequestBody PostUpdateDTO postUpdate) {
-//        int userId = httpSession.getAttribute()
-        //TODO
-        return postService.updatePost(id, postUpdate);
+    PostWithoutOwnerDTO updatePost(@PathVariable long postId, @RequestBody PostUpdateDTO postUpdate) {
+        int userId = getLoggedUserId();
+        return postService.updatePost(postId, postUpdate, userId);
     }
 
-    @PostMapping("{id:[0-9]+}/like")
-    PostWithoutOwnerDTO likePost(@PathVariable long id, HttpSession session, HttpServletRequest request) {
-        return modelMapper.map(postService.likePost(id, session, request), PostWithoutOwnerDTO.class);
-    @PostMapping("/{id:[0-9]+}/")
-    int likePost(@PathVariable long id, HttpSession session, HttpServletRequest request) {
-        long userId = getLoggedUserId(session,request);
-        if(userId<=0){
+    @DeleteMapping("/{postId:[0-9]+}")
+    boolean deletePost(@PathVariable long postId) {
+        int userId = getLoggedUserId();
+        if (userId <= 0) {
             throw new NoAuthException("You are not logged in");
-        }else {
+        }
+        return postService.deletePost(postId, userId);
+    }
+
+    @PostMapping("/{id:[0-9]+}/")
+    int likePost(@PathVariable long id) {
+        long userId = getLoggedUserId();
+        if (userId <= 0) {
+            throw new NoAuthException("You are not logged in");
+        } else {
             return postService.likePost(id, userId);
         }
     }

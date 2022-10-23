@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -67,14 +68,21 @@ public class UserService extends AbstractService {
         throw new NoAuthException("Wrong credentials!");
     }
 
+    @Transactional
     public UserNoPasswordDTO updateUser(UserUpdateDTO user, long userId) {
         User user1 = getUserById(userId);
         checkPermission(userId, user1);
         user1.setFirstName(user.getFirstName());
         user1.setLastName(user.getLastName());
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new BadRequestException("This email is already in use");
+        }
         user1.setEmail(user.getEmail());
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new BadRequestException("This username is already taken");
+        }
         user1.setUsername(user.getUsername());
-        user1.setPassword(user.getPassword());
+        user1.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user1);
         return modelMapper.map(user1, UserNoPasswordDTO.class);
 
@@ -90,9 +98,10 @@ public class UserService extends AbstractService {
         return bCryptPasswordEncoder.matches(password, user.getPassword());
     }
     
-    public String updateProfilePicture(String uname, MultipartFile file) {
+    public String updateProfilePicture(MultipartFile file, long uid) {
         try {
-            User user = userRepository.findByUsername(uname).orElseThrow(() -> new DataNotFoundException("User not found"));
+            User user = userRepository.findById(uid)
+                    .orElseThrow(() -> new DataNotFoundException("User not found"));
             String ext = Objects.requireNonNull(file.getOriginalFilename()).
                     substring(file.getOriginalFilename().lastIndexOf("."));
             if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg"))) {
@@ -125,5 +134,5 @@ public class UserService extends AbstractService {
     //servlet request get remote host req.getSession
 
     //};
-
+    
 }

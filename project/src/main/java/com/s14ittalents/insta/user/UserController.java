@@ -31,7 +31,15 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping()
-    UserNoPasswordDTO createUser(@RequestBody UserRegisterDTO user) {
+    UserNoPasswordDTO createUser() {
+        if(getLoggedUserId() > 0){
+            throw new BadRequestException("You are already logged in" +
+                    ", logout first if you wish to create another account");
+        }
+        UserRegisterDTO user = new UserRegisterDTO();
+        user.setUsername(request.getParameterMap().get("username")[0]);
+        user.setPassword(request.getParameterMap().get("password")[0]);
+
         return userService.createUser(user);
     }
     @PutMapping()
@@ -65,11 +73,12 @@ public class UserController extends AbstractController {
     
     
     @PostMapping("/{username}/pfp")
-    public String uploadProfilePicture(@PathVariable String username
-            , @RequestParam(value = "file") MultipartFile file
-            , HttpSession session) {
+    public String uploadProfilePicture(@RequestParam(value = "file") MultipartFile file) {
         if(getLoggedUserId()>0){
-            return userService.updateProfilePicture(username, file);
+            if(file.getSize()>5242880){
+                throw new BadRequestException("File size is too big, must be below 5MB");
+            }
+            return userService.updateProfilePicture(file, getLoggedUserId());
         }else {
             throw new BadRequestException("Something went wrong");
         }

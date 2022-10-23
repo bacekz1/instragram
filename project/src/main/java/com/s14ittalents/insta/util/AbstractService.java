@@ -3,11 +3,9 @@ package com.s14ittalents.insta.util;
 import com.s14ittalents.insta.comment.CommentRepository;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.content.ContentRepository;
-import com.s14ittalents.insta.exception.BadRequestException;
-import com.s14ittalents.insta.exception.Constant;
-import com.s14ittalents.insta.exception.DataNotFoundException;
-import com.s14ittalents.insta.exception.NoAuthException;
+import com.s14ittalents.insta.exception.*;
 import com.s14ittalents.insta.hashtag.Hashtag;
+import com.s14ittalents.insta.location.LocationRepository;
 import com.s14ittalents.insta.post.Post;
 import com.s14ittalents.insta.post.PostRepository;
 import com.s14ittalents.insta.hashtag.HashtagRepository;
@@ -30,7 +28,6 @@ import java.util.stream.Collectors;
 
 import static com.s14ittalents.insta.exception.Constant.*;
 
-
 @Service
 public abstract class AbstractService {
 
@@ -42,9 +39,10 @@ public abstract class AbstractService {
     protected CommentRepository commentRepository;
     @Autowired
     protected HashtagRepository hashtagRepository;
-
     @Autowired
     protected ContentRepository contentRepository;
+    @Autowired
+    protected LocationRepository locationRepository;
     @Autowired
     protected ModelMapper modelMapper;
 
@@ -107,27 +105,26 @@ public abstract class AbstractService {
         }
     }
 
-    protected static List<Content> uploadFiles(List<MultipartFile> files, long userId, Post createdPost) {
+    protected static List<Content> uploadFiles(List<MultipartFile> files, long userId, Post createdPost, int maxSize) {
         List<Content> contents = new ArrayList<>();
         for (MultipartFile file : files) {
-            if (file.getSize() > 10 * mb) {
+            if (file.getSize() > maxSize * mb) {
                 throw new BadRequestException(MAX_SIZE_PER_FILE_IS_10_MB);
             }
             try {
                 String ext = Objects.requireNonNull(file.getOriginalFilename()).
                         substring(file.getOriginalFilename().lastIndexOf("."));
                 validateFileType(ext);
-                String name = "uploads" + File.separator
-                        + File.separator + System.nanoTime() + userId + ext;
+                String name = "uploads" + File.separator + System.nanoTime() + userId + ext;
                 File f = new File(name);
                 if (!f.exists()) {
                     Files.copy(file.getInputStream(), f.toPath());
                     contents.add(new Content(f.getPath(), createdPost));
                 } else {
-                    throw new BadRequestException("The file already exists");
+                    throw new FileException(THE_FILE_ALREADY_EXISTS);
                 }
             } catch (IOException e) {
-                throw new BadRequestException(e.getMessage());
+                throw new FileException(e.getMessage());
             }
         }
         return contents;

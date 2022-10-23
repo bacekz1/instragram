@@ -2,6 +2,7 @@ package com.s14ittalents.insta.post;
 
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.ContentWithoutUser;
+import com.s14ittalents.insta.location.LocationWithoutPost;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
 import lombok.Data;
 
@@ -17,4 +18,5 @@ public class PostWithoutOwnerDTO {
     private List<Comment> comments;
     private UserWithoutPostsDTO owner;
     private List<ContentWithoutUser> contents;
+    private LocationWithoutPost location;
 }

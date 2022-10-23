@@ -8,15 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class PostCreateDTO {
-
     private String caption;
-
-    private Long locationId;
-
-    private boolean deleted;
-
+    private String location;
     List<MultipartFile> contents;
-    private long owner;
-    private LocalDateTime expirationTime;
-    private LocalDateTime createdTime;
 }

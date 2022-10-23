@@ -4,6 +4,7 @@ import com.s14ittalents.insta.exception.NoAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
@@ -13,6 +14,8 @@ public abstract class AbstractController {
     protected HttpSession session;
     @Autowired
     protected HttpServletRequest request;
+    @Autowired
+    protected HttpServletResponse response;
 
     protected long getLoggedUserId() {
         String ip = request.getRemoteAddr();

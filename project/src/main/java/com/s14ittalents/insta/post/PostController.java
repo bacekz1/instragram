@@ -5,10 +5,6 @@ import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-
 @RestController
 @RequestMapping("/post")
 public class PostController extends AbstractController {
@@ -16,9 +12,9 @@ public class PostController extends AbstractController {
     PostService postService;
 
     @PostMapping
-    PostWithoutOwnerDTO createPost(@RequestBody Post post) {
+    PostWithoutOwnerDTO createPost(@ModelAttribute PostCreateDTO postCreateDTO) {
         long userId = getLoggedUserId();
-        return postService.createPost(post, userId);
+        return postService.createPost(postCreateDTO, userId);
     }
 
     @GetMapping("/{id:[0-9]+}")

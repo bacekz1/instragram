@@ -1,6 +1,7 @@
 package com.s14ittalents.insta.post;
 
 import com.s14ittalents.insta.comment.Comment;
+import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.user.User;
@@ -10,10 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.s14ittalents.insta.exception.Constant.*;
@@ -21,16 +20,31 @@ import static com.s14ittalents.insta.exception.Constant.*;
 @Service
 public class PostService extends AbstractService {
 
-    public PostWithoutOwnerDTO createPost(Post post, long userId) {
-        if (post.getExpirationTime() != null){
+    @Transactional
+    public PostWithoutOwnerDTO createPost(PostCreateDTO postCreateDTO, long userId) {
+        if (postCreateDTO.getExpirationTime() != null) {
             throw new BadRequestException(INVALID_DATA);
         }
+        Post post = new Post();
+        post.setCaption(postCreateDTO.getCaption());
         post.setOwner(getUserById(userId));
         post.setCreatedTime(LocalDateTime.now());
         addHashtags(post);
         addPersonTags(post);
-        return modelMapper.map(postRepository.save(post), PostWithoutOwnerDTO.class);
+        Post createdPost = postRepository.save(post);
+        List<MultipartFile> files = postCreateDTO.getContents();
+        if (postCreateDTO.getContents() != null) {
+            if (postCreateDTO.getContents().size() > 10){
+                throw new BadRequestException(YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES);
+            }
+            List<Content> contents = uploadFiles(files, userId, createdPost);
+            List<Content> createdContents = contentRepository.saveAll(contents);
+            createdPost.setContents(createdContents);
+        }
+        return modelMapper.map(createdPost, PostWithoutOwnerDTO.class);
+
     }
+
 
     public PostWithoutOwnerDTO getPost(long id) {
         Post post = findPost(id);
@@ -84,23 +98,5 @@ public class PostService extends AbstractService {
         post.get().getLikes().forEach(a ->
                 System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
         return post.get().getLikes().size();
-    }
-    
-    public String uploadPostContent(long uid, MultipartFile file) {
-        //todo connect multiple upload post content to post
-        try {
-            User user = userRepository.findById(uid).orElseThrow(() -> new DataNotFoundException("User not found"));
-            String ext = Objects.requireNonNull(file.getOriginalFilename()).
-                    substring(file.getOriginalFilename().lastIndexOf("."));
-            if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg") || ext.equals(".mp4"))) {
-                throw new BadRequestException("Invalid file type");
-            }
-            String name = "uploads" + File.separator + "post_contents"
-                    + File.separator + user.getUsername() + File.separator + System.nanoTime() + "." + ext;
-            File f = new File(name);
-            return name;
-        } catch (Exception e) {
-            throw new BadRequestException("Something went wrong");
-        }
     }
 }

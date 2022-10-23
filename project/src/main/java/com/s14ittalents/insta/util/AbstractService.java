@@ -1,6 +1,9 @@
 package com.s14ittalents.insta.util;
 
 import com.s14ittalents.insta.comment.CommentRepository;
+import com.s14ittalents.insta.content.Content;
+import com.s14ittalents.insta.content.ContentRepository;
+import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.Constant;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.NoAuthException;
@@ -14,16 +17,23 @@ import com.s14ittalents.insta.user.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.s14ittalents.insta.exception.Constant.PERMISSION_DENIED;
+import static com.s14ittalents.insta.exception.Constant.*;
 
 
 @Service
 public abstract class AbstractService {
+
     @Autowired
     protected UserRepository userRepository;
     @Autowired
@@ -34,8 +44,10 @@ public abstract class AbstractService {
     protected HashtagRepository hashtagRepository;
 
     @Autowired
+    protected ContentRepository contentRepository;
+    @Autowired
     protected ModelMapper modelMapper;
-    
+
     protected User getUserById(long id) {
         return userRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
     }
@@ -70,7 +82,6 @@ public abstract class AbstractService {
     }
 
 
-    //attempting to create a method that will return a list of posts containing certain hashtag
     protected List<PostWithoutOwnerDTO> getAllPostWithHashtag(String tagName) {
         if (hashtagRepository.findByTagName(tagName).isPresent()) {
             return hashtagRepository.findByTagName(tagName).get().getPostList().stream()
@@ -81,14 +92,45 @@ public abstract class AbstractService {
         }
     }
 
-    /*
-    If a person is logged in this should return a positive non-null id value which can be used to both get
-    the user and to check if the user is logged in
-     */
+
     protected static void checkPermission(long userId, Ownerable owner) {
-        if (owner.ownerId() != userId){
+        if (owner.ownerId() != userId) {
             throw new NoAuthException(PERMISSION_DENIED);
         }
+    }
+
+    protected static void validateFileType(String fileType) {
+
+        if (!(fileType.equals(".jpg") || fileType.equals(".png") ||
+                fileType.equals(".jpeg") || fileType.equals(".mp4"))) {
+            throw new BadRequestException("Invalid file type");
+        }
+    }
+
+    protected static List<Content> uploadFiles(List<MultipartFile> files, long userId, Post createdPost) {
+        List<Content> contents = new ArrayList<>();
+        for (MultipartFile file : files) {
+            if (file.getSize() > 10 * mb) {
+                throw new BadRequestException(MAX_SIZE_PER_FILE_IS_10_MB);
+            }
+            try {
+                String ext = Objects.requireNonNull(file.getOriginalFilename()).
+                        substring(file.getOriginalFilename().lastIndexOf("."));
+                validateFileType(ext);
+                String name = "uploads" + File.separator
+                        + File.separator + System.nanoTime() + userId + ext;
+                File f = new File(name);
+                if (!f.exists()) {
+                    Files.copy(file.getInputStream(), f.toPath());
+                    contents.add(new Content(f.getPath(), createdPost));
+                } else {
+                    throw new BadRequestException("The file already exists");
+                }
+            } catch (IOException e) {
+                throw new BadRequestException(e.getMessage());
+            }
+        }
+        return contents;
     }
 
 }

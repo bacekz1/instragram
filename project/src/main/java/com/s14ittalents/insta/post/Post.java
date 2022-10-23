@@ -1,6 +1,7 @@
 package com.s14ittalents.insta.post;
 
 import com.s14ittalents.insta.comment.Comment;
+import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.hashtag.Hashtag;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.Ownerable;
@@ -31,8 +32,11 @@ public class Post implements Ownerable {
     private Long locationId;
     @Column(name = "is_deleted")
     private boolean deleted;
-    @OneToMany(mappedBy = "comment")
+    @OneToMany(mappedBy = "post")
     List<Comment> comments;
+
+    @OneToMany(mappedBy = "postId")
+    List<Content> contents;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;

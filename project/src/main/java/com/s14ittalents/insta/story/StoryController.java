@@ -1,10 +1,7 @@
 package com.s14ittalents.insta.story;
 
 import com.s14ittalents.insta.exception.NoAuthException;
-import com.s14ittalents.insta.post.Post;
-import com.s14ittalents.insta.post.PostService;
-import com.s14ittalents.insta.post.PostUpdateDTO;
-import com.s14ittalents.insta.post.PostWithoutOwnerDTO;
+import com.s14ittalents.insta.post.*;
 import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +15,9 @@ public class StoryController extends AbstractController {
     PostService postService;
 
     @PostMapping
-    PostWithoutOwnerDTO createStory(@RequestBody Post post) {
+    PostWithoutOwnerDTO createStory(@ModelAttribute PostCreateDTO postCreateDTO) {
         long userId = getLoggedUserId();
-        return storyService.createStory(post, userId);
+        return storyService.createStory(postCreateDTO, userId);
     }
     @GetMapping("/{id:[0-9]+}")
     @ResponseBody

@@ -22,6 +22,8 @@ public class UserController extends AbstractController {
     @Autowired
     private UserService userService;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
@@ -51,8 +53,8 @@ public class UserController extends AbstractController {
     @PostMapping("/login")
     UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user
             , HttpSession session, HttpServletRequest request) {
-        Optional<User> user1 = Optional.of(userService.userRepository.findByUsername(user.getUsername())
-                .orElseGet(() -> userService.userRepository.findByEmail(user.getUsername())
+        Optional<User> user1 = Optional.of(userRepository.findByUsername(user.getUsername())
+                .orElseGet(() -> userRepository.findByEmail(user.getUsername())
                         .orElseThrow(() -> new DataNotFoundException("User not found"))));
         if(session.getAttribute("logged") != null) {
             throw new UserNotCreatedException("You are already logged in");

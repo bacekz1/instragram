@@ -1,33 +1,39 @@
 package com.s14ittalents.insta.story;
 
 import com.s14ittalents.insta.comment.Comment;
-import com.s14ittalents.insta.exception.DataNotFoundException;
-import com.s14ittalents.insta.post.Post;
-import com.s14ittalents.insta.post.PostRepository;
-import com.s14ittalents.insta.post.PostUpdateDTO;
-import com.s14ittalents.insta.post.PostWithoutOwnerDTO;
-import com.s14ittalents.insta.user.User;
-import com.s14ittalents.insta.user.UserRepository;
-import com.s14ittalents.insta.util.AbstractController;
+import com.s14ittalents.insta.content.Content;
+import com.s14ittalents.insta.exception.BadRequestException;
+import com.s14ittalents.insta.post.*;
 import com.s14ittalents.insta.util.AbstractService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-
-import static com.s14ittalents.insta.exception.Constant.USER_NOT_FOUND;
+import static com.s14ittalents.insta.exception.Constant.YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES;
 
 @Service
 public class StoryService extends AbstractService {
-    public PostWithoutOwnerDTO createStory(Post post, long userId) {
+    public PostWithoutOwnerDTO createStory(PostCreateDTO postCreateDTO, long userId) {
+        Post post = new Post();
+        post.setCaption(postCreateDTO.getCaption());
         post.setOwner(getUserById(userId));
         post.setCreatedTime(LocalDateTime.now());
         post.setExpirationTime(LocalDateTime.now().plusDays(1));
-        return modelMapper.map(postRepository.save(post), PostWithoutOwnerDTO.class);
+        addHashtags(post);
+        addPersonTags(post);
+        Post createdPost = postRepository.save(post);
+        List<MultipartFile> files = postCreateDTO.getContents();
+        if (postCreateDTO.getContents() != null) {
+            if (postCreateDTO.getContents().size() > 10) {
+                throw new BadRequestException(YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES);
+            }
+            List<Content> contents = uploadFiles(files, userId, createdPost);
+            List<Content> createdContents = contentRepository.saveAll(contents);
+            createdPost.setContents(createdContents);
+        }
+        return modelMapper.map(createdPost, PostWithoutOwnerDTO.class);
     }
 
 

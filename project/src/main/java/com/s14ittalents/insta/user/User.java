@@ -94,6 +94,12 @@ public class User implements Ownerable {
 
     @ManyToMany(mappedBy = "personTags")
     private List<Post> postList;
+    
+    @ManyToMany(cascade={CascadeType.ALL})
+    @JoinTable(name="following",
+            joinColumns={@JoinColumn(name="user_id")},
+            inverseJoinColumns={@JoinColumn(name="follower_id")})
+    private List<User> following;
 
     @Override
     public long ownerId() {

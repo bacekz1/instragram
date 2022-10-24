@@ -186,6 +186,22 @@ public class UserService extends AbstractService {
         userRepository.save(user);
         return "Default profile picture set";
     }
+    
+    public String followUser(User userToFollow, long loggedUserId) {
+        User user = getUserById(loggedUserId);
+        if(userToFollow.getId() == loggedUserId) {
+            throw new BadRequestException("You cannot follow yourself");
+        }
+        if(userToFollow.getFollowing().contains(user)) {
+            userToFollow.getFollowing().remove(user);
+            userRepository.save(user);
+            return "User "+ userToFollow.getUsername() +" unfollowed";
+        }else {
+            userToFollow.getFollowing().add(user);
+            userRepository.save(user);
+            return "User "+ userToFollow.getUsername() +" followed";
+        }
+    }
     //loginUser(n,int id) {
 
 

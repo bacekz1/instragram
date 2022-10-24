@@ -114,6 +114,16 @@ public class UserController extends AbstractController {
             throw new BadRequestException("Something went wrong");
         }
     }
+    
+    @PostMapping("/follow/{username}")
+    public String followUser(@PathVariable String username) {
+        User userToFollow = userRepository.findByUsername(username.toLowerCase().trim())
+                .orElseThrow(() -> new DataNotFoundException("Follow unsuccessful, user not found"));
+        if(userToFollow.getId() == getLoggedUserId()) {
+            throw new BadRequestException("You cannot follow yourself");
+        }
+        return userService.followUser(userToFollow, getLoggedUserId());
+    }
     /*
     if get logged user id >  -> throw new BadRequestException("you are already logged in");
     

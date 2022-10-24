@@ -3,6 +3,7 @@ package com.s14ittalents.insta.story;
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.exception.BadRequestException;
+import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.post.*;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.stereotype.Service;
@@ -11,60 +12,69 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.s14ittalents.insta.exception.Constant.MAX_ALLOWED_FILES_TO_UPLOAD;
 import static com.s14ittalents.insta.exception.Constant.YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES;
 
 @Service
 public class StoryService extends AbstractService {
-    public PostWithoutOwnerDTO createStory(PostCreateDTO postCreateDTO, long userId) {
-        Post post = new Post();
-        post.setCaption(postCreateDTO.getCaption());
-        post.setOwner(getUserById(userId));
-        post.setCreatedTime(LocalDateTime.now());
-        post.setExpirationTime(LocalDateTime.now().plusDays(1));
-        addHashtags(post);
-        addPersonTags(post);
-        Post createdPost = postRepository.save(post);
-        List<MultipartFile> files = postCreateDTO.getContents();
-        if (postCreateDTO.getContents() != null) {
-            if (postCreateDTO.getContents().size() > 10) {
+    private static final int MAX_SIZE = 50;
+
+    public PostWithoutOwnerDTO createStory(PostCreateDTO storyCreateDTO, long userId) {
+        Post story = new Post();
+        story.setCaption(storyCreateDTO.getCaption());
+        story.setOwner(getUserById(userId));
+        story.setCreatedTime(LocalDateTime.now());
+        story.setExpirationTime(LocalDateTime.now().plusDays(1));
+        addHashtags(story);
+        addPersonTags(story);
+        Location location = null;
+        String locationName = storyCreateDTO.getLocation();
+        if (locationName != null) {
+            location = locationRepository.findByName(locationName)
+                    .orElseGet(() -> locationRepository.save(new Location(locationName)));
+        }
+        story.setLocationId(location);
+        Post createdStory = postRepository.save(story);
+        List<MultipartFile> files = storyCreateDTO.getContents();
+        if (storyCreateDTO.getContents() != null) {
+            if (storyCreateDTO.getContents().size() > MAX_ALLOWED_FILES_TO_UPLOAD) {
                 throw new BadRequestException(YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES);
             }
-            List<Content> contents = uploadFiles(files, userId, createdPost);
+            List<Content> contents = uploadFiles(files, userId, createdStory, MAX_SIZE);
             List<Content> createdContents = contentRepository.saveAll(contents);
-            createdPost.setContents(createdContents);
+            createdStory.setContents(createdContents);
         }
-        return modelMapper.map(createdPost, PostWithoutOwnerDTO.class);
+        return modelMapper.map(createdStory, PostWithoutOwnerDTO.class);
     }
-
 
     public PostWithoutOwnerDTO getStory(long id) {
-        Post post = findStory(id);
-        return modelMapper.map(post, PostWithoutOwnerDTO.class);
+        Post story = findStory(id);
+        return modelMapper.map(story, PostWithoutOwnerDTO.class);
     }
 
-    public PostWithoutOwnerDTO updateStory(long posId, PostUpdateDTO postUpdate, long userId) {
-        Post post = findStory(posId);
-        checkPermission(userId, post);
-        post.setCaption(postUpdate.getCaption());
-        post.getHashtags().clear();
-        post.getPersonTags().clear();
-        addHashtags(post);
-        addPersonTags(post);
-        postRepository.save(post);
-        return modelMapper.map(post, PostWithoutOwnerDTO.class);
+    public PostWithoutOwnerDTO updateStory(long posId, PostUpdateDTO storyUpdate, long userId) {
+        Post story = findStory(posId);
+        checkPermission(userId, story);
+        story.setCaption(storyUpdate.getCaption());
+        story.getHashtags().clear();
+        story.getPersonTags().clear();
+        addHashtags(story);
+        addPersonTags(story);
+        postRepository.save(story);
+        return modelMapper.map(story, PostWithoutOwnerDTO.class);
     }
-
 
     @Transactional
-    public boolean deleteStory(long postId, long userId) {
-        Post post = findStory(postId);
-        checkPermission(userId, post);
-        List<Comment> comments = commentRepository.findByPostId(postId).stream().toList();
+    public boolean deleteStory(long storyId, long userId) {
+        Post story = findStory(storyId);
+        checkPermission(userId, story);
+        List<Comment> comments = commentRepository.findByPostId(storyId).stream().toList();
         comments.forEach(comment -> comment.setDeleted(true));
         commentRepository.saveAll(comments);
-        post.setDeleted(true);
-        post.setCaption("deleted at" + LocalDateTime.now());
-        postRepository.save(post);
+        story.setDeleted(true);
+        story.setCaption("deleted at" + LocalDateTime.now());
+        postRepository.save(story);
         return true;
     }
 }

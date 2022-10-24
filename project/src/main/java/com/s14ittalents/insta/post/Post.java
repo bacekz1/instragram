@@ -3,6 +3,7 @@ package com.s14ittalents.insta.post;
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.hashtag.Hashtag;
+import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.Ownerable;
 import lombok.Getter;
@@ -27,20 +28,18 @@ public class Post implements Ownerable {
     private long id;
     @Column
     private String caption;
-    @Column
-    @Positive(message = "location_id should be positive num")
-    private Long locationId;
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location locationId;
     @Column(name = "is_deleted")
     private boolean deleted;
     @OneToMany(mappedBy = "post")
     List<Comment> comments;
-
     @OneToMany(mappedBy = "postId")
     List<Content> contents;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;
-
     @ManyToMany(mappedBy = "likedPosts")
     private List<User> likes;
     @Column

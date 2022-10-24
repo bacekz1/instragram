@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.exception;
+    package com.s14ittalents.insta.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +21,7 @@ import java.util.ArrayList;
 public class ExceptionController extends ResponseEntityExceptionHandler {
     @Autowired
     ExceptionDTO exceptionDTO;
-
-
     Logger logger = LoggerFactory.getLogger(ExceptionController.class);
-
 
     @ExceptionHandler(value = {DataNotFoundException.class})
     ResponseEntity<Object> handleDataNotFound(DataNotFoundException ex, WebRequest request) {

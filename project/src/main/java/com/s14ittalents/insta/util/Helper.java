@@ -1,16 +1,7 @@
 package com.s14ittalents.insta.util;
 
-import com.s14ittalents.insta.exception.*;
-import com.s14ittalents.insta.hashtag.Hashtag;
-import com.s14ittalents.insta.post.Post;
-import com.s14ittalents.insta.user.User;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
 public final class Helper {
     private final static char hashtag = '#';
     private final static char personTag = '@';

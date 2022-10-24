@@ -4,6 +4,7 @@ import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
+import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
@@ -19,32 +20,35 @@ import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public class PostService extends AbstractService {
+    private static final int MAX_SIZE = 5;
 
     @Transactional
     public PostWithoutOwnerDTO createPost(PostCreateDTO postCreateDTO, long userId) {
-        if (postCreateDTO.getExpirationTime() != null) {
-            throw new BadRequestException(INVALID_DATA);
-        }
         Post post = new Post();
         post.setCaption(postCreateDTO.getCaption());
         post.setOwner(getUserById(userId));
         post.setCreatedTime(LocalDateTime.now());
         addHashtags(post);
         addPersonTags(post);
+        Location location = null;
+        String locationName = postCreateDTO.getLocation();
+        if (locationName != null) {
+            location = locationRepository.findByName(locationName)
+                    .orElseGet(() -> locationRepository.save(new Location(locationName)));
+        }
+        post.setLocationId(location);
         Post createdPost = postRepository.save(post);
         List<MultipartFile> files = postCreateDTO.getContents();
         if (postCreateDTO.getContents() != null) {
-            if (postCreateDTO.getContents().size() > 10){
+            if (postCreateDTO.getContents().size() > MAX_ALLOWED_FILES_TO_UPLOAD) {
                 throw new BadRequestException(YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES);
             }
-            List<Content> contents = uploadFiles(files, userId, createdPost);
+            List<Content> contents = uploadFiles(files, userId, createdPost, MAX_SIZE);
             List<Content> createdContents = contentRepository.saveAll(contents);
             createdPost.setContents(createdContents);
         }
         return modelMapper.map(createdPost, PostWithoutOwnerDTO.class);
-
     }
-
 
     public PostWithoutOwnerDTO getPost(long id) {
         Post post = findPost(id);

@@ -11,13 +11,11 @@ import org.springframework.web.bind.annotation.*;
 public class StoryController extends AbstractController {
     @Autowired
     StoryService storyService;
-    @Autowired
-    PostService postService;
 
     @PostMapping
-    PostWithoutOwnerDTO createStory(@ModelAttribute PostCreateDTO postCreateDTO) {
+    PostWithoutOwnerDTO createStory(@ModelAttribute PostCreateDTO storyCreateDTO) {
         long userId = getLoggedUserId();
-        return storyService.createStory(postCreateDTO, userId);
+        return storyService.createStory(storyCreateDTO, userId);
     }
     @GetMapping("/{id:[0-9]+}")
     @ResponseBody
@@ -26,19 +24,19 @@ public class StoryController extends AbstractController {
         return storyService.getStory(id);
     }
 
-    @PutMapping("/{postId:[0-9]+}")
+    @PutMapping("/{story:[0-9]+}")
     @ResponseBody
-    PostWithoutOwnerDTO updateStory(@PathVariable long postId, @RequestBody PostUpdateDTO postUpdate) {
+    PostWithoutOwnerDTO updateStory(@PathVariable long story, @RequestBody PostUpdateDTO storyUpdate) {
         long userId = getLoggedUserId();
-        return storyService.updateStory(postId, postUpdate, userId);
+        return storyService.updateStory(story, storyUpdate, userId);
     }
 
-    @DeleteMapping("/{postId:[0-9]+}")
-    boolean deleteStory(@PathVariable long postId) {
+    @DeleteMapping("/{storyId:[0-9]+}")
+    boolean deleteStory(@PathVariable long storyId) {
         long userId = getLoggedUserId();
         if (userId <= 0) {
             throw new NoAuthException("You are not logged in");
         }
-        return storyService.deleteStory(postId, userId);
+        return storyService.deleteStory(storyId, userId);
     }
 }

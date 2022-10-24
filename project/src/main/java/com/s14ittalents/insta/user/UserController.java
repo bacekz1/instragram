@@ -27,7 +27,7 @@ public class UserController extends AbstractController {
 
     @GetMapping("/{username}")
     UserNoPasswordDTO getUser(@PathVariable String username) {
-        return userService.getUserByUsername(username);
+        return userService.getUserByUsernameToDTO(username);
     }
 
     @PostMapping()
@@ -72,6 +72,9 @@ public class UserController extends AbstractController {
         }
         validatePassword(user.getPassword());
         Optional<User> user1 = userService.checkIfUserExists(user);
+        if(user1.get().isBanned()) {
+            throw new BadRequestException("You are banned");
+        }
         if(session.getAttribute("logged") != null) {
             throw new UserNotCreatedException("You are already logged in");
         }
@@ -130,6 +133,12 @@ public class UserController extends AbstractController {
     public List<UserOnlyMailAndUsernameDTO> getFollowing() {
         return userService.getFollowing(getLoggedUserId());
     }
+    
+    @PutMapping("/{username}/badUser")
+    public String banUser(@PathVariable String username) {
+        return userService.banUser(getLoggedUserId(),username);
+    }
+    
     /*
     if get logged user id >  -> throw new BadRequestException("you are already logged in");
     

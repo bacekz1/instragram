@@ -33,7 +33,7 @@ public class UserService extends AbstractService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    UserNoPasswordDTO getUserByUsername(String username) {
+    UserNoPasswordDTO getUserByUsernameToDTO(String username) {
         Optional<User> user = Optional.of(userRepository.findByUsername(username)
                 .orElseThrow(() -> new DataNotFoundException("User not found")));
         return modelMapper.map(user, UserNoPasswordDTO.class);
@@ -141,6 +141,9 @@ public class UserService extends AbstractService {
             return name;
         } catch (IOException e) {
             //response.setStatus(500);
+            e.getCause();
+            e.printStackTrace();
+            e.getMessage();
             throw new BadRequestException("Unable to set profile picture at this moment," +
                     " default profile picture will be used");
         }
@@ -223,6 +226,26 @@ public class UserService extends AbstractService {
                 .collect(Collectors.toList());
     }
     
+    public String banUser(long loggedUserId, String username) {
+        User user = getUserById(loggedUserId);
+        if(user.getId() == loggedUserId) {
+            throw new BadRequestException("You cannot ban yourself");
+        }
+        if(!user.getEmail().split("@")[1].equals("admin.instagram.com")) {
+            throw new BadRequestException("You do not have permission to ban users");
+        }
+        User userToBan = getUserByUsername(username);
+        if(user.isBanned()){
+            user.setBanned(false);
+            userRepository.save(userToBan);
+            return "User's "+ username +" ban has been lifted";
+        }else {
+            user.setBanned(true);
+            userRepository.save(userToBan);
+            return "User "+ username +" has been banned";
+        }
+
+    }
     //loginUser(n,int id) {
 
 

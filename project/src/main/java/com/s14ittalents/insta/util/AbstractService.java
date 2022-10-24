@@ -49,6 +49,9 @@ public abstract class AbstractService {
     protected User getUserById(long id) {
         return userRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
     }
+    protected User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
+    }
     protected long getUserId(String username) {
         return userRepository.
                 findByUsername(username).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND)).getId();

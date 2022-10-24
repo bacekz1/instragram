@@ -18,8 +18,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService extends AbstractService {
@@ -192,16 +194,31 @@ public class UserService extends AbstractService {
         if(userToFollow.getId() == loggedUserId) {
             throw new BadRequestException("You cannot follow yourself");
         }
-        if(userToFollow.getFollowing().contains(user)) {
-            userToFollow.getFollowing().remove(user);
+        if(user.getFollowing().contains(userToFollow)) {
+            user.getFollowing().remove(userToFollow);
             userRepository.save(user);
             return "User "+ userToFollow.getUsername() +" unfollowed";
         }else {
-            userToFollow.getFollowing().add(user);
+            user.getFollowing().add(userToFollow);
             userRepository.save(user);
             return "User "+ userToFollow.getUsername() +" followed";
         }
     }
+    
+    public List<UserOnlyMailAndUsernameDTO> getFollowing(long userId) {
+        User user = getUserById(userId);
+        List<User> followedUser = user.getFollowing();
+        return followedUser.stream().map(u -> modelMapper.map(u, UserOnlyMailAndUsernameDTO.class))
+                .collect(Collectors.toList());
+    }
+    
+    public List<UserOnlyMailAndUsernameDTO> getFollowers(long userId) {
+        User user = getUserById(userId);
+        List<User> followers = user.getFollowers();
+        return followers.stream().map(u -> modelMapper.map(u, UserOnlyMailAndUsernameDTO.class))
+                .collect(Collectors.toList());
+    }
+    
     //loginUser(n,int id) {
 
 

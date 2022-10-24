@@ -9,8 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Optional;
 
 import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
@@ -123,6 +122,15 @@ public class UserController extends AbstractController {
             throw new BadRequestException("You cannot follow yourself");
         }
         return userService.followUser(userToFollow, getLoggedUserId());
+    }
+    
+    @GetMapping("/followers")
+    public List<UserOnlyMailAndUsernameDTO> getFollowers() {
+        return userService.getFollowers(getLoggedUserId());
+    }
+    @GetMapping("/following")
+    public List<UserOnlyMailAndUsernameDTO> getFollowing() {
+        return userService.getFollowing(getLoggedUserId());
     }
     /*
     if get logged user id >  -> throw new BadRequestException("you are already logged in");

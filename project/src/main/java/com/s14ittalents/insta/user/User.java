@@ -100,11 +100,20 @@ public class User implements Ownerable {
             joinColumns={@JoinColumn(name="user_id")},
             inverseJoinColumns={@JoinColumn(name="follower_id")})
     private List<User> following;
-
+    
+    
+    @ManyToMany(cascade={CascadeType.ALL})
+    @JoinTable(name="following",
+            joinColumns={@JoinColumn(name="follower_id")},
+            inverseJoinColumns={@JoinColumn(name="user_id")})
+    
+    private List<User> followers;
     @Override
     public long ownerId() {
         return id;
     }
+    
+
     /*
     From lecture:
     

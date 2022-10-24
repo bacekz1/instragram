@@ -5,6 +5,7 @@ import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,8 @@ public class MessageService extends AbstractService {
         Message message = new Message();
         message.setReceiverId(getUserByUsername(username).getId());
         message.setSenderId(getUserById(loggedUserId).getId());
+        message.setSeen(false);
+        message.setSendDate(LocalDateTime.now());
         messageRepository.save(message);
         return modelMapper.map(message, MessageOnlyIdDTO.class);
     }

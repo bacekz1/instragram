@@ -5,6 +5,8 @@ import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.post.*;
+import com.s14ittalents.insta.user.User;
+import com.s14ittalents.insta.user.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,7 @@ import static com.s14ittalents.insta.exception.Constant.YOU_CAN_ONLY_CHOOSE_10_O
 public class StoryService extends AbstractService {
     private static final int MAX_SIZE = 50;
 
+    @Transactional
     public PostWithoutOwnerDTO createStory(PostCreateDTO storyCreateDTO, long userId) {
         Post story = new Post();
         story.setCaption(storyCreateDTO.getCaption());
@@ -37,8 +40,8 @@ public class StoryService extends AbstractService {
         story.setLocationId(location);
         Post createdStory = postRepository.save(story);
         List<MultipartFile> files = storyCreateDTO.getContents();
-        if (storyCreateDTO.getContents() != null) {
-            if (storyCreateDTO.getContents().size() > MAX_ALLOWED_FILES_TO_UPLOAD) {
+        if (files != null) {
+            if (files.size() > MAX_ALLOWED_FILES_TO_UPLOAD) {
                 throw new BadRequestException(YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES);
             }
             List<Content> contents = uploadFiles(files, userId, createdStory, MAX_SIZE);
@@ -76,5 +79,22 @@ public class StoryService extends AbstractService {
         story.setCaption("deleted at" + LocalDateTime.now());
         postRepository.save(story);
         return true;
+    }
+    
+    public int likeStory(long id, long userId) {
+        Post story = findPost(id);
+        User user = getUserById(userId);
+    
+        if (story.getLikes().contains(user)) {
+            story.getLikes().remove(getUserById(userId));
+        } else {
+            story.getLikes().add(getUserById(userId));
+        }
+        story.getLikes().forEach(a ->
+                System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
+        userRepository.save(getUserById(userId));
+        story.getLikes().forEach(a ->
+                System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
+        return story.getLikes().size();
     }
 }

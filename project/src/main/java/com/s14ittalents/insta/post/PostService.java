@@ -39,8 +39,8 @@ public class PostService extends AbstractService {
         post.setLocationId(location);
         Post createdPost = postRepository.save(post);
         List<MultipartFile> files = postCreateDTO.getContents();
-        if (postCreateDTO.getContents() != null) {
-            if (postCreateDTO.getContents().size() > MAX_ALLOWED_FILES_TO_UPLOAD) {
+        if (files != null) {
+            if (files.size() > MAX_ALLOWED_FILES_TO_UPLOAD) {
                 throw new BadRequestException(YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES);
             }
             List<Content> contents = uploadFiles(files, userId, createdPost, MAX_SIZE);
@@ -82,25 +82,19 @@ public class PostService extends AbstractService {
     }
 
     public int likePost(long id, long userId) {
-        Optional<Post> post = postRepository.findByIdAndDeletedIsFalseAndExpirationTimeIsNull(id);
-        if (post.isEmpty()) {
-            throw new DataNotFoundException(POST_NOT_FOUND);
-        }
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new DataNotFoundException(USER_NOT_FOUND);
-        }
+        Post post = findPost(id);
+        User user = getUserById(userId);
 
-        if (post.get().getLikes().contains(user.get())) {
-            post.get().getLikes().remove(getUserById(userId));
+        if (post.getLikes().contains(user)) {
+            post.getLikes().remove(getUserById(userId));
         } else {
-            post.get().getLikes().add(getUserById(userId));
+            post.getLikes().add(getUserById(userId));
         }
-        post.get().getLikes().forEach(a ->
+        post.getLikes().forEach(a ->
                 System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
         userRepository.save(getUserById(userId));
-        post.get().getLikes().forEach(a ->
+        post.getLikes().forEach(a ->
                 System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
-        return post.get().getLikes().size();
+        return post.getLikes().size();
     }
 }

@@ -71,9 +71,7 @@ public class UserController extends AbstractController {
             validateUsername(user.getUsername());
         }
         validatePassword(user.getPassword());
-        Optional<User> user1 = Optional.of(userRepository.findByUsername(user.getUsername())
-                .orElseGet(() -> userRepository.findByEmail(user.getUsername())
-                        .orElseThrow(() -> new DataNotFoundException("User not found"))));
+        Optional<User> user1 = userService.checkIfUserExists(user);
         if(session.getAttribute("logged") != null) {
             throw new UserNotCreatedException("You are already logged in");
         }

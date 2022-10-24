@@ -12,12 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.DiscriminatorValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -187,6 +185,12 @@ public class UserService extends AbstractService {
                 + "default_profile_picture.jpg");
         userRepository.save(user);
         return "Default profile picture set";
+    }
+    
+    protected Optional<User> checkIfUserExists(UserLoginDTO user) {
+        return Optional.of(userRepository.findByUsername(user.getUsername())
+                .orElseGet(() -> userRepository.findByEmail(user.getUsername())
+                        .orElseThrow(() -> new DataNotFoundException("User not found"))));
     }
     
     public String followUser(User userToFollow, long loggedUserId) {

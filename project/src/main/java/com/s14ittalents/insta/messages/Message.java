@@ -1,12 +1,15 @@
 package com.s14ittalents.insta.messages;
 
 
+import com.s14ittalents.insta.post.Post;
+import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.Ownerable;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -34,7 +37,6 @@ public class Message implements Ownerable {
     private LocalDateTime sendDate;
     @Column
     private boolean isSeen;
-    
     @Override
     public long ownerId() {
         return id;

@@ -23,7 +23,7 @@ public class MessageController extends AbstractController {
         return messageService.getReceivedMessages(getLoggedUserId());
     }
     
-    PostMapping("/{username}")
+    @PostMapping("/{username}")
     MessageOnlyIdDTO sendMessage(@PathVariable String username, @RequestBody MessageCreateDTO message) {
         
         return messageService.sendMessage(getLoggedUserId(), username);

@@ -27,4 +27,11 @@ public class MessageService extends AbstractService {
                 .collect(Collectors.toList());
     }
     
+    public MessageOnlyIdDTO sendMessage(long loggedUserId, String username) {
+        Message message = new Message();
+        message.setReceiverId(getUserByUsername(username).getId());
+        message.setSenderId(getUserById(loggedUserId).getId());
+        messageRepository.save(message);
+        return modelMapper.map(message, MessageOnlyIdDTO.class);
+    }
 }

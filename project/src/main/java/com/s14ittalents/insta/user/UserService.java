@@ -1,9 +1,6 @@
 package com.s14ittalents.insta.user;
 
-import com.s14ittalents.insta.exception.BadRequestException;
-import com.s14ittalents.insta.exception.DataNotFoundException;
-import com.s14ittalents.insta.exception.NoAuthException;
-import com.s14ittalents.insta.exception.UserNotCreatedException;
+import com.s14ittalents.insta.exception.*;
 import com.s14ittalents.insta.util.AbstractService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +17,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.s14ittalents.insta.exception.Constant.mb;
 
 @Service
 public class UserService extends AbstractService {
@@ -41,6 +40,10 @@ public class UserService extends AbstractService {
 
 
     UserNoPasswordDTO createUser(UserRegisterDTO user) {
+        validateEmail(user.getEmail());
+        validateUsername(user.getUsername());
+        validatePassword(user.getPassword());
+        validatePassword(user.getConfirmPassword());
         userRepository.findByUsername(user.getUsername())
                 .ifPresent(u -> {
                     throw new UserNotCreatedException("Username already exists");
@@ -72,8 +75,21 @@ public class UserService extends AbstractService {
         }
     }
 
-    UserOnlyMailAndUsernameDTO loginUser(User user, String password) {
-        if (checkPasswordMatch(user, password)) {
+    UserOnlyMailAndUsernameDTO loginUser(UserLoginDTO user1) {
+        if(user1.getUsername().indexOf('@') != -1) {
+            validateEmail(user1.getUsername());
+        } else {
+            validateUsername(user1.getUsername());
+        }
+        validatePassword(user1.getPassword());
+        checkIfUserExists(user1.getUsername());
+        User user= getUserByUsername(user1.getUsername());
+        if(user.isBanned()) {
+            throw new BadRequestException("You are banned");
+        }
+
+
+        if (checkPasswordMatch(user, user1.getPassword())) {
             return modelMapper.map(user, UserOnlyMailAndUsernameDTO.class);
         }
         throw new NoAuthException("Wrong credentials!");
@@ -82,6 +98,9 @@ public class UserService extends AbstractService {
     @Transactional
     public UserNoPasswordDTO updateUser(UserUpdateDTO user, long userId) {
         
+        validateEmail(user.getEmail());
+        validateUsername(user.getUsername());
+        validatePassword(user.getPassword());
         User user1 = getUserById(userId);
         checkPermission(userId, user1);
         user1.setFirstName(user.getFirstName());
@@ -111,9 +130,11 @@ public class UserService extends AbstractService {
     }
     
     public String updateProfilePicture(MultipartFile file, long uid) {
+        if(file.getSize()>mb*5){
+            throw new BadRequestException("File size is too big, must be below 5MB");
+        }
         try {
-            User user = userRepository.findById(uid)
-                    .orElseThrow(() -> new DataNotFoundException("User not found"));
+            User user = getUserById(uid);
             if(file.isEmpty()) {
                 throw new BadRequestException("File is empty");
             }
@@ -122,14 +143,13 @@ public class UserService extends AbstractService {
             if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg"))) {
                 throw new BadRequestException("Invalid file type");
             }
-            String name = "uploads" + File.separator + "pfp" + File.separator + user.getUsername()
-                    + File.separator + System.nanoTime() + ext;
+            String name = "uploads" + File.separator + "pfp" + File.separator + System.nanoTime() + ext;
             File f = new File(name);
             if(!f.exists()) {
                 Files.copy(file.getInputStream(), f.toPath());
             }
             else{
-                throw new BadRequestException("The file already exists");
+                throw new FileException("The file already exists");
             }
             if(user.getProfilePicture() != null && !(user.getProfilePicture().equals("default_profile_picture" + File.separator
                     + "default_profile_picture.jpg"))){
@@ -140,18 +160,19 @@ public class UserService extends AbstractService {
             userRepository.save(user);
             return name;
         } catch (IOException e) {
-            //response.setStatus(500);
             e.getCause();
             e.printStackTrace();
             e.getMessage();
-            throw new BadRequestException("Unable to set profile picture at this moment," +
+            throw new FileException("Unable to set profile picture at this moment," +
                     " default profile picture will be used");
         }
     }
     
 
     public String deleteUser(long userId, UserDeleteDTO user) {
-        
+    
+        validatePassword(user.getPassword());
+        validatePassword(user.getConfirmPassword());
         User userToDelete = getUserById(userId);
         String password = user.getPassword();
         System.out.println(password);
@@ -190,13 +211,18 @@ public class UserService extends AbstractService {
         return "Default profile picture set";
     }
     
-    protected Optional<User> checkIfUserExists(UserLoginDTO user) {
-        return Optional.of(userRepository.findByUsername(user.getUsername())
-                .orElseGet(() -> userRepository.findByEmail(user.getUsername())
+    protected Optional<User> checkIfUserExists(String usermame) {
+        return Optional.of(userRepository.findByUsername(usermame)
+                .orElseGet(() -> userRepository.findByEmail(usermame)
                         .orElseThrow(() -> new DataNotFoundException("User not found"))));
     }
     
-    public String followUser(User userToFollow, long loggedUserId) {
+    public String followUser(String username, long loggedUserId) {
+        User userToFollow = userRepository.findByUsername(username.toLowerCase().trim())
+                .orElseThrow(() -> new DataNotFoundException("Follow unsuccessful, user not found"));
+        if(userToFollow.getId() == loggedUserId) {
+            throw new BadRequestException("You cannot follow yourself");
+        }
         User user = getUserById(loggedUserId);
         if(userToFollow.getId() == loggedUserId) {
             throw new BadRequestException("You cannot follow yourself");
@@ -245,6 +271,10 @@ public class UserService extends AbstractService {
             return "User "+ username +" has been banned";
         }
 
+    }
+    
+    public long getIdFromMailUsernameDTO(UserOnlyMailAndUsernameDTO user1) {
+        return getUserByUsername(user1.getUsername()).getId();
     }
     //loginUser(n,int id) {
 

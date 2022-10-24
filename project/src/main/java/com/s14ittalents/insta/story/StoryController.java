@@ -39,4 +39,10 @@ public class StoryController extends AbstractController {
         }
         return storyService.deleteStory(storyId, userId);
     }
+    
+    @PostMapping("/{id:[0-9]+}/")
+    int likePost(@PathVariable long id) {
+        long userId = getLoggedUserId();
+        return storyService.likeStory(id, userId);
+    }
 }

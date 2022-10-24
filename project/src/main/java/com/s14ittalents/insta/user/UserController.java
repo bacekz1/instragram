@@ -20,8 +20,6 @@ public class UserController extends AbstractController {
     @Autowired
     private UserService userService;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
@@ -32,59 +30,36 @@ public class UserController extends AbstractController {
 
     @PostMapping()
     UserNoPasswordDTO createUser(@ModelAttribute UserRegisterDTO user) {
-        validateEmail(user.getEmail());
-        validateUsername(user.getUsername());
-        validatePassword(user.getPassword());
-        validatePassword(user.getConfirmPassword());
         if(session.getAttribute("id") != null) {
             throw new BadRequestException("You are already logged in" +
                     ", logout first if you wish to create another account");
         }
-//        UserRegisterDTO user = new UserRegisterDTO();
-//        user.setUsername(request.getParameterMap().get("username")[0]);
-//        user.setPassword(request.getParameterMap().get("password")[0]);
 
         return userService.createUser(user);
     }
     @PutMapping()
     UserNoPasswordDTO updateUser(@RequestBody UserUpdateDTO user) {
         long userId = getLoggedUserId();
-        validateEmail(user.getEmail());
-        validateUsername(user.getUsername());
-        validatePassword(user.getPassword());
         return userService.updateUser(user, userId);
     }
     
     @DeleteMapping()
     String deleteUser(@RequestBody UserDeleteDTO user) {
         long userId = getLoggedUserId();
-        validatePassword(user.getPassword());
-        validatePassword(user.getConfirmPassword());
         return userService.deleteUser(userId, user);
     }
 
     @PostMapping("/login")
-    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user) {
-        if(user.getUsername().indexOf('@') != -1) {
-            validateEmail(user.getUsername());
-        } else {
-            validateUsername(user.getUsername());
-        }
-        validatePassword(user.getPassword());
-        Optional<User> user1 = userService.checkIfUserExists(user);
-        if(user1.get().isBanned()) {
-            throw new BadRequestException("You are banned");
-        }
+    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user) {;
         if(session.getAttribute("logged") != null) {
             throw new UserNotCreatedException("You are already logged in");
         }
-        UserOnlyMailAndUsernameDTO user2 = userService.loginUser(user1
-                .orElseThrow(() -> new BadRequestException("Try again")), user.getPassword());
+        UserOnlyMailAndUsernameDTO user1 = userService.loginUser(user);
         session.setAttribute("logged", true);
-        session.setAttribute("id", user1.get().getId());
+        session.setAttribute("id", userService.getIdFromMailUsernameDTO(user1));
         System.out.println(session.getAttribute("id"));
         session.setAttribute(REMOTE_IP, request.getRemoteAddr());
-        return user2;
+        return user1;
     }
     
     @PostMapping("/logout")
@@ -95,11 +70,8 @@ public class UserController extends AbstractController {
     
     
     @PutMapping("/{username}/pfp")
-    public String uploadProfilePicture(@RequestParam(value = "file") MultipartFile file) {
+    public String uploadProfilePicture(@ModelAttribute(value = "file") MultipartFile file) {
         if(getLoggedUserId()>0){
-            if(file.getSize()>5242880){
-                throw new BadRequestException("File size is too big, must be below 5MB");
-            }
             return userService.updateProfilePicture(file, getLoggedUserId());
         }else {
             throw new BadRequestException("Something went wrong");
@@ -117,12 +89,7 @@ public class UserController extends AbstractController {
     
     @PostMapping("/follow/{username}")
     public String followUser(@PathVariable String username) {
-        User userToFollow = userRepository.findByUsername(username.toLowerCase().trim())
-                .orElseThrow(() -> new DataNotFoundException("Follow unsuccessful, user not found"));
-        if(userToFollow.getId() == getLoggedUserId()) {
-            throw new BadRequestException("You cannot follow yourself");
-        }
-        return userService.followUser(userToFollow, getLoggedUserId());
+        return userService.followUser(username, getLoggedUserId());
     }
     
     @GetMapping("/followers")

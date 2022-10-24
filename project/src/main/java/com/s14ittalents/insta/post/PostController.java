@@ -43,11 +43,7 @@ public class PostController extends AbstractController {
     @PostMapping("/{id:[0-9]+}/")
     int likePost(@PathVariable long id) {
         long userId = getLoggedUserId();
-        if (userId <= 0) {
-            throw new NoAuthException("You are not logged in");
-        } else {
             return postService.likePost(id, userId);
-        }
     }
     /*
             if new session is set - its from another client/ file with requests/ can make APIHttp  or Postman

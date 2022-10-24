@@ -7,8 +7,6 @@ import com.s14ittalents.insta.post.Post;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,12 +18,6 @@ import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public class CommentService extends AbstractService {
-
-    @Autowired
-    ModelMapper modelMapper;
-    @Autowired
-    CommentRepository commentRepository;
-
     List<CommentWithRepliesDTO> getCommentWithReplies(long id) {
         Optional<Comment> comment = commentRepository.findById(id);
         comment.orElseThrow(() -> new DataNotFoundException(Constant.DATA_NOT_FOUND));
@@ -49,10 +41,11 @@ public class CommentService extends AbstractService {
 
     public CreateCommentDTO replyComment(CreateCommentDTO dto, long postId, long commentId) {
         Comment comment = modelMapper.map(dto, Comment.class);
-        if (comment.ownerId() == dto.getOwnerId()){
+
+        Comment replyComment = findComment(commentId);
+        if (replyComment.ownerId() == dto.getOwnerId()){
             throw new BadRequestException(CAN_NOT_REPLY_YOURSELF);
         }
-        Comment replyComment = findComment(commentId);
         comment.setOwnerId(dto.getOwnerId());
         Post post = findPost(postId);
         comment.setCreatedAt(LocalDateTime.now());

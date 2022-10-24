@@ -5,7 +5,6 @@ import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 
@@ -13,33 +12,49 @@ import java.util.List;
 public class CommentController extends AbstractController {
     @Autowired
     private CommentService commentService;
-//
-//    @GetMapping({"/{id:[0-9]+}"})
-//    Comment getComment(@RequestBody @PathVariable long id) {
-//        return commentService.getComment(id);
-//    }
 
     @GetMapping({"/comment/{id:[0-9]+}"})
     List<CommentWithRepliesDTO> getCommentWithReplies(@RequestBody @PathVariable long id) {
         return commentService.getCommentWithReplies(id);
     }
 
+    @PostMapping("/post/{postId}")
+    CreateCommentDTO createComment(@PathVariable long postId, @RequestBody CreateCommentDTO dto) {
+        long userId = getLoggedUserId();
+        dto.setOwnerId(userId);
+        return commentService.createComment(dto, postId);
+    }
+
+    @PostMapping("/post/{postId}/comment/{commentId}")
+    CreateCommentDTO createReply(@PathVariable long postId, @PathVariable long commentId,
+                                 @RequestBody CreateCommentDTO dto) {
+        long userId = getLoggedUserId();
+        dto.setOwnerId(userId);
+        return commentService.replyComment(dto, postId, commentId);
+    }
+
+    @PutMapping("/comment/{commentId}")
+    CreateCommentDTO editComment(@PathVariable long commentId, @RequestBody CreateCommentDTO dto) {
+        long userId = getLoggedUserId();
+        dto.setOwnerId(userId);
+        return commentService.editComment(dto, commentId);
+    }
+
+    @DeleteMapping("/comment/{commentId}")
+    void deleteComment(@PathVariable long commentId) {
+        long userId = getLoggedUserId();
+        commentService.deleteComment(userId, commentId);
+    }
+
     @PostMapping("/comment/{id:[0-9]+}")
     int likePost(@PathVariable long id) {
         long userId = getLoggedUserId();
-        if(userId<=0){
+        if (userId <= 0) {
             throw new NoAuthException("You are not logged in");
-        }else {
+        } else {
             return commentService.likeComment(id, userId);
         }
     }
-    @PostMapping("/post/{id}")
-    CreateCommentDTO createComment(@PathVariable long id, @RequestBody CreateCommentDTO dto, HttpSession session) {
-        int userId = 2;
-        dto.setOwnerId(userId);
-        dto.setPostId(id);
-        return commentService.createComment(dto);
-    }
-    
-    
+
+
 }

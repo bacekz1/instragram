@@ -1,5 +1,6 @@
 package com.s14ittalents.insta.util;
 
+import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.comment.CommentRepository;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.content.ContentRepository;
@@ -20,10 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.s14ittalents.insta.exception.Constant.*;
@@ -49,9 +47,11 @@ public abstract class AbstractService {
     protected User getUserById(long id) {
         return userRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
     }
+
     protected User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
     }
+
     protected long getUserId(String username) {
         return userRepository.
                 findByUsername(username).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND)).getId();
@@ -67,15 +67,49 @@ public abstract class AbstractService {
                 .orElseThrow(() -> new DataNotFoundException(Constant.POST_NOT_FOUND));
     }
 
+    protected Comment findComment(long id) {
+        return commentRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND));
+    }
+
     public void addPersonTags(Post post) {
-        List<User> users = Helper.findPersonTags(post.getCaption()).stream()
+        if (post.getComments() != null) {
+            Set<User> userTags = post.getComments().stream().map(Comment::getComment)
+                    .map(tag -> userRepository.findByUsername(tag.replaceAll("@", "")))
+                    .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+            post.getPersonTags().addAll(userTags);
+        }
+        Set<User> users = Helper.findPersonTags(post).stream()
                 .map(tag -> userRepository.findByUsername(tag.replaceAll("@", "")))
-                .filter(Optional::isPresent).map(Optional::get).toList();
+                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+        post.getPersonTags().addAll(users);
+    }
+
+    public void addPersonTags(Post post, Comment comment) {
+        Set<User> users = Helper.findPersonTags(comment).stream()
+                .map(tag -> userRepository.findByUsername(tag.replaceAll("@", "")))
+                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
         post.getPersonTags().addAll(users);
     }
 
     public void addHashtags(Post post) {
-        List<String> hashtagStr = Helper.findHashTags(post.getCaption());
+        Set<String> hashtagStr = Helper.findHashTags(post);
+        if (post.getComments() != null) {
+            Set<String> commentHashtags = post.getComments().stream().map(Comment::getComment).collect(Collectors.toSet());
+            hashtagStr.addAll(commentHashtags);
+        }
+        for (String s : hashtagStr) {
+            Optional<Hashtag> optionalHashtag = hashtagRepository.findByTagName(s);
+            if (optionalHashtag.isPresent()) {
+                post.getHashtags().add(optionalHashtag.get());
+            } else {
+                post.getHashtags().add(new Hashtag(s));
+            }
+        }
+    }
+
+    public void addHashtags(Post post, Comment comment) {
+        Set<String> hashtagStr = Helper.findHashTags(comment);
         for (String s : hashtagStr) {
             Optional<Hashtag> optionalHashtag = hashtagRepository.findByTagName(s);
             if (optionalHashtag.isPresent()) {
@@ -136,56 +170,56 @@ public abstract class AbstractService {
         }
         return contents;
     }
-    
-    protected String validatePassword(String password){
-        if(password.length() < 8){
+
+    protected String validatePassword(String password) {
+        if (password.length() < 8) {
             throw new BadRequestException("Password must be at least 8 characters long");
         }
-        if(password.length() > 20){
+        if (password.length() > 20) {
             throw new BadRequestException("Password must be at most 20 characters long");
         }
-        if(!password.matches(".*[a-z].*")){
+        if (!password.matches(".*[a-z].*")) {
             throw new BadRequestException("Password must contain at least one lowercase letter");
         }
-        if(!password.matches(".*[A-Z].*")){
+        if (!password.matches(".*[A-Z].*")) {
             throw new BadRequestException("Password must contain at least one uppercase letter");
         }
-        if(!password.matches(".*[0-9].*")){
+        if (!password.matches(".*[0-9].*")) {
             throw new BadRequestException("Password must contain at least one digit");
         }
-        if(!password.matches(".*[!@#$%^&*()_+].*")){
+        if (!password.matches(".*[!@#$%^&*()_+].*")) {
             throw new BadRequestException("Password must contain at least one special character");
         }
-        
+
         return password.trim();
     }
-    
-    protected String validateUsername(String username){
-        if(username.length() < 2){
+
+    protected String validateUsername(String username) {
+        if (username.length() < 2) {
             throw new BadRequestException("Username must be at least 2 characters long");
         }
-        if(username.length() > 30){
+        if (username.length() > 30) {
             throw new BadRequestException("Username must be at most 30 characters long");
         }
-        if(!username.matches("^[a-z0-9_]+$")){
+        if (!username.matches("^[a-z0-9_]+$")) {
             throw new BadRequestException("Username must contain only lowercase letters, digits and underscore");
         }
         return username.trim();
     }
-    
-    protected String validateEmail(String email){
-        if(email.length() < 5){
+
+    protected String validateEmail(String email) {
+        if (email.length() < 5) {
             throw new BadRequestException("Email must be at least 5 characters long");
         }
-        if(email.length() > 50) {
+        if (email.length() > 50) {
             throw new BadRequestException("Email must be at most 50 characters long");
         }
-        if(!email.matches("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"" +
+        if (!email.matches("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"" +
                 "(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])" +
                 "*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2" +
                 "(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])" +
                 "|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b" +
-                "\\x0c\\x0e-\\x7f])+)\\])")){
+                "\\x0c\\x0e-\\x7f])+)\\])")) {
             throw new BadRequestException("Email is not valid");
         }
         return email.trim();

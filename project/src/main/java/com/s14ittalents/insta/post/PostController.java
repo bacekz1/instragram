@@ -32,18 +32,15 @@ public class PostController extends AbstractController {
     }
 
     @DeleteMapping("/{postId:[0-9]+}")
-    boolean deletePost(@PathVariable long postId) {
+    void deletePost(@PathVariable long postId) {
         long userId = getLoggedUserId();
-        if (userId <= 0) {
-            throw new NoAuthException("You are not logged in");
-        }
-        return postService.deletePost(postId, userId);
+        postService.deletePostComments(postId, userId);
     }
 
     @PostMapping("/{id:[0-9]+}/")
     int likePost(@PathVariable long id) {
         long userId = getLoggedUserId();
-            return postService.likePost(id, userId);
+        return postService.likePost(id, userId);
     }
     /*
             if new session is set - its from another client/ file with requests/ can make APIHttp  or Postman

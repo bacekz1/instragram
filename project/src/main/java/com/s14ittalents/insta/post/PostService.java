@@ -1,9 +1,7 @@
 package com.s14ittalents.insta.post;
 
-import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.exception.BadRequestException;
-import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
@@ -14,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static com.s14ittalents.insta.exception.Constant.*;
 
@@ -69,16 +66,14 @@ public class PostService extends AbstractService {
 
 
     @Transactional
-    public boolean deletePost(long postId, long userId) {
+    public void deletePostComments(long postId, long userId) {
         Post post = findPost(postId);
         checkPermission(userId, post);
-        List<Comment> comments = commentRepository.findByPostId(postId).stream().toList();
-        comments.forEach(comment -> comment.setDeleted(true));
-        commentRepository.saveAll(comments);
         post.setDeleted(true);
         post.setCaption("deleted at" + LocalDateTime.now());
+        deletePostComments(post);
         postRepository.save(post);
-        return true;
+
     }
 
     public int likePost(long id, long userId) {
@@ -96,5 +91,14 @@ public class PostService extends AbstractService {
         post.getLikes().forEach(a ->
                 System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
         return post.getLikes().size();
+    }
+
+    private void deletePostComments(Post post){
+        if (post.getComments() != null){
+            for (int i = 0; i < post.getComments().size(); i++) {
+                post.getComments().get(i).setDeleted(true);
+                post.getComments().get(i).setComment("deleted at" + LocalDateTime.now());
+            }
+        }
     }
 }

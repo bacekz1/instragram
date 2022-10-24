@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.File;
+package com.s14ittalents.insta.file;
 
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.FileException;

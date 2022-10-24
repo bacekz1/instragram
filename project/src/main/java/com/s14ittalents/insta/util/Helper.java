@@ -1,7 +1,8 @@
 package com.s14ittalents.insta.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
 public final class Helper {
     private final static char hashtag = '#';
     private final static char personTag = '@';
@@ -12,15 +13,15 @@ public final class Helper {
     private Helper() {
     }
 
-    public static List<String> findHashTags(String text) {
+    public static Set<String> findHashTags(Commentable text) {
         builder.delete(0,builder.length());
         boolean personTagFlag = false;
         boolean hashtagFlag = false;
 
-        List<String> hashTagList = new ArrayList<>();
+        Set<String> hashTagList = new HashSet<>();
 
-        for (int i = 0; i < text.length(); i++) {
-            char curChar = text.charAt(i);
+        for (int i = 0; i < text.getComment().length(); i++) {
+            char curChar = text.getComment().charAt(i);
 
             if (hashtagFlag) {
                 if (curChar == hashtag) {
@@ -83,15 +84,15 @@ public final class Helper {
         return hashTagList;
     }
 
-    public static List<String> findPersonTags(String text) {
+    public static Set<String> findPersonTags(Commentable text) {
         builder.delete(0,builder.length());
         boolean personTagFlag = false;
         boolean hashtagFlag = false;
 
-        List<String> personTagList = new ArrayList<>();
+        Set<String> personTagList = new HashSet<>();
 
-        for (int i = 0; i < text.length(); i++) {
-            char curChar = text.charAt(i);
+        for (int i = 0; i < text.getComment().length(); i++) {
+            char curChar = text.getComment().charAt(i);
 
             if (hashtagFlag) {
                 if (curChar == hashtag) {

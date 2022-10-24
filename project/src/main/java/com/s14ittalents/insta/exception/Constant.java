@@ -12,6 +12,7 @@ public class Constant {
     public static final String YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES = "You can only choose 10 or fewer files";
     public static final String MAX_SIZE_PER_FILE_IS_10_MB = "Max size per file is 10mb";
     public static final String THE_FILE_ALREADY_EXISTS = "The file already exists";
-
     public static final int MAX_ALLOWED_FILES_TO_UPLOAD = 10;
+    public static final String COMMENT_NOT_FOUND = "Comment not found";
+    public static final String CAN_NOT_REPLY_YOURSELF = "Can not reply yourself";
 }

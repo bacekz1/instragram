@@ -5,6 +5,7 @@ import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.hashtag.Hashtag;
 import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.user.User;
+import com.s14ittalents.insta.util.Commentable;
 import com.s14ittalents.insta.util.Ownerable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,14 +16,16 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Setter
 @Getter
 @NoArgsConstructor
 @Table(name = "post")
-public class Post implements Ownerable {
+public class Post implements Ownerable, Commentable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -47,22 +50,27 @@ public class Post implements Ownerable {
     @Column
     @NotNull
     private LocalDateTime createdTime;
-    @ManyToMany(cascade=CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "hashtags_posts",
-            joinColumns = { @JoinColumn(name = "post_hashtag_id") },
-            inverseJoinColumns = { @JoinColumn(name = "tag_id") })
-    private List<Hashtag> hashtags = new ArrayList<>();
+            joinColumns = {@JoinColumn(name = "post_hashtag_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")})
+    private Set<Hashtag> hashtags = new HashSet<>();
 
-    @ManyToMany(cascade=CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "person_tag",
-            joinColumns = { @JoinColumn(name = "post_persontag_id") },
-            inverseJoinColumns = { @JoinColumn(name = "user_tag_id") })
-        private List<User> personTags = new ArrayList<>();
+            joinColumns = {@JoinColumn(name = "post_persontag_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_tag_id")})
+    private Set<User> personTags = new HashSet<>();
 
     @Override
     public long ownerId() {
-       return owner.getId();
+        return owner.getId();
+    }
+
+    @Override
+    public String getComment() {
+       return getCaption();
     }
 }

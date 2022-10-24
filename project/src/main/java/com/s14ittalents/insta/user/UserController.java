@@ -2,7 +2,6 @@ package com.s14ittalents.insta.user;
 
 import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
-import com.s14ittalents.insta.exception.ExceptionController;
 import com.s14ittalents.insta.exception.UserNotCreatedException;
 import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,26 +32,46 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping()
-    UserNoPasswordDTO createUser() {
-        if(getLoggedUserId() > 0){
+    UserNoPasswordDTO createUser(@ModelAttribute UserRegisterDTO user) {
+        validateEmail(user.getEmail());
+        validateUsername(user.getUsername());
+        validatePassword(user.getPassword());
+        validatePassword(user.getConfirmPassword());
+        if(session.getAttribute("id") != null) {
             throw new BadRequestException("You are already logged in" +
                     ", logout first if you wish to create another account");
         }
-        UserRegisterDTO user = new UserRegisterDTO();
-        user.setUsername(request.getParameterMap().get("username")[0]);
-        user.setPassword(request.getParameterMap().get("password")[0]);
+//        UserRegisterDTO user = new UserRegisterDTO();
+//        user.setUsername(request.getParameterMap().get("username")[0]);
+//        user.setPassword(request.getParameterMap().get("password")[0]);
 
         return userService.createUser(user);
     }
     @PutMapping()
     UserNoPasswordDTO updateUser(@RequestBody UserUpdateDTO user) {
         long userId = getLoggedUserId();
+        validateEmail(user.getEmail());
+        validateUsername(user.getUsername());
+        validatePassword(user.getPassword());
         return userService.updateUser(user, userId);
+    }
+    
+    @DeleteMapping()
+    String deleteUser(@RequestBody UserDeleteDTO user) {
+        long userId = getLoggedUserId();
+        validatePassword(user.getPassword());
+        validatePassword(user.getConfirmPassword());
+        return userService.deleteUser(userId, user);
     }
 
     @PostMapping("/login")
-    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user
-            , HttpSession session, HttpServletRequest request) {
+    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user) {
+        if(user.getUsername().indexOf('@') != -1) {
+            validateEmail(user.getUsername());
+        } else {
+            validateUsername(user.getUsername());
+        }
+        validatePassword(user.getPassword());
         Optional<User> user1 = Optional.of(userRepository.findByUsername(user.getUsername())
                 .orElseGet(() -> userRepository.findByEmail(user.getUsername())
                         .orElseThrow(() -> new DataNotFoundException("User not found"))));
@@ -69,18 +88,28 @@ public class UserController extends AbstractController {
     }
     
     @PostMapping("/logout")
-    void logoutUser(HttpSession session) {
+    String logoutUser() {
         session.invalidate();
+        return "You have been logged out";
     }
     
     
-    @PostMapping("/{username}/pfp")
+    @PutMapping("/{username}/pfp")
     public String uploadProfilePicture(@RequestParam(value = "file") MultipartFile file) {
         if(getLoggedUserId()>0){
             if(file.getSize()>5242880){
                 throw new BadRequestException("File size is too big, must be below 5MB");
             }
             return userService.updateProfilePicture(file, getLoggedUserId());
+        }else {
+            throw new BadRequestException("Something went wrong");
+        }
+    }
+    
+    @PutMapping("/{username}/pfp/default")
+    public String setDefaultProfilePicture() {
+        if(getLoggedUserId()>0){
+            return userService.setDefaultProfilePicture(getLoggedUserId());
         }else {
             throw new BadRequestException("Something went wrong");
         }

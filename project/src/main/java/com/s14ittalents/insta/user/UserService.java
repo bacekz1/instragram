@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.DiscriminatorValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -37,6 +39,7 @@ public class UserService extends AbstractService {
         return modelMapper.map(user, UserNoPasswordDTO.class);
     }
 
+
     UserNoPasswordDTO createUser(UserRegisterDTO user) {
         userRepository.findByUsername(user.getUsername())
                 .ifPresent(u -> {
@@ -47,22 +50,30 @@ public class UserService extends AbstractService {
                     throw new UserNotCreatedException("Email already exists");
                 });
         if (Objects.equals(user.getPassword(), user.getConfirmPassword())) {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            if (user.getProfilePicture() == null) {
-                user.setProfilePicture("default_profile_picture" + File.separator
+            User newUser = new User();
+            newUser.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            newUser.setUsername(user.getUsername());
+            newUser.setEmail(user.getEmail());
+            newUser.setCreatedAt(LocalDateTime.now());
+            newUser.setBio(user.getBio());
+            newUser.setDateOfBirth(user.getDateOfBirth());
+            newUser.setFirstName(user.getFirstName());
+            newUser.setLastName(user.getLastName());
+            newUser.setProfilePicture("default_profile_picture" + File.separator
                         + "default_profile_picture.jpg");
-            }
             user.setCreatedAt(LocalDateTime.now());
-            userRepository.save(modelMapper.map(user, User.class));
-            user.setId(userRepository.findByUsername(user.getUsername()).get().getId());
-            return modelMapper.map(user, UserNoPasswordDTO.class);
+            userRepository.save(newUser);
+            if(user.getProfilePicture() != null) {
+                updateProfilePicture(user.getProfilePicture(), getUserId(newUser.getUsername()));
+            }
+            return modelMapper.map(newUser, UserNoPasswordDTO.class);
         } else {
             throw new UserNotCreatedException("Passwords do not match");
         }
     }
 
     UserOnlyMailAndUsernameDTO loginUser(User user, String password) {
-        if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
+        if (checkPasswordMatch(user, password)) {
             return modelMapper.map(user, UserOnlyMailAndUsernameDTO.class);
         }
         throw new NoAuthException("Wrong credentials!");
@@ -70,6 +81,7 @@ public class UserService extends AbstractService {
 
     @Transactional
     public UserNoPasswordDTO updateUser(UserUpdateDTO user, long userId) {
+        
         User user1 = getUserById(userId);
         checkPermission(userId, user1);
         user1.setFirstName(user.getFirstName());
@@ -102,13 +114,16 @@ public class UserService extends AbstractService {
         try {
             User user = userRepository.findById(uid)
                     .orElseThrow(() -> new DataNotFoundException("User not found"));
+            if(file.isEmpty()) {
+                throw new BadRequestException("File is empty");
+            }
             String ext = Objects.requireNonNull(file.getOriginalFilename()).
                     substring(file.getOriginalFilename().lastIndexOf("."));
             if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg"))) {
                 throw new BadRequestException("Invalid file type");
             }
             String name = "uploads" + File.separator + "pfp" + File.separator + user.getUsername()
-                    + File.separator + System.nanoTime() + "." + ext;
+                    + File.separator + System.nanoTime() + ext;
             File f = new File(name);
             if(!f.exists()) {
                 Files.copy(file.getInputStream(), f.toPath());
@@ -116,7 +131,8 @@ public class UserService extends AbstractService {
             else{
                 throw new BadRequestException("The file already exists");
             }
-            if(user.getProfilePicture() != null){
+            if(user.getProfilePicture() != null && !(user.getProfilePicture().equals("default_profile_picture" + File.separator
+                    + "default_profile_picture.jpg"))){
                 File old = new File(user.getProfilePicture());
                 old.delete();
             }
@@ -124,8 +140,51 @@ public class UserService extends AbstractService {
             userRepository.save(user);
             return name;
         } catch (IOException e) {
-            throw new BadRequestException("Something went wrong");
+            //response.setStatus(500);
+            throw new BadRequestException("Unable to set profile picture at this moment," +
+                    " default profile picture will be used");
         }
+    }
+    
+
+    public String deleteUser(long userId, UserDeleteDTO user) {
+        
+        User userToDelete = getUserById(userId);
+        String password = user.getPassword();
+        System.out.println(password);
+        String passwordConfirm = user.getConfirmPassword();
+        System.out.println(passwordConfirm);
+        if(!password.equals(passwordConfirm)) {
+            throw new BadRequestException("Passwords do not match");
+        }
+        if(!(checkPasswordMatch(userToDelete, user.getPassword()))) {
+            throw new BadRequestException("Wrong password");
+        }
+        //checkPermission(userId, userToDelete);
+        userToDelete.setDeleted(true);
+        String replaceInDeleted = String.valueOf((userToDelete.getId()));
+        userToDelete.setUsername(replaceInDeleted);
+        userToDelete.setEmail(replaceInDeleted+"-"+LocalDateTime.now());
+        userToDelete.setFirstName(replaceInDeleted);
+        userToDelete.setLastName(replaceInDeleted);
+        userToDelete.setPassword(replaceInDeleted);
+        userToDelete.setGender(replaceInDeleted);
+        userToDelete.setProfilePicture(replaceInDeleted);
+        userToDelete.setPhoneNum(replaceInDeleted);
+        userToDelete.setBio(replaceInDeleted);
+        userToDelete.setDateOfBirth(null);
+        userToDelete.setVerified(false);
+        userRepository.save(userToDelete);
+        return "User deleted";
+    }
+    
+    public String setDefaultProfilePicture(long loggedUserId) {
+        User user = getUserById(loggedUserId);
+        checkPermission(loggedUserId, user);
+        user.setProfilePicture("default_profile_picture" + File.separator
+                + "default_profile_picture.jpg");
+        userRepository.save(user);
+        return "Default profile picture set";
     }
     //loginUser(n,int id) {
 

@@ -224,5 +224,12 @@ public abstract class AbstractService {
         }
         return email.trim();
     }
-
+    
+    protected User validateIfUserIsAdminByEmail(long loggedUserId) {
+        User user = getUserById(loggedUserId);
+        if(!user.getEmail().split("@")[1].equals("admin.instagram.com")) {
+            throw new BadRequestException("You do not have permission to ban users");
+        }
+        return user;
+    }
 }

@@ -123,7 +123,34 @@ public class UserService extends AbstractService {
         userRepository.save(user);
         return user;
     }
-
+    
+    public String changePassword(UserChangePasswordDTO user, long userId) {
+        if (user.getNewPassword()==null || user.getConfirmPassword()==null || user.getOldPassword()==null) {
+            throw new BadRequestException("All fields are required");
+        }
+        User user1 = getUserById(userId);
+        checkPermission(userId, user1);
+        if (checkPasswordMatch(user1, user.getOldPassword().trim())) {
+            if(user.getOldPassword().equals(user.getNewPassword())) {
+                throw new BadRequestException("New password cannot be the same as the old one");
+            }
+            validatePassword(user.getNewPassword());
+            checkIfPasswordAndConfirmPasswordMatch(user.getNewPassword(), user.getConfirmPassword());
+            user1.setPassword(bCryptPasswordEncoder.encode(user.getNewPassword()));
+            userRepository.save(user1);
+            return "Password changed successfully";
+        }
+        throw new BadRequestException("Wrong password");
+    }
+    
+    
+    
+    private void checkIfPasswordAndConfirmPasswordMatch(String password, String confirmPassword) {
+        if(!Objects.equals(password, confirmPassword)) {
+            throw new BadRequestException("Passwords do not match");
+        }
+    }
+    
     public boolean checkPasswordMatch(User user, String password) {
         return bCryptPasswordEncoder.matches(password, user.getPassword());
     }
@@ -251,13 +278,10 @@ public class UserService extends AbstractService {
     }
     
     public String banUser(long loggedUserId, String username) {
-        User user = getUserById(loggedUserId);
+        User user = validateIfUserIsAdminByEmail(loggedUserId);
         if(user.getId() == loggedUserId) {
             throw new BadRequestException("You cannot ban yourself");
-        }
-        if(!user.getEmail().split("@")[1].equals("admin.instagram.com")) {
-            throw new BadRequestException("You do not have permission to ban users");
-        }
+        };
         User userToBan = getUserByUsername(username);
         userToBan.setBanned(!userToBan.isBanned());
         userRepository.save(userToBan);

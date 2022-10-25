@@ -68,6 +68,13 @@ public class UserController extends AbstractController {
         return "You have been logged out";
     }
     
+    //mapping for change password
+    @PutMapping("/password")
+    String changePassword(@RequestBody UserChangePasswordDTO user) {
+        long userId = getLoggedUserId();
+        return userService.changePassword(user, userId);
+    }
+    
     
     @PutMapping("/{username}/pfp")
     public String uploadProfilePicture(@ModelAttribute(value = "file") MultipartFile file) {

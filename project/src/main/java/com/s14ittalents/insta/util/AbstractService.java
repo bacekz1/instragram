@@ -10,7 +10,7 @@ import com.s14ittalents.insta.location.LocationRepository;
 import com.s14ittalents.insta.post.Post;
 import com.s14ittalents.insta.post.PostRepository;
 import com.s14ittalents.insta.hashtag.HashtagRepository;
-import com.s14ittalents.insta.post.PostWithoutOwnerDTO;
+import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserRepository;
 import org.modelmapper.ModelMapper;

@@ -3,9 +3,13 @@ package com.s14ittalents.insta.post;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.location.Location;
+import com.s14ittalents.insta.post.dto.PostCreateDTO;
+import com.s14ittalents.insta.post.dto.PostUpdateDTO;
+import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -103,9 +107,13 @@ public class PostService extends AbstractService {
         }
     }
 
-    public List<PostWithoutOwnerDTO> getMyPosts(long userId) {
-        return postRepository.findByOwnerIdAndDeletedIsFalseAndExpirationTimeIsNullOrderByCreatedTimeDesc(userId)
+    public Page<PostWithoutOwnerDTO> getMyPosts(long userId, int page) {
+        Pageable pages = PageRequest.of(page, 12);
+        List<PostWithoutOwnerDTO> list = postRepository.findByOwnerIdAndDeletedIsFalseAndExpirationTimeIsNullOrderByCreatedTimeDesc(userId,
+                        pages)
                 .stream()
-                .map(p -> modelMapper.map(p, PostWithoutOwnerDTO.class)).collect(Collectors.toList());
+                .map(p -> modelMapper.map(p, PostWithoutOwnerDTO.class)).toList();
+        return new PageImpl<>(list);
+
     }
 }

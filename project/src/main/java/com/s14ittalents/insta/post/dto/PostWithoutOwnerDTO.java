@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.post;
+package com.s14ittalents.insta.post.dto;
 
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.ContentWithoutUser;

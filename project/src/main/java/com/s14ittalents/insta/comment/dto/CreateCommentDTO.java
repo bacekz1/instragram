@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.comment;
+package com.s14ittalents.insta.comment.dto;
 
 import lombok.Getter;
 import lombok.Setter;

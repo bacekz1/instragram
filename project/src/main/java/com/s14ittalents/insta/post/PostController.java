@@ -1,7 +1,11 @@
 package com.s14ittalents.insta.post;
 
+import com.s14ittalents.insta.post.dto.PostCreateDTO;
+import com.s14ittalents.insta.post.dto.PostUpdateDTO;
+import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,11 +29,11 @@ public class PostController extends AbstractController {
         return postService.getPost(id);
     }
 
-    @GetMapping("/my")
+    @GetMapping("/my/{page}")
     @ResponseBody
-    List<PostWithoutOwnerDTO> getMyPosts() {
+    Page<PostWithoutOwnerDTO> getMyPosts(@PathVariable int page) {
         long userId = getLoggedUserId();
-        return postService.getMyPosts(userId);
+        return postService.getMyPosts(userId, page);
     }
 
     @PutMapping("/{postId:[0-9]+}")

@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.post;
+package com.s14ittalents.insta.post.dto;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;

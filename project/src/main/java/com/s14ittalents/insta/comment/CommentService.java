@@ -1,5 +1,7 @@
 package com.s14ittalents.insta.comment;
 
+import com.s14ittalents.insta.comment.dto.CommentWithRepliesDTO;
+import com.s14ittalents.insta.comment.dto.CreateCommentDTO;
 import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.Constant;
 import com.s14ittalents.insta.exception.DataNotFoundException;

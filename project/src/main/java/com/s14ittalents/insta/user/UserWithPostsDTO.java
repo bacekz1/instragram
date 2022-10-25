@@ -1,6 +1,6 @@
 package com.s14ittalents.insta.user;
 
-import com.s14ittalents.insta.post.PostWithoutOwnerDTO;
+import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import lombok.Data;
 
 import java.util.List;

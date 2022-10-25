@@ -1,5 +1,7 @@
 package com.s14ittalents.insta.exception;
 
+import java.io.File;
+
 public class Constant {
     public static long mb = 1024000;
     //1mb
@@ -15,4 +17,10 @@ public class Constant {
     public static final int MAX_ALLOWED_FILES_TO_UPLOAD = 10;
     public static final String COMMENT_NOT_FOUND = "Comment not found";
     public static final String CAN_NOT_REPLY_YOURSELF = "Can not reply yourself";
+    
+    public static final String PATH_TO_STATIC =
+            "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator;
+    
+    public static final String DEFAULT_PROFILE_PICTURE =
+            PATH_TO_STATIC + "default_profile_picture" + File.separator + "default_profile_picture.jpg";
 }

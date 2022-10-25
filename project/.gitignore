@@ -6,6 +6,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 /uploads
+/src/main/resources/static/pfp
 
 ### STS ###
 .apt_generated

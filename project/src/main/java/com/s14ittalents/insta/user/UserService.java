@@ -18,12 +18,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.s14ittalents.insta.exception.Constant.mb;
+import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public class UserService extends AbstractService {
-
-
+    
+    
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -62,8 +62,7 @@ public class UserService extends AbstractService {
             newUser.setDateOfBirth(user.getDateOfBirth());
             newUser.setFirstName(user.getFirstName());
             newUser.setLastName(user.getLastName());
-            newUser.setProfilePicture("default_profile_picture" + File.separator
-                        + "default_profile_picture.jpg");
+            newUser.setProfilePicture(DEFAULT_PROFILE_PICTURE);
             user.setCreatedAt(LocalDateTime.now());
             userRepository.save(newUser);
             if(user.getProfilePicture() != null) {
@@ -143,26 +142,26 @@ public class UserService extends AbstractService {
             if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg"))) {
                 throw new BadRequestException("Invalid file type");
             }
-            String name = "uploads" + File.separator + "pfp" + File.separator + System.nanoTime() + ext;
-            File f = new File(name);
+            
+            String dirName = PATH_TO_STATIC + "pfp";
+            String fileName = dirName + File.separator + System.nanoTime() + "-" + uid + "-" + ext;
+            File dir = new File(dirName);
+            File f = new File(fileName);
+            dir.mkdirs();
             if(!f.exists()) {
                 Files.copy(file.getInputStream(), f.toPath());
             }
             else{
                 throw new FileException("The file already exists");
             }
-            if(user.getProfilePicture() != null && !(user.getProfilePicture().equals("default_profile_picture" + File.separator
-                    + "default_profile_picture.jpg"))){
+            if(user.getProfilePicture() != null && !(user.getProfilePicture().equals(DEFAULT_PROFILE_PICTURE))){
                 File old = new File(user.getProfilePicture());
                 old.delete();
             }
-            user.setProfilePicture(name);
+            user.setProfilePicture(fileName);
             userRepository.save(user);
-            return name;
+            return fileName;
         } catch (IOException e) {
-            e.getCause();
-            e.printStackTrace();
-            e.getMessage();
             throw new FileException("Unable to set profile picture at this moment," +
                     " default profile picture will be used");
         }
@@ -205,8 +204,7 @@ public class UserService extends AbstractService {
     public String setDefaultProfilePicture(long loggedUserId) {
         User user = getUserById(loggedUserId);
         checkPermission(loggedUserId, user);
-        user.setProfilePicture("default_profile_picture" + File.separator
-                + "default_profile_picture.jpg");
+        user.setProfilePicture(DEFAULT_PROFILE_PICTURE);
         userRepository.save(user);
         return "Default profile picture set";
     }
@@ -276,12 +274,4 @@ public class UserService extends AbstractService {
     public long getIdFromMailUsernameDTO(UserOnlyMailAndUsernameDTO user1) {
         return getUserByUsername(user1.getUsername()).getId();
     }
-    //loginUser(n,int id) {
-
-
-    // check also if ip matches
-    //servlet request get remote host req.getSession
-
-    //};
-    
 }

@@ -81,21 +81,16 @@ public class PostService extends AbstractService {
 
     }
 
-    public int likePost(long id, long userId) {
-        Post post = findPost(id);
+    public int likePost(long postId, long userId) {
+        Post post = findPost(postId);
         User user = getUserById(userId);
-
-        if (post.getLikes().contains(user)) {
-            post.getLikes().remove(getUserById(userId));
+        if (user.getLikedPosts().contains(post)) {
+            user.getLikedPosts().remove(post);
         } else {
-            post.getLikes().add(getUserById(userId));
+            user.getLikedPosts().add(post);
         }
-        post.getLikes().forEach(a ->
-                System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
-        userRepository.save(getUserById(userId));
-        post.getLikes().forEach(a ->
-                System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
-        return post.getLikes().size();
+        userRepository.save(user);
+        return user.getLikedPosts().size();
     }
 
     private void deletePostComments(Post post) {
@@ -109,8 +104,8 @@ public class PostService extends AbstractService {
 
     public Page<PostWithoutOwnerDTO> getMyPosts(long userId, int page) {
         Pageable pages = PageRequest.of(page, 12);
-        List<PostWithoutOwnerDTO> list = postRepository.findByOwnerIdAndDeletedIsFalseAndExpirationTimeIsNullOrderByCreatedTimeDesc(userId,
-                        pages)
+        List<PostWithoutOwnerDTO> list = postRepository
+                .findByOwnerIdAndDeletedIsFalseAndExpirationTimeIsNullOrderByCreatedTimeDesc(userId, pages)
                 .stream()
                 .map(p -> modelMapper.map(p, PostWithoutOwnerDTO.class)).toList();
         return new PageImpl<>(list);

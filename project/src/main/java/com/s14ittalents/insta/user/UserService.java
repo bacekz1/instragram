@@ -259,16 +259,10 @@ public class UserService extends AbstractService {
             throw new BadRequestException("You do not have permission to ban users");
         }
         User userToBan = getUserByUsername(username);
-        if(user.isBanned()){
-            user.setBanned(false);
-            userRepository.save(userToBan);
-            return "User's "+ username +" ban has been lifted";
-        }else {
-            user.setBanned(true);
-            userRepository.save(userToBan);
-            return "User "+ username +" has been banned";
-        }
-
+        userToBan.setBanned(!userToBan.isBanned());
+        userRepository.save(userToBan);
+        return userToBan.isBanned()? "User "+ username +" has been banned"
+                : "User's "+ username +" ban has been lifted";
     }
     
     public long getIdFromMailUsernameDTO(UserOnlyMailAndUsernameDTO user1) {

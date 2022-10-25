@@ -26,7 +26,7 @@ public class User implements Ownerable {
 
     @Column
     private boolean activityStatus;
-    
+
     @Column
     @NonNull
     private String email;
@@ -71,6 +71,8 @@ public class User implements Ownerable {
 
     @Column(name = "is_deleted")
     private boolean deleted;
+    @Column
+    private boolean isDeactivated;
 
     @Column
     @NotNull
@@ -84,7 +86,7 @@ public class User implements Ownerable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
     List<Post> likedPosts;
-    
+
     @ManyToMany
     @JoinTable(name = "like_comments",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -94,20 +96,21 @@ public class User implements Ownerable {
 
     @ManyToMany(mappedBy = "personTags")
     private List<Post> postList;
-    
-    @ManyToMany(cascade={CascadeType.ALL})
-    @JoinTable(name="following",
-            joinColumns={@JoinColumn(name="user_id")},
-            inverseJoinColumns={@JoinColumn(name="follower_id")})
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(name = "following",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "follower_id")})
     private List<User> following;
-    
-    
-    @ManyToMany(cascade={CascadeType.ALL})
-    @JoinTable(name="following",
-            joinColumns={@JoinColumn(name="follower_id")},
-            inverseJoinColumns={@JoinColumn(name="user_id")})
-    
+
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(name = "following",
+            joinColumns = {@JoinColumn(name = "follower_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+
     private List<User> followers;
+
     @Override
     public long ownerId() {
         return id;

@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.s14ittalents.insta.exception.Constant.*;
 
@@ -93,12 +94,18 @@ public class PostService extends AbstractService {
         return post.getLikes().size();
     }
 
-    private void deletePostComments(Post post){
-        if (post.getComments() != null){
+    private void deletePostComments(Post post) {
+        if (post.getComments() != null) {
             for (int i = 0; i < post.getComments().size(); i++) {
                 post.getComments().get(i).setDeleted(true);
                 post.getComments().get(i).setComment("deleted at" + LocalDateTime.now());
             }
         }
+    }
+
+    public List<PostWithoutOwnerDTO> getMyPosts(long userId) {
+        return postRepository.findByOwnerIdAndDeletedIsFalseAndExpirationTimeIsNullOrderByCreatedTimeDesc(userId)
+                .stream()
+                .map(p -> modelMapper.map(p, PostWithoutOwnerDTO.class)).collect(Collectors.toList());
     }
 }

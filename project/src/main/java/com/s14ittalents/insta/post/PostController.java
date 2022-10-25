@@ -1,9 +1,10 @@
 package com.s14ittalents.insta.post;
 
-import com.s14ittalents.insta.exception.NoAuthException;
 import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/post")
@@ -22,6 +23,13 @@ public class PostController extends AbstractController {
     PostWithoutOwnerDTO getPost(@PathVariable long id) {
         getLoggedUserId();
         return postService.getPost(id);
+    }
+
+    @GetMapping("/my")
+    @ResponseBody
+    List<PostWithoutOwnerDTO> getMyPosts() {
+        long userId = getLoggedUserId();
+        return postService.getMyPosts(userId);
     }
 
     @PutMapping("/{postId:[0-9]+}")

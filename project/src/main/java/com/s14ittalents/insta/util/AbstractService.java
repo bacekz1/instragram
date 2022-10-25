@@ -156,8 +156,16 @@ public abstract class AbstractService {
                 String ext = Objects.requireNonNull(file.getOriginalFilename()).
                         substring(file.getOriginalFilename().lastIndexOf("."));
                 validateFileType(ext);
-                String name = "uploads" + File.separator + System.nanoTime() + userId + ext;
-                File f = new File(name);
+                String dirName;
+                if (createdPost.getExpirationTime() != null) {
+                    dirName = PATH_TO_STATIC + "story";
+                } else {
+                    dirName = PATH_TO_STATIC + "post";
+                }
+                String fileName = dirName + File.separator + System.nanoTime() + userId + ext;
+                File dir = new File(dirName);
+                File f = new File(fileName);
+                dir.mkdirs();
                 if (!f.exists()) {
                     Files.copy(file.getInputStream(), f.toPath());
                     contents.add(new Content(f.getPath(), createdPost));

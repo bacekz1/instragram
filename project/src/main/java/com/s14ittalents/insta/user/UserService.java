@@ -22,8 +22,8 @@ import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public class UserService extends AbstractService {
-    
-    
+
+
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -65,7 +65,7 @@ public class UserService extends AbstractService {
             newUser.setProfilePicture(DEFAULT_PROFILE_PICTURE);
             user.setCreatedAt(LocalDateTime.now());
             userRepository.save(newUser);
-            if(user.getProfilePicture() != null) {
+            if (user.getProfilePicture() != null) {
                 updateProfilePicture(user.getProfilePicture(), getUserId(newUser.getUsername()));
             }
             return modelMapper.map(newUser, UserNoPasswordDTO.class);
@@ -75,15 +75,15 @@ public class UserService extends AbstractService {
     }
 
     UserOnlyMailAndUsernameDTO loginUser(UserLoginDTO user1) {
-        if(user1.getUsername().indexOf('@') != -1) {
+        if (user1.getUsername().indexOf('@') != -1) {
             validateEmail(user1.getUsername());
         } else {
             validateUsername(user1.getUsername());
         }
         validatePassword(user1.getPassword());
         checkIfUserExists(user1.getUsername());
-        User user= getUserByUsername(user1.getUsername());
-        if(user.isBanned()) {
+        User user = getUserByUsername(user1.getUsername());
+        if (user.isBanned()) {
             throw new BadRequestException("You are banned");
         }
 
@@ -96,7 +96,7 @@ public class UserService extends AbstractService {
 
     @Transactional
     public UserNoPasswordDTO updateUser(UserUpdateDTO user, long userId) {
-        
+
         validateEmail(user.getEmail());
         validateUsername(user.getUsername());
         validatePassword(user.getPassword());
@@ -123,15 +123,15 @@ public class UserService extends AbstractService {
         userRepository.save(user);
         return user;
     }
-    
+
     public String changePassword(UserChangePasswordDTO user, long userId) {
-        if (user.getNewPassword()==null || user.getConfirmPassword()==null || user.getOldPassword()==null) {
+        if (user.getNewPassword() == null || user.getConfirmPassword() == null || user.getOldPassword() == null) {
             throw new BadRequestException("All fields are required");
         }
         User user1 = getUserById(userId);
         checkPermission(userId, user1);
         if (checkPasswordMatch(user1, user.getOldPassword().trim())) {
-            if(user.getOldPassword().equals(user.getNewPassword())) {
+            if (user.getOldPassword().equals(user.getNewPassword())) {
                 throw new BadRequestException("New password cannot be the same as the old one");
             }
             validatePassword(user.getNewPassword());
@@ -142,46 +142,44 @@ public class UserService extends AbstractService {
         }
         throw new BadRequestException("Wrong password");
     }
-    
-    
-    
+
+
     private void checkIfPasswordAndConfirmPasswordMatch(String password, String confirmPassword) {
-        if(!Objects.equals(password, confirmPassword)) {
+        if (!Objects.equals(password, confirmPassword)) {
             throw new BadRequestException("Passwords do not match");
         }
     }
-    
+
     public boolean checkPasswordMatch(User user, String password) {
         return bCryptPasswordEncoder.matches(password, user.getPassword());
     }
-    
+
     public String updateProfilePicture(MultipartFile file, long uid) {
-        if(file.getSize()>mb*5){
+        if (file.getSize() > mb * 5) {
             throw new BadRequestException("File size is too big, must be below 5MB");
         }
         try {
             User user = getUserById(uid);
-            if(file.isEmpty()) {
+            if (file.isEmpty()) {
                 throw new BadRequestException("File is empty");
             }
             String ext = Objects.requireNonNull(file.getOriginalFilename()).
                     substring(file.getOriginalFilename().lastIndexOf("."));
-            if(!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg"))) {
+            if (!(ext.equals(".jpg") || ext.equals(".png") || ext.equals(".jpeg"))) {
                 throw new BadRequestException("Invalid file type");
             }
-            
+
             String dirName = PATH_TO_STATIC + "pfp";
             String fileName = dirName + File.separator + System.nanoTime() + "-" + uid + "-" + ext;
             File dir = new File(dirName);
             File f = new File(fileName);
             dir.mkdirs();
-            if(!f.exists()) {
+            if (!f.exists()) {
                 Files.copy(file.getInputStream(), f.toPath());
-            }
-            else{
+            } else {
                 throw new FileException("The file already exists");
             }
-            if(user.getProfilePicture() != null && !(user.getProfilePicture().equals(DEFAULT_PROFILE_PICTURE))){
+            if (user.getProfilePicture() != null && !(user.getProfilePicture().equals(DEFAULT_PROFILE_PICTURE))) {
                 File old = new File(user.getProfilePicture());
                 old.delete();
             }
@@ -193,10 +191,10 @@ public class UserService extends AbstractService {
                     " default profile picture will be used");
         }
     }
-    
+
 
     public String deleteUser(long userId, UserDeleteDTO user) {
-    
+
         validatePassword(user.getPassword());
         validatePassword(user.getConfirmPassword());
         User userToDelete = getUserById(userId);
@@ -204,17 +202,17 @@ public class UserService extends AbstractService {
         System.out.println(password);
         String passwordConfirm = user.getConfirmPassword();
         System.out.println(passwordConfirm);
-        if(!password.equals(passwordConfirm)) {
+        if (!password.equals(passwordConfirm)) {
             throw new BadRequestException("Passwords do not match");
         }
-        if(!(checkPasswordMatch(userToDelete, user.getPassword()))) {
+        if (!(checkPasswordMatch(userToDelete, user.getPassword()))) {
             throw new BadRequestException("Wrong password");
         }
         //checkPermission(userId, userToDelete);
         userToDelete.setDeleted(true);
         String replaceInDeleted = String.valueOf((userToDelete.getId()));
         userToDelete.setUsername(replaceInDeleted);
-        userToDelete.setEmail(replaceInDeleted+"-"+LocalDateTime.now());
+        userToDelete.setEmail(replaceInDeleted + "-" + LocalDateTime.now());
         userToDelete.setFirstName(replaceInDeleted);
         userToDelete.setLastName(replaceInDeleted);
         userToDelete.setPassword(replaceInDeleted);
@@ -227,7 +225,7 @@ public class UserService extends AbstractService {
         userRepository.save(userToDelete);
         return "User deleted";
     }
-    
+
     public String setDefaultProfilePicture(long loggedUserId) {
         User user = getUserById(loggedUserId);
         checkPermission(loggedUserId, user);
@@ -235,60 +233,60 @@ public class UserService extends AbstractService {
         userRepository.save(user);
         return "Default profile picture set";
     }
-    
+
     protected Optional<User> checkIfUserExists(String usermame) {
         return Optional.of(userRepository.findByUsername(usermame)
                 .orElseGet(() -> userRepository.findByEmail(usermame)
                         .orElseThrow(() -> new DataNotFoundException("User not found"))));
     }
-    
+
     public String followUser(String username, long loggedUserId) {
         User userToFollow = userRepository.findByUsername(username.toLowerCase().trim())
                 .orElseThrow(() -> new DataNotFoundException("Follow unsuccessful, user not found"));
-        if(userToFollow.getId() == loggedUserId) {
+        if (userToFollow.getId() == loggedUserId) {
             throw new BadRequestException("You cannot follow yourself");
         }
         User user = getUserById(loggedUserId);
-        if(userToFollow.getId() == loggedUserId) {
+        if (userToFollow.getId() == loggedUserId) {
             throw new BadRequestException("You cannot follow yourself");
         }
-        if(user.getFollowing().contains(userToFollow)) {
+        if (user.getFollowing().contains(userToFollow)) {
             user.getFollowing().remove(userToFollow);
             userRepository.save(user);
-            return "User "+ userToFollow.getUsername() +" unfollowed";
-        }else {
+            return "User " + userToFollow.getUsername() + " unfollowed";
+        } else {
             user.getFollowing().add(userToFollow);
             userRepository.save(user);
-            return "User "+ userToFollow.getUsername() +" followed";
+            return "User " + userToFollow.getUsername() + " followed";
         }
     }
-    
+
     public List<UserOnlyMailAndUsernameDTO> getFollowing(long userId) {
         User user = getUserById(userId);
         List<User> followedUser = user.getFollowing();
         return followedUser.stream().map(u -> modelMapper.map(u, UserOnlyMailAndUsernameDTO.class))
                 .collect(Collectors.toList());
     }
-    
+
     public List<UserOnlyMailAndUsernameDTO> getFollowers(long userId) {
         User user = getUserById(userId);
         List<User> followers = user.getFollowers();
         return followers.stream().map(u -> modelMapper.map(u, UserOnlyMailAndUsernameDTO.class))
                 .collect(Collectors.toList());
     }
-    
+
     public String banUser(long loggedUserId, String username) {
-        User user = validateIfUserIsAdminByEmail(loggedUserId);
-        if(user.getId() == loggedUserId) {
-            throw new BadRequestException("You cannot ban yourself");
-        };
+        validateIfUserIsAdminByEmail(loggedUserId);
         User userToBan = getUserByUsername(username);
+        if (userToBan.getId() == loggedUserId) {
+            throw new BadRequestException("You cannot ban yourself");
+        }
         userToBan.setBanned(!userToBan.isBanned());
         userRepository.save(userToBan);
-        return userToBan.isBanned()? "User "+ username +" has been banned"
-                : "User's "+ username +" ban has been lifted";
+        return userToBan.isBanned() ? "User " + username + " has been banned"
+                : "User's " + username + " ban has been lifted";
     }
-    
+
     public long getIdFromMailUsernameDTO(UserOnlyMailAndUsernameDTO user1) {
         return getUserByUsername(user1.getUsername()).getId();
     }

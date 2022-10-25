@@ -18,6 +18,7 @@ import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public class CommentService extends AbstractService {
+
     List<CommentWithRepliesDTO> getCommentWithReplies(long id) {
         Optional<Comment> comment = commentRepository.findById(id);
         comment.orElseThrow(() -> new DataNotFoundException(Constant.DATA_NOT_FOUND));
@@ -41,10 +42,12 @@ public class CommentService extends AbstractService {
 
     public CreateCommentDTO replyComment(CreateCommentDTO dto, long postId, long commentId) {
         Comment comment = modelMapper.map(dto, Comment.class);
-
         Comment replyComment = findComment(commentId);
-        if (replyComment.ownerId() == dto.getOwnerId()){
+        if (replyComment.ownerId() == dto.getOwnerId()) {
             throw new BadRequestException(CAN_NOT_REPLY_YOURSELF);
+        }
+        if (replyComment.replies.stream().anyMatch(c -> c.getOwnerId() == dto.getOwnerId())) {
+            throw new BadRequestException(YOU_ALREADY_REPLY_THIS_COMMENT);
         }
         comment.setOwnerId(dto.getOwnerId());
         Post post = findPost(postId);

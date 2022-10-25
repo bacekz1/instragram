@@ -23,4 +23,6 @@ public class Constant {
     
     public static final String DEFAULT_PROFILE_PICTURE =
             PATH_TO_STATIC + "default_profile_picture" + File.separator + "default_profile_picture.jpg";
+
+    public static final String YOU_ALREADY_REPLY_THIS_COMMENT = "You already reply this comment";
 }

@@ -7,6 +7,8 @@ target/
 !**/src/test/**/target/
 /uploads
 /src/main/resources/static/pfp
+/src/main/resources/static/story
+/src/main/resources/static/post
 
 ### STS ###
 .apt_generated

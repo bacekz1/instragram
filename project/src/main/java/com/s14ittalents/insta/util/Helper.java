@@ -4,9 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class Helper {
-    private final static char hashtag = '#';
-    private final static char personTag = '@';
-    private final static char space = ' ';
+    public final static char hashtag = '#';
+    public final static char personTag = '@';
+    public final static char space = ' ';
 
     private final static StringBuilder builder = new StringBuilder();
 

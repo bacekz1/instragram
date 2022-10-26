@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/post")
@@ -49,10 +48,11 @@ public class PostController extends AbstractController {
         postService.deletePostComments(postId, userId);
     }
 
-    @PostMapping("/{id:[0-9]+}/")
-    int likePost(@PathVariable long id) {
+    @PostMapping("/{postId:[0-9]+}/")
+    int likePost(@PathVariable long postId) {
         long userId = getLoggedUserId();
-        return postService.likePost(id, userId);
+        System.out.println("opa");
+        return postService.likePost(postId, userId);
     }
     /*
             if new session is set - its from another client/ file with requests/ can make APIHttp  or Postman

@@ -388,11 +388,13 @@ CREATE TABLE `users` (
   `created_at` datetime NOT NULL,
   `is_private` tinyint DEFAULT '0',
   `is_deactivated` tinyint DEFAULT NULL,
+  `verification_code` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`) /*!80000 INVISIBLE */,
   KEY `username` (`username`),
-  KEY `email` (`email`)
+  KEY `email` (`email`),
+  KEY `verification_code` (`verification_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -402,7 +404,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,0,'bksdv@ubef.com','pe6o',NULL,NULL,'adf','1999-01-01','07','m','',1,'123',0,0,'2022-10-21 23:33:24',0,0),(2,0,'busdfb@bsukdfb.com','go6o',NULL,NULL,NULL,'1998-02-02','02','m','',1,'test',0,0,'2022-10-21 23:33:26',0,0),(3,0,'wefw4r24r@efw4.com','hillow',NULL,NULL,'wew','2022-10-19','3855843','m',NULL,1,'123456',0,0,'2022-10-21 23:32:26',0,0),(4,0,'user@user.com','user1234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$IXZrDlovnaGmJpf4yX2ZyucDVaRpJF79vMR162ZpiYlNGEI6VqO8u',0,0,'2022-10-22 18:04:13',0,0),(5,0,'user@1user.com','user11234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$Er4ApYjsLEGG3MB.IepqNuv7gyxYYWVHy1X9ZzA1ayxVAyqDWvkGy',0,0,'2022-10-23 17:58:10',0,0),(6,0,'user@11user.com','user111234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$qK1T/aLO5HQYH352lm57G.vp83Lvvc33nrAY.Iv0YtJ94W4zlMRH.',0,0,'2022-10-23 17:59:00',0,0),(7,0,'user@111user.com','user1111234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$UXDGBbRN/D8537Zo.JvSben1ykC6iVJ6JcNDWicLy5ZwXQu6RqtZe',1,0,'2022-10-23 18:00:27',0,0),(8,0,'inguofdsl@gm.coms','gifgiasigd7erqw',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$0gg4Aq9B9lcylYBWTwlmeeDLjDkxf0jD4qahcNfCb/Eihm7ZvaAPa',0,0,'2022-10-24 18:02:16',0,0),(9,0,'inguofdsl@gm.com1s','gifgiasigd7erqw1',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$kjWldusVVeyTDVv1c9KeBOiperuSl20WyVU0EFiERQ/ZaR5lJz4U.',0,0,'2022-10-24 23:47:03',0,0),(10,0,'inguofdsl@admin.instagram.com','admin',NULL,NULL,NULL,NULL,NULL,NULL,'src\\main\\resources\\static\\default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$gS2wJW7IxRMkRr/w2UPe..8fBKzO3OwiDgKIidLKKOP/oglV2olxm',0,0,'2022-10-25 17:44:20',0,0),(11,0,'inguofdsl@admin1.instagram.com','admina',NULL,NULL,NULL,NULL,NULL,NULL,'src\\main\\resources\\static\\default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$q11/ghA0I54DzdFQTzzZlO629dLNzla0.jEwWlU63y/YGE8e.jNPe',0,0,'2022-10-25 17:59:48',0,0);
+INSERT INTO `users` VALUES (1,0,'bksdv@ubef.com','pe6o',NULL,NULL,'adf','1999-01-01','07','m','',1,'123',0,0,'2022-10-21 23:33:24',0,0,NULL),(2,0,'busdfb@bsukdfb.com','go6o',NULL,NULL,NULL,'1998-02-02','02','m','',1,'test',0,0,'2022-10-21 23:33:26',0,0,NULL),(3,0,'wefw4r24r@efw4.com','hillow',NULL,NULL,'wew','2022-10-19','3855843','m',NULL,1,'123456',0,0,'2022-10-21 23:32:26',0,0,NULL),(4,0,'user@user.com','user1234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$IXZrDlovnaGmJpf4yX2ZyucDVaRpJF79vMR162ZpiYlNGEI6VqO8u',0,0,'2022-10-22 18:04:13',0,0,NULL),(5,0,'user@1user.com','user11234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$Er4ApYjsLEGG3MB.IepqNuv7gyxYYWVHy1X9ZzA1ayxVAyqDWvkGy',0,0,'2022-10-23 17:58:10',0,0,NULL),(6,0,'user@11user.com','user111234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$qK1T/aLO5HQYH352lm57G.vp83Lvvc33nrAY.Iv0YtJ94W4zlMRH.',0,0,'2022-10-23 17:59:00',0,0,NULL),(7,0,'user@111user.com','user1111234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$UXDGBbRN/D8537Zo.JvSben1ykC6iVJ6JcNDWicLy5ZwXQu6RqtZe',1,0,'2022-10-23 18:00:27',0,0,NULL),(8,0,'inguofdsl@gm.coms','gifgiasigd7erqw',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$0gg4Aq9B9lcylYBWTwlmeeDLjDkxf0jD4qahcNfCb/Eihm7ZvaAPa',0,0,'2022-10-24 18:02:16',0,0,NULL),(9,0,'inguofdsl@gm.com1s','gifgiasigd7erqw1',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$kjWldusVVeyTDVv1c9KeBOiperuSl20WyVU0EFiERQ/ZaR5lJz4U.',0,0,'2022-10-24 23:47:03',0,0,NULL),(10,0,'inguofdsl@admin.instagram.com','admin',NULL,NULL,NULL,NULL,NULL,NULL,'src\\main\\resources\\static\\default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$gS2wJW7IxRMkRr/w2UPe..8fBKzO3OwiDgKIidLKKOP/oglV2olxm',0,0,'2022-10-25 17:44:20',0,0,NULL),(11,0,'inguofdsl@admin1.instagram.com','admina',NULL,NULL,NULL,NULL,NULL,NULL,'src\\main\\resources\\static\\default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$q11/ghA0I54DzdFQTzzZlO629dLNzla0.jEwWlU63y/YGE8e.jNPe',0,0,'2022-10-25 17:59:48',0,0,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -415,4 +417,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-26 15:36:45
+-- Dump completed on 2022-10-26 15:41:38

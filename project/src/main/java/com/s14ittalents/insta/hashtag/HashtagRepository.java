@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
     Optional<Hashtag> findByTagName(String tagName);
-    List<Hashtag> findByTagNameContaining(String query, Pageable pageable);
+    List<Hashtag> findByTagNameLike(String query, Pageable pageable);
 }

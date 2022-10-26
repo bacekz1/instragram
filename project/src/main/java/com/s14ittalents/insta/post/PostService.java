@@ -7,7 +7,6 @@ import com.s14ittalents.insta.post.dto.PostCreateDTO;
 import com.s14ittalents.insta.post.dto.PostUpdateDTO;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
-import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -68,7 +67,6 @@ public class PostService extends AbstractService {
         return modelMapper.map(post, PostWithoutOwnerDTO.class);
     }
 
-
     @Transactional
     public void deletePostComments(long postId, long userId) {
         Post post = findPost(postId);
@@ -77,7 +75,6 @@ public class PostService extends AbstractService {
         post.setCaption("deleted at" + LocalDateTime.now());
         deletePostComments(post);
         postRepository.save(post);
-
     }
 
     public int likePost(long postId, long userId) {
@@ -89,7 +86,6 @@ public class PostService extends AbstractService {
         } else {
             user.getLikedPosts().add(post);
             post.getLikes().add(user);
-
         }
         userRepository.save(user);
         return post.getLikes().size();

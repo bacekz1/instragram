@@ -3,7 +3,6 @@ package com.s14ittalents.insta.search;
 import com.s14ittalents.insta.hashtag.dto.HashtagWithoutPost;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
-import com.s14ittalents.insta.user.dto.UserWithPostsDTO;
 import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.data.domain.PageRequest;
@@ -34,11 +33,7 @@ public class SearchService extends AbstractService {
         } else if (query.charAt(0) == personTag) {
             Optional<User> user = userRepository
                     .findByUsernameAndVerifiedIsTrueAndBannedIsFalseAndDeletedIsFalse(query.substring(1));
-            if (user.isPresent()) {
-                searchResultDTO.setUser(modelMapper.map(user, UserWithoutPostsDTO.class));
-            } else {
-                return searchResultDTO;
-            }
+            searchResultDTO.setUser(modelMapper.map(user, UserWithoutPostsDTO.class));
         } else {
             searchResultDTO.setPosts(postRepository.searchHashtagPosts(query)
                     .stream()
@@ -47,10 +42,10 @@ public class SearchService extends AbstractService {
                     .stream()
                     .map(s -> modelMapper.map(s, PostWithoutOwnerDTO.class)).toList());
             searchResultDTO.setUsers(userRepository
-                    .findByUsernameContainingAndVerifiedIsTrueAndBannedIsFalseAndDeletedIsFalse( query, pages)
+                    .findByUsernameContainingAndVerifiedIsTrueAndBannedIsFalseAndDeletedIsFalse(query, pages)
                     .stream()
                     .map(u -> modelMapper.map(u, UserWithoutPostsDTO.class)).toList());
-            searchResultDTO.setHashtags(hashtagRepository.findByTagNameContaining(query,pages)
+            searchResultDTO.setHashtags(hashtagRepository.findByTagNameLike(query, pages)
                     .stream()
                     .map(h -> modelMapper.map(h, HashtagWithoutPost.class)).toList());
 

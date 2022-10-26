@@ -1,16 +1,16 @@
 package com.s14ittalents.insta.user;
 
 import com.s14ittalents.insta.exception.BadRequestException;
-import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.UserNotCreatedException;
+import com.s14ittalents.insta.user.dto.*;
 import com.s14ittalents.insta.util.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.s14ittalents.insta.exception.Constant.REMOTE_IP;
 
@@ -30,23 +30,45 @@ public class UserController extends AbstractController {
 
     @PostMapping()
     UserNoPasswordDTO createUser(@ModelAttribute UserRegisterDTO user) {
+        String siteURL = request.getRequestURL().toString().replace(request.getServletPath(), "");
         if(session.getAttribute("id") != null) {
             throw new BadRequestException("You are already logged in" +
                     ", logout first if you wish to create another account");
         }
 
-        return userService.createUser(user);
+        return userService.createUser(user,siteURL);
     }
-    @PutMapping()
-    UserNoPasswordDTO updateUser(@RequestBody UserUpdateDTO user) {
+    @GetMapping("/verify")
+    public String verifyUser(@Param("code") String code) {
+        if (userService.verify(code)) {
+            return "verify_success";
+        } else {
+            return "verify_fail";
+        }
+    }
+    @PutMapping("/accountCredentials")
+    UserNoPasswordDTO updateUserCred(@ModelAttribute UserUpdateDTO user) {
         long userId = getLoggedUserId();
-        return userService.updateUser(user, userId);
+        return userService.updateUserCredentials(user, userId);
     }
     
-    @DeleteMapping()
-    String deleteUser(@RequestBody UserDeleteDTO user) {
+    
+    @PutMapping("/accountInfo")
+    UserNoPasswordDTO updateUser(@ModelAttribute UserEditDTO user) {
         long userId = getLoggedUserId();
-        return userService.deleteUser(userId, user);
+        return userService.editUserInfo(user, userId);
+    }
+    @DeleteMapping("/{username}")
+    String adminDeleteUser(@RequestBody UserDeleteDTO user, @PathVariable String username) {
+        long userId = getLoggedUserId();
+        return userService.deleteUser(userId, user, username);
+    }
+    
+    @DeleteMapping("")
+    String deactivateUser(@RequestBody UserDeactivateDTO user) {
+        long userId = getLoggedUserId();
+        session.invalidate();
+        return userService.deactivateUser(userId, user);
     }
 
     @PostMapping("/login")

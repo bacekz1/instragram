@@ -1,11 +1,11 @@
-package com.s14ittalents.insta.user;
+package com.s14ittalents.insta.user.dto;
 
 import lombok.Data;
 
 @Data
-public class UserWithoutPostsDTO {
+public class UserNoPasswordDTO {
     private long id;
-    private boolean activityStatus;
+    private boolean activity_status;
     private String username;
     private String email;
     private String firstName;

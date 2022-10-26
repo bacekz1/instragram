@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.user;
+package com.s14ittalents.insta.user.dto;
 
 import lombok.Data;
 

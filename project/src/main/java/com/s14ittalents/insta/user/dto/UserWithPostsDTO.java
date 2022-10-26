@@ -1,17 +1,21 @@
-package com.s14ittalents.insta.user;
+package com.s14ittalents.insta.user.dto;
 
+import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class UserUpdateDTO {
+public class UserWithPostsDTO {
+    private long id;
+    private boolean activityStatus;
     private String username;
     private String email;
-    private String password;
     private String firstName;
     private String lastName;
     private String profilePicture;
     private String bio;
     private String gender;
     private String phoneNum;
-    private boolean privateAccount;
+    private List<PostWithoutOwnerDTO> posts;
 }

@@ -1,11 +1,16 @@
-package com.s14ittalents.insta.user;
+package com.s14ittalents.insta.user.dto;
 
-import lombok.Data;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRegisterDTO {
     private long id;
     private boolean activityStatus;
@@ -20,5 +25,7 @@ public class UserRegisterDTO {
     private String gender;
     private String phoneNum;
     private LocalDateTime createdAt;
-    private LocalDateTime dateOfBirth;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateOfBirth;
+    
 }

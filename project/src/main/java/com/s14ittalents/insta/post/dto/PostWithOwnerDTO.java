@@ -1,6 +1,6 @@
 package com.s14ittalents.insta.post.dto;
 
-import com.s14ittalents.insta.user.UserWithoutPostsDTO;
+import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import lombok.Data;
 
 @Data

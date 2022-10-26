@@ -21,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -228,15 +230,79 @@ public abstract class AbstractService {
                 "(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])" +
                 "|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b" +
                 "\\x0c\\x0e-\\x7f])+)\\])")) {
+            
             throw new BadRequestException("Email is not valid");
         }
         return email.trim();
     }
     
+    protected String validateBio(String bio) {
+        if (bio.length() > 200) {
+            throw new BadRequestException("Bio must be at most 200 characters long");
+        }
+        return bio.trim();
+    }
+    
+    protected String validateName(String name, String type) {
+        if (name.length() < 2) {
+            throw new BadRequestException(type + "name must be at least 2 characters long");
+        }
+        if (name.length() > 30) {
+            throw new BadRequestException(type + " name must be at most 30 characters long");
+        }
+        if (name.matches(".*[<>].*") || name.matches(".*http.*")) {
+            throw new BadRequestException("Name must not contain <> symbols or web addresses");
+        }
+        return name.trim();
+    }
+    
+    protected String validatePhoneNum(String phone) {
+        if (phone.length() < 4) {
+            throw new BadRequestException("Phone must be at least 5 characters long");
+        }
+        if (phone.length() > 20) {
+            throw new BadRequestException("Phone must be at most 20 characters long");
+        }
+        if (!phone.matches("^[+0-9]+$")) {
+            throw new BadRequestException("Phone must contain only digits, + and - symbols");
+        }
+        return phone.trim();
+    }
+    
+    protected String validateGender(String gender) {
+        if (gender.length() < 2) {
+            throw new BadRequestException("Gender must be at least 2 characters long");
+        }
+        if (gender.length() > 15) {
+            throw new BadRequestException("Gender name must be less than 30 characters long");
+        }
+        if (!gender.matches("[a-zA-Z]+")) {
+            throw new BadRequestException("Gender name must contain only letters");
+        }
+        return gender.trim();
+    }
+    
+    protected LocalDate validateDateOfBirth(LocalDate dateOfBirth) {
+        if (dateOfBirth.isAfter(LocalDate.now())) {
+            throw new BadRequestException("Date of birth cannot be in the future");
+        }
+        if (dateOfBirth.isBefore(LocalDate.of(1850, 1, 1))) {
+            throw new BadRequestException("Date of birth cannot be before 1850");
+        }
+        if (dateOfBirth.plusYears(13).isAfter(LocalDate.now())) {
+            throw new BadRequestException("You must be at least 13 years old to register or use this application");
+        }
+        System.out.println(dateOfBirth);
+        return dateOfBirth;
+    }
+
+    
+
+    
     protected User validateIfUserIsAdminByEmail(long loggedUserId) {
         User user = getUserById(loggedUserId);
         if(!user.getEmail().split("@")[1].equals("admin.instagram.com")) {
-            throw new BadRequestException("You do not have permission to ban users");
+            throw new BadRequestException("You do not have admin rights");
         }
         return user;
     }

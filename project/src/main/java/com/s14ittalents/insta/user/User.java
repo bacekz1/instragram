@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,9 +49,9 @@ public class User implements Ownerable {
     @Size(max = 200)
     private String bio;
 
-    @Column
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime dateOfBirth;
+    @Column(name = "date_of_birth")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateOfBirth;
 
     @Column
     private String phoneNum;
@@ -73,6 +74,8 @@ public class User implements Ownerable {
     private boolean deleted;
     @Column
     private boolean isDeactivated;
+    @Column
+    private String verificationCode;
 
     @Column
     @NotNull

@@ -3,7 +3,7 @@ package com.s14ittalents.insta.post.dto;
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.ContentWithoutUser;
 import com.s14ittalents.insta.location.LocationWithoutPost;
-import com.s14ittalents.insta.user.UserWithoutPostsDTO;
+import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import lombok.Data;
 
 import java.util.List;

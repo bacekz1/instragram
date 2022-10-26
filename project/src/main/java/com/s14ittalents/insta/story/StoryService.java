@@ -9,7 +9,7 @@ import com.s14ittalents.insta.post.dto.PostCreateDTO;
 import com.s14ittalents.insta.post.dto.PostUpdateDTO;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
-import com.s14ittalents.insta.user.UserWithoutPostsDTO;
+import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

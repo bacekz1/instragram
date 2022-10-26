@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<Comment> findByIdAndDeletedIsFalse(long id);
     List<Comment> findByPostId(long id);
+    
+    List<Comment> getAllByOwnerId(long id);
 }

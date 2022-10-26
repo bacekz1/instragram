@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
@@ -26,7 +27,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -131,7 +131,7 @@ public class UserService extends AbstractService {
         helper.setText(content, true);
         
         mailSender.send(message);
-    } catch(MessagingException|UnsupportedEncodingException e){
+    } catch(MessagingException | UnsupportedEncodingException e){
                 throw new UserNotCreatedException("Error while sending verification email");
     }
         

@@ -88,36 +88,19 @@ public class CommentService extends AbstractService {
         commentRepository.save(comment);
     }
 
-    /*
-    public Comment likeComment(long id, HttpSession session) {
-        Comment comment = commentRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.DATA_NOT_FOUND));
-        comment.getLikes().add(getUserById((Long) session.getAttribute("id")));
-        getUserById((Long) session.getAttribute("id")).getLikedComments().add(comment);
-        commentRepository.save(comment);
-        userRepository.save(getUserById((Long) session.getAttribute("id")));
-        return comment.get();
-    }
-     */
     public int likeComment(long id, long userId) {
-        Optional<Comment> comment = commentRepository.findByIdAndDeletedIsFalse(id);
-        if (comment.isEmpty()) {
-            throw new DataNotFoundException(POST_NOT_FOUND);
-        }
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new DataNotFoundException(USER_NOT_FOUND);
-        }
+        Comment comment = findComment(id);
+        User user = getUserById(userId);
 
-        if (comment.get().getLikes().contains(user.get())) {
-            comment.get().getLikes().remove(getUserById(userId));
+        if (user.getLikedComments().contains(comment)) {
+            user.getLikedComments().remove(comment);
+            comment.getLikes().remove(user);
         } else {
-            comment.get().getLikes().add(getUserById(userId));
+            user.getLikedComments().add(comment);
+            comment.getLikes().add(user);
         }
-        comment.get().getLikes().forEach(a ->
-                System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
-        userRepository.save(getUserById(userId));
-        comment.get().getLikes().forEach(a ->
-                System.out.println((modelMapper.map(a, UserWithoutPostsDTO.class)).getEmail()));
+        userRepository.save(user);
+
         return comment.get().getLikes().size();
     }
 

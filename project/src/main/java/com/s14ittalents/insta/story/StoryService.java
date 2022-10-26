@@ -89,10 +89,12 @@ public class StoryService extends AbstractService {
         User user = getUserById(userId);
         if (user.getLikedPosts().contains(post)) {
             user.getLikedPosts().remove(post);
+            post.getLikes().remove(user);
         } else {
             user.getLikedPosts().add(post);
+            post.getLikes().add(user);
         }
         userRepository.save(user);
-        return user.getLikedPosts().size();
+        return post.getLikes().size();
     }
 }

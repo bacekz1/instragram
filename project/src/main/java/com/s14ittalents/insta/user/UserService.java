@@ -136,7 +136,7 @@ public class UserService extends AbstractService {
         helper.setSubject(subject);
         
         content = content.replace("[[name]]", user.getFirstName() + " " + user.getLastName());
-        String verifyURL = siteURL + "users/verify?code=" + user.getVerificationCode();
+        String verifyURL = siteURL + "/users/verify?code=" + user.getVerificationCode();
         
         content = content.replace("[[URL]]", verifyURL);
         
@@ -169,7 +169,7 @@ public class UserService extends AbstractService {
             helper.setSubject(subject);
             
             content = content.replace("[[name]]", user.getFirstName() + " " + user.getLastName());
-            String forgottenPassword = siteURL + "users/passwordRecovery?code=" + user.getVerificationCode();
+            String forgottenPassword = siteURL + "/users/passwordRecovery?code=" + user.getVerificationCode();
             
             content = content.replace("[[URL]]", forgottenPassword);
             
@@ -225,7 +225,7 @@ public class UserService extends AbstractService {
         }
         validatePassword(user1.getPassword());
         checkIfUserExists(user1.getUsername());
-        User user = getUserByUsername(user1.getUsername());
+        User user = getUserByUsernameLogin(user1.getUsername());
         if(!user.isVerified()){
             throw new BadRequestException("You have not verified your account, please check your email");
         }

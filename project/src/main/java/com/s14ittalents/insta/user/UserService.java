@@ -2,6 +2,7 @@ package com.s14ittalents.insta.user;
 
 import com.s14ittalents.insta.comment.CommentService;
 import com.s14ittalents.insta.exception.*;
+import com.s14ittalents.insta.post.Post;
 import com.s14ittalents.insta.post.PostService;
 import com.s14ittalents.insta.story.StoryService;
 import com.s14ittalents.insta.user.dto.*;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

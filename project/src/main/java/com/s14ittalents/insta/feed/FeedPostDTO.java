@@ -2,12 +2,8 @@ package com.s14ittalents.insta.feed;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data

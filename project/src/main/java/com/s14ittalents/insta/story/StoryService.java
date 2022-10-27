@@ -85,7 +85,7 @@ public class StoryService extends AbstractService {
     }
     
     public int likeStory(long postId, long userId) {
-        Post post = findPost(postId);
+        Post post = findStory(postId);
         User user = getUserById(userId);
         if (user.getLikedPosts().contains(post)) {
             user.getLikedPosts().remove(post);

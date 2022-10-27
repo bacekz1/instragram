@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,8 +65,13 @@ public abstract class AbstractService {
     }
 
     protected Post findStory(long id) {
-        return postRepository.findByIdAndDeletedIsFalseAndExpirationTimeNotNullAndCreatedTimeIsNotNull(id)
+        Post post = postRepository.findByIdAndDeletedIsFalseAndExpirationTimeNotNullAndCreatedTimeIsNotNull(id)
                 .orElseThrow(() -> new DataNotFoundException(Constant.POST_NOT_FOUND));
+        if (post.getExpirationTime().isBefore(LocalDateTime.now())) {
+            System.out.println("o yea");
+            throw new DataNotFoundException(Constant.POST_NOT_FOUND);
+        }
+        return post;
     }
 
     protected Comment findComment(long id) {
@@ -229,19 +235,19 @@ public abstract class AbstractService {
                 "(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])" +
                 "|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b" +
                 "\\x0c\\x0e-\\x7f])+)\\])")) {
-            
+
             throw new BadRequestException("Email is not valid");
         }
         return email.trim();
     }
-    
+
     protected String validateBio(String bio) {
         if (bio.length() > 200) {
             throw new BadRequestException("Bio must be at most 200 characters long");
         }
         return bio.trim();
     }
-    
+
     protected String validateName(String name, String type) {
         if (name.length() < 2) {
             throw new BadRequestException(type + "name must be at least 2 characters long");
@@ -254,7 +260,7 @@ public abstract class AbstractService {
         }
         return name.trim();
     }
-    
+
     protected String validatePhoneNum(String phone) {
         if (phone.length() < 4) {
             throw new BadRequestException("Phone must be at least 5 characters long");
@@ -267,7 +273,7 @@ public abstract class AbstractService {
         }
         return phone.trim();
     }
-    
+
     protected String validateGender(String gender) {
         if (gender.length() < 2) {
             throw new BadRequestException("Gender must be at least 2 characters long");
@@ -280,7 +286,7 @@ public abstract class AbstractService {
         }
         return gender.trim();
     }
-    
+
     protected LocalDate validateDateOfBirth(LocalDate dateOfBirth) {
         if (dateOfBirth.isAfter(LocalDate.now())) {
             throw new BadRequestException("Date of birth cannot be in the future");
@@ -295,12 +301,10 @@ public abstract class AbstractService {
         return dateOfBirth;
     }
 
-    
 
-    
     protected User validateIfUserIsAdminByEmail(long loggedUserId) {
         User user = getUserById(loggedUserId);
-        if(!user.getEmail().split("@")[1].equals("admin.instagram.com")) {
+        if (!user.getEmail().split("@")[1].equals("admin.instagram.com")) {
             throw new BadRequestException("You do not have admin rights");
         }
         return user;

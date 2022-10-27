@@ -13,7 +13,7 @@ public class SearchController extends AbstractController {
     @GetMapping()
     @ResponseBody
     SearchResultDTO search(@RequestParam String query) {
-//        getLoggedUserId();
+        getLoggedUserId();
         return searchService.search(query);
     }
 }

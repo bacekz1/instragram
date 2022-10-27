@@ -38,7 +38,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     "JOIN hashtags_posts as h ON p.id = h.post_hashtag_id\n" +
                     "JOIN hashtags as ha ON ha.id = h.tag_id\n" +
                     "JOIN like_post as l ON l.post_id = p.id\n" +
-                    "WHERE tag_name like %:query% AND is_deleted = 0 AND expiration_time IS NOT null\n" +
+                    "WHERE tag_name like %:query% AND is_deleted = 0 AND expiration_time >= CURDATE()\n" +
                     "GROUP BY post_hashtag_id\n" +
                     "ORDER BY post_hashtag_id DESC\n" +
                     "LIMIT 5",

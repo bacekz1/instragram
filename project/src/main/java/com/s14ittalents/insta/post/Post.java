@@ -4,12 +4,14 @@ import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.hashtag.Hashtag;
 import com.s14ittalents.insta.location.Location;
+import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.Commentable;
 import com.s14ittalents.insta.util.Ownerable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.modelmapper.AbstractConverter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -23,7 +25,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @Table(name = "post")
-public class Post implements Ownerable, Commentable {
+public class Post  implements Ownerable, Commentable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -69,6 +71,9 @@ public class Post implements Ownerable, Commentable {
 
     @Override
     public String getComment() {
-       return getCaption();
+        return getCaption();
     }
+
+
+
 }

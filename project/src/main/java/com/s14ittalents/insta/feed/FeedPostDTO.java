@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 public class FeedPostDTO {
     private String profile_picture;
     private String username;

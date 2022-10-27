@@ -3,8 +3,10 @@ package com.s14ittalents.insta.post.dto;
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.ContentWithoutUser;
 import com.s14ittalents.insta.location.LocationWithoutPost;
+import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import lombok.Data;
+
 
 import java.util.List;
 
@@ -19,4 +21,9 @@ public class PostWithoutOwnerDTO {
     private UserWithoutPostsDTO owner;
     private List<ContentWithoutUser> contents;
     private LocationWithoutPost location;
+    private List<UserWithoutPostsDTO> likes;
+
+    public Integer getLikes() {
+        return likes.size();
+    }
 }

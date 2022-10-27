@@ -3,7 +3,6 @@ package com.s14ittalents.insta.search;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.s14ittalents.insta.hashtag.dto.HashtagWithoutPost;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
-import com.s14ittalents.insta.user.dto.UserWithPostsDTO;
 import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import lombok.Getter;
 import lombok.Setter;

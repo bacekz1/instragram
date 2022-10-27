@@ -64,14 +64,9 @@ public abstract class AbstractService {
                 .orElseThrow(() -> new DataNotFoundException(Constant.POST_NOT_FOUND));
     }
 
-    protected Post findStory(long id) {
-        Post post = postRepository.findByIdAndDeletedIsFalseAndExpirationTimeNotNullAndCreatedTimeIsNotNull(id)
-                .orElseThrow(() -> new DataNotFoundException(Constant.POST_NOT_FOUND));
-        if (post.getExpirationTime().isBefore(LocalDateTime.now())) {
-            System.out.println("o yea");
-            throw new DataNotFoundException(Constant.POST_NOT_FOUND);
-        }
-        return post;
+    protected Post findStory(long userId) {
+        return postRepository.findStory(userId)
+                .orElseThrow(() -> new DataNotFoundException(STORY_NOT_FOUND));
     }
 
     protected Comment findComment(long id) {

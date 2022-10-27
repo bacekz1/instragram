@@ -1,6 +1,5 @@
 package com.s14ittalents.insta.post;
 
-import com.s14ittalents.insta.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,8 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +14,6 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findByIdAndDeletedIsFalseAndExpirationTimeIsNull(long id);
-
-    Optional<Post> findByIdAndDeletedIsFalseAndExpirationTimeNotNullAndCreatedTimeIsNotNull(long id);
 
     Page<Post> findByOwnerIdAndDeletedIsFalseAndExpirationTimeIsNullOrderByCreatedTimeDesc(long id, Pageable pageable);
 
@@ -47,12 +42,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     "LIMIT 5",
             nativeQuery = true)
     List<Post> searchHashtagStories(@Param("query") String query);
-//
-//    @Query(
-//            value = "SELECT *\n" +
-//                    "FROM post\n" +
-//                    "WHERE user_id = :query AND expiration_time >= CURDATE() AND is_deleted = 0 AND created_time IS NOT NULL",
-//            nativeQuery = true)
-//    Optional<Post> findPost(@Param("userId") long userId);
-//
+
+    @Query(
+            value = "SELECT * \n" +
+                    "FROM post\n" +
+                    "WHERE user_id = :userId AND expiration_time >= CURDATE() AND is_deleted = 0 AND created_time IS NOT NULL",
+            nativeQuery = true)
+    Optional<Post> findStory(@Param("userId") long userId);
+
 }

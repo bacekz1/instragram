@@ -1,9 +1,7 @@
 package com.s14ittalents.insta.user;
 
-import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.comment.CommentService;
 import com.s14ittalents.insta.exception.*;
-import com.s14ittalents.insta.post.Post;
 import com.s14ittalents.insta.post.PostService;
 import com.s14ittalents.insta.story.StoryService;
 import com.s14ittalents.insta.user.dto.*;
@@ -106,6 +104,18 @@ public class UserService extends AbstractService {
         }
     }
     
+    @Transactional
+    String fixForgottenPassword(UserOnlyMailAndUsernameDTO user, String siteURL) {
+        validateUsername(user.getUsername());
+        validateEmail(user.getEmail());
+        User userToFix = userRepository.findByUsername(user.getUsername())
+                .orElseGet(() -> userRepository.findByEmail(user.getEmail())
+                        .orElseThrow(() -> new UserNotCreatedException("User not found")));
+            sendForgottenPasswordEmail(userToFix, siteURL);
+            userRepository.save(userToFix);
+            return "Please check your email and use the code to change your password";
+    }
+    
     @Async
     void sendVerificationEmail(User user, String siteURL){
             try{
@@ -114,7 +124,7 @@ public class UserService extends AbstractService {
         String senderName = "ItTalents Project";
         String subject = "Please verify your registration";
         String content = "Dear [[name]],<br>" + "Please click the link below to verify your registration:<br>" +
-                "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank you,<br>" + "Your company name.";
+                "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank you,<br>" + "-ItTalents Team.";
         
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -134,14 +144,70 @@ public class UserService extends AbstractService {
     } catch(MessagingException | UnsupportedEncodingException e){
                 throw new UserNotCreatedException("Error while sending verification email");
     }
+    
         
     }
+    
+    @Async
+    void sendForgottenPasswordEmail(User user, String siteURL){
+        try{
+            String toAddress = user.getEmail();
+            String fromAddress = "itTalentsInstagramProject@gmail.com";
+            String senderName = "ItTalents Project";
+            String subject = "Forgotten Password";
+            String content = "Dear [[name]],<br>" + "Please click the link below to verify its' you " +
+                    "so you can set your new password:<br>" +
+                    "<h3><a href=\"[[URL]]\" target=\"_self\">GET CODE</a></h3>" + "Thank you,<br>" + "-ItTalents Team.";
+            
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
+            
+            content = content.replace("[[name]]", user.getFirstName() + " " + user.getLastName());
+            String forgottenPassword = siteURL + "users/passwordRecovery?code=" + user.getVerificationCode();
+            
+            content = content.replace("[[URL]]", forgottenPassword);
+            
+            helper.setText(content, true);
+            
+            mailSender.send(message);
+        } catch(MessagingException | UnsupportedEncodingException e){
+            throw new UserNotCreatedException("Error while sending forgotten password email");
+        }
+        
+        
+    }
+    
+    
     
     public boolean verify(String verificationCode){
         Optional<User> user = userRepository.getUserByVerificationCode(verificationCode);
         
         if(user.isPresent()){
             user.get().setVerified(true);
+            userRepository.save(user.get());
+            return true;
+        } else {
+            throw new UserNotCreatedException("Invalid code");
+        }
+    }
+    public boolean setNewPasswordForForgottenPassword(String verificationCode,UserPasswordResetDTO userNewPassword){
+        Optional<User> user = userRepository.getUserByVerificationCode(verificationCode);
+        
+        if(user.isPresent()){
+            if (userNewPassword.getPassword() == null || userNewPassword.getConfirmPassword() == null
+                    || userNewPassword.getPassword().isBlank() || userNewPassword.getConfirmPassword().isBlank()) {
+                throw new BadRequestException("You must enter your old password to confirm password change" +
+                        " and enter new password and confirm it, if you do not want to change your password," +
+                        " leave the fields empty");
+            }
+            validatePassword(userNewPassword.getPassword());
+            validatePassword(userNewPassword.getConfirmPassword());
+            checkIfPasswordAndConfirmPasswordMatch(userNewPassword.getPassword(), userNewPassword.getConfirmPassword());
+            user.get().setPassword(encodePassword(userNewPassword.getPassword()));
             userRepository.save(user.get());
             return true;
         } else {
@@ -178,7 +244,7 @@ public class UserService extends AbstractService {
         if (!checkPasswordMatch(user1, user.getPassword())) {
             throw new NoAuthException("Wrong password, enter correct password to confirm changes");
         }
-        if (user.getNewPassword() != null || user.getConfirmPassword() != null
+        if (user.getNewPassword() == null || user.getConfirmPassword() == null
                 || user.getNewPassword().isBlank() || user.getConfirmPassword().isBlank()) {
             throw new BadRequestException("You must enter your old password to confirm password change" +
                     " and enter new password and confirm it, if you do not want to change your password," +
@@ -443,4 +509,5 @@ public class UserService extends AbstractService {
         userRepository.save(userToDeactivate);
         return "User " + userToDeactivate.getUsername() + " deactivated";
     }
+    
 }

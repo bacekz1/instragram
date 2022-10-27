@@ -38,12 +38,29 @@ public class UserController extends AbstractController {
 
         return userService.createUser(user,siteURL);
     }
+    @PostMapping("/passwordRecovery")
+    String getNewPassword(@ModelAttribute UserOnlyMailAndUsernameDTO user) {
+        String siteURL = request.getRequestURL().toString().replace(request.getServletPath(), "");
+        if(session.getAttribute("id") != null) {
+            throw new BadRequestException("You are already logged in and you can change your password from your profile");
+        }
+        
+        return userService.fixForgottenPassword(user,siteURL);
+    }
     @GetMapping("/verify")
     public String verifyUser(@Param("code") String code) {
         if (userService.verify(code)) {
-            return "verify_success";
+            return "User verified successfully";
         } else {
-            return "verify_fail";
+            return "Verification failed";
+        }
+    }
+    @PutMapping("/passwordRecovery")
+    public String fixPassword(@Param("code") String code, @RequestBody UserPasswordResetDTO userNewPassword) {
+        if (userService.setNewPasswordForForgottenPassword(code,userNewPassword)) {
+            return "Password reset successfully";
+        } else {
+            return "Password reset failed";
         }
     }
     @PutMapping("/accountCredentials")

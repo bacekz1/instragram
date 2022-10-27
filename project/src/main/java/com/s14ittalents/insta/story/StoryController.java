@@ -19,19 +19,13 @@ public class StoryController extends AbstractController {
         long userId = getLoggedUserId();
         return storyService.createStory(storyCreateDTO, userId);
     }
-    @GetMapping("/{id:[0-9]+}")
-    @ResponseBody
-    PostWithoutOwnerDTO getStory(@PathVariable long id) {
-        getLoggedUserId();
-        return storyService.getStory(id);
-    }
+//    @GetMapping()
+//    @ResponseBody
+//    PostWithoutOwnerDTO getStory() {
+//       long userId = getLoggedUserId();
+//        return storyService.getStory(userId);
+//    }
 
-    @PutMapping("/{story:[0-9]+}")
-    @ResponseBody
-    PostWithoutOwnerDTO updateStory(@PathVariable long story, @RequestBody PostUpdateDTO storyUpdate) {
-        long userId = getLoggedUserId();
-        return storyService.updateStory(story, storyUpdate, userId);
-    }
 
     @DeleteMapping("/{storyId:[0-9]+}")
     boolean deleteStory(@PathVariable long storyId) {

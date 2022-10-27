@@ -3,13 +3,12 @@ package com.s14ittalents.insta.story;
 import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.exception.BadRequestException;
+import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.post.*;
 import com.s14ittalents.insta.post.dto.PostCreateDTO;
-import com.s14ittalents.insta.post.dto.PostUpdateDTO;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
-import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,22 +53,11 @@ public class StoryService extends AbstractService {
         return modelMapper.map(createdStory, PostWithoutOwnerDTO.class);
     }
 
-    public PostWithoutOwnerDTO getStory(long id) {
-        Post story = findStory(id);
-        return modelMapper.map(story, PostWithoutOwnerDTO.class);
-    }
-
-    public PostWithoutOwnerDTO updateStory(long posId, PostUpdateDTO storyUpdate, long userId) {
-        Post story = findStory(posId);
-        checkPermission(userId, story);
-        story.setCaption(storyUpdate.getCaption());
-        story.getHashtags().clear();
-        story.getPersonTags().clear();
-        addHashtags(story);
-        addPersonTags(story);
-        postRepository.save(story);
-        return modelMapper.map(story, PostWithoutOwnerDTO.class);
-    }
+//    public PostWithoutOwnerDTO getStory(long userId) {
+//         Post story = postRepository.findByOwnerAndDeletedIsFalseAndExpirationTimeNotNullAndCreatedTimeIsNotNull(getUserById(userId))
+//                 .orElseThrow(() -> new DataNotFoundException("test"));
+//        return modelMapper.map(story, PostWithoutOwnerDTO.class);
+//    }
 
     @Transactional
     public boolean deleteStory(long storyId, long userId) {

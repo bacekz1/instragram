@@ -7,7 +7,6 @@ import com.s14ittalents.insta.exception.Constant;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.post.Post;
 import com.s14ittalents.insta.user.User;
-import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,6 @@ public class CommentService extends AbstractService {
     public CreateCommentDTO createComment(CreateCommentDTO dto, long postId) {
         Comment comment = modelMapper.map(dto, Comment.class);
         comment.setOwnerId(dto.getOwnerId());
-        System.out.println(postId);
         Post post = findPost(postId);
         comment.setCreatedAt(LocalDateTime.now());
         addHashtags(post, comment);

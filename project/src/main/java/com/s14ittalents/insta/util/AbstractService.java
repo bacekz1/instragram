@@ -30,7 +30,8 @@ import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public abstract class AbstractService {
-
+    
+    
     @Autowired
     protected UserRepository userRepository;
     @Autowired
@@ -52,6 +53,10 @@ public abstract class AbstractService {
 
     protected User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
+    }
+    
+    protected User getUserByUsernameLogin(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new DataNotFoundException(Constant.WRONG_CREDENTIALS));
     }
 
     protected long getUserId(String username) {

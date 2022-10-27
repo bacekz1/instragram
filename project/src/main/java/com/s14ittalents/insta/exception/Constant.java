@@ -29,4 +29,5 @@ public class Constant {
             PATH_TO_STATIC + "default_profile_picture" + File.separator + "default_profile_picture.jpg";
 
     public static final String YOU_ALREADY_REPLY_THIS_COMMENT = "You already reply this comment";
+    public static final String WRONG_CREDENTIALS = "Wrong credentials!";
 }

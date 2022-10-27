@@ -21,7 +21,7 @@ public class PostWithoutOwnerDTO {
     private List<ContentWithoutUser> contents;
     private LocationWithoutPost location;
     private List<UserWithoutPostsDTO> likes;
-
+    
     public Integer getLikes() {
         if (likes != null) {
             return likes.size();

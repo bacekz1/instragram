@@ -224,7 +224,7 @@ public class UserService extends AbstractService {
             validateUsername(user1.getUsername());
         }
         validatePassword(user1.getPassword());
-        checkIfUserExists(user1.getUsername());
+        checkIfUserExistsLogin(user1.getUsername());
         User user = getUserByUsernameLogin(user1.getUsername());
         if(!user.isVerified()){
             throw new BadRequestException("You have not verified your account, please check your email");
@@ -445,7 +445,12 @@ public class UserService extends AbstractService {
                 .orElseGet(() -> userRepository.findByEmail(usermame)
                         .orElseThrow(() -> new DataNotFoundException("User not found"))));
     }
-
+    
+    protected Optional<User> checkIfUserExistsLogin(String usermame) {
+        return Optional.of(userRepository.findByUsername(usermame)
+                .orElseGet(() -> userRepository.findByEmail(usermame)
+                        .orElseThrow(() -> new DataNotFoundException("Wrong credentials!"))));
+    }
     public String followUser(String username, long loggedUserId) {
         User userToFollow = userRepository.findByUsername(username.toLowerCase().trim())
                 .orElseThrow(() -> new DataNotFoundException("Follow unsuccessful, user not found"));

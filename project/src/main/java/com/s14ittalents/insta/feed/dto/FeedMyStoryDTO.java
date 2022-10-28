@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.feed;
+package com.s14ittalents.insta.feed.dto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class FeedMyStoryDTO {
         this.expiration_time = expiration_time;
     }
     
-    void setTimePassed(long timePassed) {
+    public void setTimePassed(long timePassed) {
         this.timePassed = "~"+(24+timePassed)+"h";
     }
 }

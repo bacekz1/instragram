@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.feed;
+package com.s14ittalents.insta.feed.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

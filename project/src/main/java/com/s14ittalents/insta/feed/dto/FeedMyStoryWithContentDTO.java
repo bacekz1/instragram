@@ -1,17 +1,17 @@
-package com.s14ittalents.insta.feed;
+package com.s14ittalents.insta.feed.dto;
 
-import com.s14ittalents.insta.content.Content;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FeedPostWithContentDTO {
-    private FeedPostDTO post;
+public class FeedMyStoryWithContentDTO {
+    private FeedMyStoryDTO story;
     private List<FeedContentDTO> content;
     private int countLikes;
-    private int countComments;
+    private List<FeedUserLikerDTO> usersWhoLiked;
 }

@@ -1,5 +1,6 @@
 package com.s14ittalents.insta.feed;
 
+import com.s14ittalents.insta.feed.dto.*;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;

@@ -46,8 +46,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(
             value = "SELECT * \n" +
                     "FROM post\n" +
-                    "WHERE user_id = :userId AND expiration_time >= CURDATE() AND is_deleted = 0 AND created_time IS NOT NULL",
+                    "WHERE id = :postId AND expiration_time >= CURDATE() AND is_deleted = 0 AND created_time IS NOT NULL",
             nativeQuery = true)
-    Optional<Post> findStory(@Param("userId") long userId);
+    Optional<Post> findStory(@Param("postId") long postId);
 
 }

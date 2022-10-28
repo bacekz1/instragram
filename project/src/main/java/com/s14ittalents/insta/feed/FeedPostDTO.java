@@ -3,6 +3,7 @@ package com.s14ittalents.insta.feed;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -18,5 +19,6 @@ public class FeedPostDTO {
     private long post_id;
     private String caption;
     private String location;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created_time;
 }

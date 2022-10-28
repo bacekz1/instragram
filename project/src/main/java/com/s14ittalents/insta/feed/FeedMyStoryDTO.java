@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
-public class FeedStoryDTO {
+public class FeedMyStoryDTO {
     private String profile_picture;
     private String username;
     private String first_name;
@@ -20,7 +20,7 @@ public class FeedStoryDTO {
     private LocalDateTime expiration_time;
     private String timePassed;
     
-    public FeedStoryDTO(String profile_picture, String username, String first_name, String last_name,
+    public FeedMyStoryDTO(String profile_picture, String username, String first_name, String last_name,
                         long post_id, String caption, String location, LocalDateTime expiration_time) {
         this.profile_picture = profile_picture;
         this.username = username;

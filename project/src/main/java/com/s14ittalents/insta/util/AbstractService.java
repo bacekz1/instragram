@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,8 +68,12 @@ public abstract class AbstractService {
                 .orElseThrow(() -> new DataNotFoundException(Constant.POST_NOT_FOUND));
     }
 
-    protected Post findStory(long postId) {
-        return postRepository.findStory(postId)
+    protected Post findStoryById(long userId) {
+        return postRepository.findStoryById(userId)
+                .orElseThrow(() -> new DataNotFoundException(STORY_NOT_FOUND));
+    }
+    protected Post findStoryByUserId(long userId) {
+        return postRepository.findStoryById(userId)
                 .orElseThrow(() -> new DataNotFoundException(STORY_NOT_FOUND));
     }
 

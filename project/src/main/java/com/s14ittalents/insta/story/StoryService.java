@@ -27,7 +27,7 @@ public class StoryService extends AbstractService {
 
     @Transactional
     public PostWithoutOwnerDTO createStory(PostCreateDTO storyCreateDTO, long userId) {
-        Optional<Post> story = postRepository.findStory(userId);
+        Optional<Post> story = postRepository.findStoryByUserId(userId);
         if (story.isEmpty()) {
             Post createStory = new Post();
             createStory.setCaption(storyCreateDTO.getCaption());
@@ -70,13 +70,13 @@ public class StoryService extends AbstractService {
     }
 
     public PostWithoutOwnerDTO getStory(long userId) {
-        Post story = findStory(userId);
+        Post story = findStoryById(userId);
         return modelMapper.map(story, PostWithoutOwnerDTO.class);
     }
 
 
     public void updatePost(ContentIdDTO contentIdDTO, long userId) {
-        Post story = findStory(userId);
+        Post story = findStoryById(userId);
         Content content = contentRepository
                 .findById(contentIdDTO.getId()).orElseThrow(() -> new DataNotFoundException(CONTENT_NOT_FOUND));
         story.getContents().remove(content);
@@ -85,7 +85,7 @@ public class StoryService extends AbstractService {
 
     @Transactional
     public boolean deleteStory(long storyId, long userId) {
-        Post story = findStory(storyId);
+        Post story = findStoryById(storyId);
         checkPermission(userId, story);
         List<Comment> comments = commentRepository.findByPostId(storyId).stream().toList();
         comments.forEach(comment -> comment.setDeleted(true));
@@ -97,7 +97,7 @@ public class StoryService extends AbstractService {
     }
 
     public int likeStory(long postId, long userId) {
-        Post post = findStory(postId);
+        Post post = findStoryById(postId);
         User user = getUserById(userId);
         if (user.getLikedPosts().contains(post)) {
             user.getLikedPosts().remove(post);

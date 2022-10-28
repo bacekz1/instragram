@@ -97,8 +97,9 @@ public class UserService extends AbstractService {
             sendVerificationEmail(newUser, siteURL);
             newUser.setCreatedAt(LocalDateTime.now());
             userRepository.save(newUser);
-            if (user.getProfilePicture() != null) {
-                updateProfilePicture(user.getProfilePicture(), getUserId(newUser.getUsername()));
+            User userToCheckProfilePicture = userRepository.findByUsername(newUser.getUsername()).get();
+            if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
+                updateProfilePicture(user.getProfilePicture(), getUserId(userToCheckProfilePicture.getUsername()));
             }
             return modelMapper.map(newUser, UserNoPasswordDTO.class);
         } else {

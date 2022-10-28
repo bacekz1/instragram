@@ -76,7 +76,7 @@ public class UserController extends AbstractController {
         return userService.editUserInfo(user, userId);
     }
     @DeleteMapping("/{username}")
-    String adminDeleteUser(@RequestBody UserDeleteDTO user, @PathVariable String username) {
+    String adminDeleteUser(@ModelAttribute UserDeleteDTO user, @PathVariable String username) {
         long userId = getLoggedUserId();
         return userService.deleteUser(userId, user, username);
     }

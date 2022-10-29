@@ -1,6 +1,7 @@
 package com.s14ittalents.insta.messages;
 
 import com.s14ittalents.insta.util.AbstractController;
+import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,18 +15,23 @@ public class MessageController extends AbstractController {
     private MessageService messageService;
     
     @GetMapping("/sentMessages")
-    List<MessageOnlyIdDTO> getSentMessages() {
+    List<MessageInfoDTO> getSentMessages() {
         return messageService.getSentMessages(getLoggedUserId());
     }
     
     @GetMapping("/receivedMessages")
-    List<MessageOnlyIdDTO> getReceivedMessages() {
+    List<MessageInfoDTO> getReceivedMessages() {
         return messageService.getReceivedMessages(getLoggedUserId());
     }
     
     @PostMapping("/{username}")
-    MessageOnlyIdDTO sendMessage(@PathVariable String username, @RequestBody MessageCreateDTO message) {
+    MessageInfoDTO sendMessage(@PathVariable String username, @RequestBody MessageCreateDTO message) {
         
-        return messageService.sendMessage(getLoggedUserId(), username);
+        return messageService.sendMessage(getLoggedUserId(), username, message.getText());
+    }
+    
+    @GetMapping("/conversation/{username}")
+    MessageConversationDTO getConversation(@PathVariable String username) {
+        return messageService.getConversation(getLoggedUserId(), username);
     }
 }

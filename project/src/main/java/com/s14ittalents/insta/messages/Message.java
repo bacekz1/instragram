@@ -37,6 +37,8 @@ public class Message implements Ownerable {
     private LocalDateTime sendDate;
     @Column
     private boolean isSeen;
+//    @Column
+//    private boolean isDeleted;
     @Override
     public long ownerId() {
         return id;

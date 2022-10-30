@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/posts")
 public class PostController extends AbstractController {
     @Autowired
     PostService postService;

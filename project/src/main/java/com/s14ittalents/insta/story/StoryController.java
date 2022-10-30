@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/story")
+@RequestMapping("/stories")
 public class StoryController extends AbstractController {
     @Autowired
     StoryService storyService;
@@ -20,14 +20,14 @@ public class StoryController extends AbstractController {
         return storyService.createStory(storyCreateDTO, userId);
     }
 
-    @GetMapping()
+    @GetMapping
     @ResponseBody
     PostWithoutOwnerDTO getStory() {
         long userId = getLoggedUserId();
         return storyService.getStory(userId);
     }
 
-    @PutMapping()
+    @PutMapping
     void updatePost(@RequestBody ContentIdDTO contentIdDTO) {
         long userId = getLoggedUserId();
         storyService.updatePost(contentIdDTO, userId);
@@ -42,9 +42,9 @@ public class StoryController extends AbstractController {
         return storyService.deleteStory(storyId, userId);
     }
 
-    @PostMapping("/{postId:[0-9]+}/")
-    int likePost(@PathVariable long postId) {
+    @PostMapping("/{storyId:[0-9]+}")
+    int likeStory(@PathVariable long storyId) {
         long userId = getLoggedUserId();
-        return storyService.likeStory(postId, userId);
+        return storyService.likeStory(storyId, userId);
     }
 }

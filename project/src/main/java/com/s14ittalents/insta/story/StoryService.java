@@ -96,18 +96,18 @@ public class StoryService extends AbstractService {
         return true;
     }
 
-    public int likeStory(long postId, long userId) {
-        Post post = findStoryById(postId);
+    public int likeStory(long storyId, long userId) {
+        Post story = findStoryById(storyId);
         User user = getUserById(userId);
-        if (user.getLikedPosts().contains(post)) {
-            user.getLikedPosts().remove(post);
-            post.getLikes().remove(user);
+        if (user.getLikedPosts().contains(story)) {
+            user.getLikedPosts().remove(story);
+            story.getLikes().remove(user);
         } else {
-            user.getLikedPosts().add(post);
-            post.getLikes().add(user);
+            user.getLikedPosts().add(story);
+            story.getLikes().add(user);
         }
         userRepository.save(user);
-        return post.getLikes().size();
+        return story.getLikes().size();
     }
 
 }

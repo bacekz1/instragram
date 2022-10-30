@@ -40,7 +40,7 @@ public class CommentService extends AbstractService {
         return modelMapper.map(createdComment, CreateCommentDTO.class);
     }
 
-    public CreateCommentDTO replyComment(CreateCommentDTO dto, long postId, long commentId) {
+    public CreateCommentDTO replyComment(CreateCommentDTO dto, long commentId) {
         Comment comment = modelMapper.map(dto, Comment.class);
         Comment replyComment = findComment(commentId);
         if (replyComment.ownerId() == dto.getOwnerId()) {
@@ -50,7 +50,7 @@ public class CommentService extends AbstractService {
             throw new BadRequestException(YOU_ALREADY_REPLY_THIS_COMMENT);
         }
         comment.setOwnerId(dto.getOwnerId());
-        Post post = findPost(postId);
+        Post post = replyComment.getPost();
         comment.setCreatedAt(LocalDateTime.now());
         comment.setReplyId(replyComment);
         addHashtags(post, comment);
@@ -89,7 +89,6 @@ public class CommentService extends AbstractService {
     public int likeComment(long id, long userId) {
         Comment comment = findComment(id);
         User user = getUserById(userId);
-
         if (user.getLikedComments().contains(comment)) {
             user.getLikedComments().remove(comment);
             comment.getLikes().remove(user);
@@ -98,7 +97,6 @@ public class CommentService extends AbstractService {
             comment.getLikes().add(user);
         }
         userRepository.save(user);
-
         return comment.get().getLikes().size();
     }
 

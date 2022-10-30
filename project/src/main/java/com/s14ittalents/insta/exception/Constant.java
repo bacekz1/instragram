@@ -34,4 +34,21 @@ public class Constant {
     public static final String WRONG_CREDENTIALS = "Wrong credentials!";
     
     public static final String REPLACE_IN_DELETED = ("del-" + LocalDateTime.now()).substring(0, 30);
+    public static final String SQL_TO_COUNT_ALL_FROM_SELECTION_FOR_FEED =
+                    "SELECT \n" + "    COUNT(*)\n"
+                    + "FROM\n"
+                    + "    users AS u\n" 
+                    + "        LEFT JOIN\n"
+                    + "    following "
+                    + "AS f ON (u.id = f.user_id)\n"
+                    + "        LEFT JOIN\n"
+                    + "    post AS p ON (p.user_id = u.id)\n"
+                    + "        LEFT JOIN\n"
+                    + "    locations AS l ON (p.location_id = l.id)\n"
+                    + "WHERE\n"
+                    + "    f.follower_id = ? \n"
+                    + "        AND u.is_banned = '0'\n"
+                    + "        AND u.is_deactivated = '0'\n"
+                    + "        AND p.expiration_time IS NULL\n"
+                    + "        AND p.is_deleted = '0'\n";
 }

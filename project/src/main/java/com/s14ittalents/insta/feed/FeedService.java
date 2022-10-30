@@ -21,22 +21,12 @@ public class FeedService extends AbstractService {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private FeedDataAccessService feedDataAccessService;
     //todo: move queries to Dao, make queries parametrized, cleanup newline characters left from SQL queries
     private static final Pageable PAGEABLE = PageRequest.of(0, 5);
-    public int count(long loggedUserId, String insertOrder) {
-        String sql = "SELECT \n"
-                + "    COUNT(*)\n"
-                + "FROM\n"
-                + "    users AS u\n"
-                + "        LEFT JOIN\n"
-                + "    following AS f ON (u.id = f.user_id)\n"
-                + "        LEFT JOIN\n" + "    post AS p ON (p.user_id = u.id)\n"
-                + "        LEFT JOIN\n" + "    locations AS l ON (p.location_id = l.id)\n"
-                + "WHERE\n" + "    f.follower_id = '"+ (int) loggedUserId +"'\n" + "        AND u.is_banned = '0'\n"
-                + "        AND u.is_deactivated = '0'\n" + "        AND p.expiration_time IS NULL\n"
-                + "        AND p.is_deleted = '0'\n"
-                + "ORDER BY p.created_time "+insertOrder+"\n";
-        return jdbcTemplate.queryForObject(sql,Integer.class);
+    public int count(long loggedUserId) {
+        return feedDataAccessService.countAllRowsForPostSelect(loggedUserId);
     }
     
     @Transactional
@@ -105,7 +95,7 @@ public class FeedService extends AbstractService {
             postsWithContent.add(new FeedPostWithContentDTO(post,content,countLikes,countComments));
         }
         return new PageImpl<>(postsWithContent, PAGEABLE.withPage((int) page),
-                count(loggedUserId, insertOrder)).get().collect(Collectors.toList());
+                count(loggedUserId)).get().collect(Collectors.toList());
     }
     
     @Transactional

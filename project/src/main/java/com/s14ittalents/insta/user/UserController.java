@@ -127,7 +127,12 @@ public class UserController extends AbstractController {
     @PutMapping("/password")
     String changePassword(@RequestBody UserChangePasswordDTO user) {
         long userId = getLoggedUserId();
-        return userService.changePassword(user, userId);
+        String resp = userService.changePassword(user, userId);
+        if (resp.equals("Password changed successfully")) {
+            session.invalidate();
+            return resp + ", you have been logged out, please log in again with the new credentials";
+        }
+        return resp;
     }
     
     

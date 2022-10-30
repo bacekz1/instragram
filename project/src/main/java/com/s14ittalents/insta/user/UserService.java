@@ -321,13 +321,13 @@ public class UserService extends AbstractService {
     
     public String changePassword(UserChangePasswordDTO user, long userId) {
         if (user.getNewPassword() == null || user.getConfirmPassword() == null || user.getOldPassword() == null) {
-            throw new BadRequestException("All fields are required");
+            throw new NoAuthException("All fields are required");
         }
         User user1 = getUserById(userId);
         checkPermission(userId, user1);
         if (checkPasswordMatch(user1, user.getOldPassword().trim())) {
             if (user.getOldPassword().equals(user.getNewPassword())) {
-                throw new BadRequestException("New password cannot be the same as the old one");
+                throw new NoAuthException("New password cannot be the same as the old one");
             }
             validatePassword(user.getNewPassword());
             checkIfPasswordAndConfirmPasswordMatch(user.getNewPassword(), user.getConfirmPassword());
@@ -335,13 +335,13 @@ public class UserService extends AbstractService {
             userRepository.save(user1);
             return "Password changed successfully";
         }
-        throw new BadRequestException("Wrong password");
+        throw new NoAuthException("Wrong password");
     }
 
 
     private void checkIfPasswordAndConfirmPasswordMatch(String password, String confirmPassword) {
         if (!Objects.equals(password, confirmPassword)) {
-            throw new BadRequestException("Passwords do not match");
+            throw new NoAuthException("Passwords do not match");
         }
     }
 

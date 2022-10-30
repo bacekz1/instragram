@@ -118,21 +118,4 @@ public class User implements Ownerable {
     public long ownerId() {
         return id;
     }
-    
-
-    /*
-    From lecture:
-    
-    Way 1 - Basic Many to many - only one column in joined table with foreign keys
-    user is responsible to connection many to many
-    
-    userRepository.save(user);
-    
-    user as owning has to do edit both tales
-    posts.save()- would not work if user is owning
-    
-    
-
-    depends which is the owning side
-     */
 }

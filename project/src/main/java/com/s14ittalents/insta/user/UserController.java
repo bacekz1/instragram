@@ -23,9 +23,14 @@ public class UserController extends AbstractController {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    @GetMapping("/{username}")
-    UserNoPasswordDTO getUser(@PathVariable String username) {
+    @GetMapping("/username/{username}")
+    UserNoPasswordDTO getUserByUsername(@PathVariable String username) {
         return userService.getUserByUsernameToDTO(username);
+    }
+    
+    @GetMapping("/{id:[0-9]+}")
+    UserNoPasswordDTO getUserById(@PathVariable long id) {
+        return userService.getUserByIdToDTO(id);
     }
 
     @PostMapping()
@@ -63,6 +68,7 @@ public class UserController extends AbstractController {
             return "Password reset failed";
         }
     }
+    //todo: fully test /accountCredentials endpoint and /accountInfo endpoint
     @PutMapping("/accountCredentials")
     UserNoPasswordDTO updateUserCred(@ModelAttribute UserUpdateDTO user) {
         long userId = getLoggedUserId();
@@ -75,10 +81,20 @@ public class UserController extends AbstractController {
         long userId = getLoggedUserId();
         return userService.editUserInfo(user, userId);
     }
-    @DeleteMapping("/{username}")
-    String adminDeleteUser(@ModelAttribute UserDeleteDTO user, @PathVariable String username) {
+    @DeleteMapping("/account/{account}")
+    String adminDeleteUser(@ModelAttribute UserDeleteDTO user, @PathVariable String account) {
         long userId = getLoggedUserId();
-        return userService.deleteUser(userId, user, username);
+        boolean isUsername = false;
+        if (account.lastIndexOf("@")==-1) {
+            isUsername = true;
+        }
+        return userService.deleteUser(userId, user, account, isUsername);
+    }
+    
+    @DeleteMapping("/{id:[0-9]+}")
+    String adminDeleteUser(@ModelAttribute UserDeleteDTO user, @PathVariable long id) {
+        long userId = getLoggedUserId();
+        return userService.deleteUser(userId, user, userService.getUserById(id).getUsername(),true);
     }
     
     @DeleteMapping("")
@@ -89,7 +105,7 @@ public class UserController extends AbstractController {
     }
 
     @PostMapping("/login")
-    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user) {;
+    UserOnlyMailAndUsernameDTO loginUser(@RequestBody UserLoginDTO user) {
         if(session.getAttribute("logged") != null) {
             throw new UserNotCreatedException("You are already logged in");
         }
@@ -115,7 +131,7 @@ public class UserController extends AbstractController {
     }
     
     
-    @PutMapping("/{username}/pfp")
+    @PutMapping("/pfp")
     public String uploadProfilePicture(@ModelAttribute(value = "file") MultipartFile file) {
         if(getLoggedUserId()>0){
             return userService.updateProfilePicture(file, getLoggedUserId());
@@ -124,7 +140,7 @@ public class UserController extends AbstractController {
         }
     }
     
-    @PutMapping("/{username}/pfp/default")
+    @PutMapping("/pfp/default")
     public String setDefaultProfilePicture() {
         if(getLoggedUserId()>0){
             return userService.setDefaultProfilePicture(getLoggedUserId());
@@ -133,9 +149,14 @@ public class UserController extends AbstractController {
         }
     }
     
-    @PostMapping("/follow/{username}")
+    @PostMapping("/username/{username}/follow")
     public String followUser(@PathVariable String username) {
         return userService.followUser(username, getLoggedUserId());
+    }
+    
+    @PostMapping("/{id:[0-9]+}/follow")
+    public String followUser(@PathVariable long id) {
+        return userService.followUser(userService.getUserById(id).getUsername(), getLoggedUserId());
     }
     
     @GetMapping("/followers")
@@ -147,29 +168,22 @@ public class UserController extends AbstractController {
         return userService.getFollowing(getLoggedUserId());
     }
     
-    @PutMapping("/{username}/badUser")
+    @GetMapping("/{id:[0-9]+}/followers")
+    public List<UserOnlyMailAndUsernameDTO> getFollowersOfUserById(@PathVariable long id) {
+        return userService.getFollowers(id);
+    }
+    @GetMapping("/{id:[0-9]+}/following")
+    public List<UserOnlyMailAndUsernameDTO> getFollowingOfUserById(@PathVariable long id) {
+        return userService.getFollowing(id);
+    }
+    
+    @PutMapping("username/{username}/badUser")
     public String banUser(@PathVariable String username) {
-        return userService.banUser(getLoggedUserId(),username);
+        return userService.banUser(getLoggedUserId(),username,null);
     }
-    
-    /*
-    if get logged user id >  -> throw new BadRequestException("you are already logged in");
-    
-    
-
-     */
-    
-    /*PostMapping("/{username}/profile_picture"){
-    --url params - form data -come as key value - req get param
-    @RequestParam("profile_picture") MultipartFile file
-    multipart resolver
-    
-    //upload to files (make unique name) user id + timestamp
-    //get the file name
-    //upload filename to user.profile_picture
-    
+    @PutMapping("/{id:[0-9]+}/badUser")
+    public String banUserById(@PathVariable long id) {
+        return userService.banUser(getLoggedUserId(),null,id);
     }
-    
-     */
 }
 

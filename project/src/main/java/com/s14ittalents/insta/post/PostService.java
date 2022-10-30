@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.s14ittalents.insta.exception.Constant.*;
@@ -21,7 +22,7 @@ import static com.s14ittalents.insta.exception.Constant.*;
 @Service
 public class PostService extends AbstractService {
     private static final int MAX_SIZE = 5;
-
+    
     @Transactional
     public PostWithoutOwnerDTO createPost(PostCreateDTO postCreateDTO, long userId) {
         Post post = new Post();
@@ -72,7 +73,15 @@ public class PostService extends AbstractService {
         Post post = findPost(postId);
         checkPermission(userId, post);
         post.setDeleted(true);
-        post.setCaption("deleted at" + LocalDateTime.now());
+        post.setCaption(REPLACE_IN_DELETED);
+        deletePostComments(post);
+        postRepository.save(post);
+    }
+    
+    @Transactional
+    public void deletePostCommentsWhenDeletingUser(Post post) {
+        post.setDeleted(true);
+        post.setCaption(REPLACE_IN_DELETED);
         deletePostComments(post);
         postRepository.save(post);
     }

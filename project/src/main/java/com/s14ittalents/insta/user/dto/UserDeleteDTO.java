@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UserDeleteDTO {
-    private String usernameToDelete;
     private String passwordOfAdmin;
     private String confirmPasswordOfAdmin;
 }

@@ -21,7 +21,7 @@ public class FeedService extends AbstractService {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    
+    //todo: move queries to Dao, make queries parametrized, cleanup newline characters left from SQL queries
     private static final Pageable PAGEABLE = PageRequest.of(0, 5);
     public int count(long loggedUserId, String insertOrder) {
         String sql = "SELECT \n"
@@ -40,8 +40,9 @@ public class FeedService extends AbstractService {
     }
     
     @Transactional
-    public List<FeedPostWithContentDTO> getPostsOfFollowedUsers(long loggedUserId, boolean order, int page) {
-        PAGEABLE.withPage(page);
+    public List<FeedPostWithContentDTO> getPostsOfFollowedUsers(long loggedUserId, boolean order, long page) {
+        
+        PAGEABLE.withPage((int) page);
         String insertOrder = order ? "ASC" : "DESC";
         String sql = "SELECT \n" + "    u.profile_picture,\n"
                 + "    u.username,\n"
@@ -60,8 +61,8 @@ public class FeedService extends AbstractService {
                 + "        AND u.is_deactivated = '0'\n" + "        AND p.expiration_time IS NULL\n"
                 + "        AND p.is_deleted = '0'\n"
                 + "ORDER BY p.created_time "+insertOrder+"\n"
-                + "LIMIT "+PAGEABLE.withPage(page).getPageSize()+"\n"
-                + "OFFSET "+PAGEABLE.withPage(page).getOffset()+"\n";
+                + "LIMIT "+PAGEABLE.withPage((int) page).getPageSize()+"\n"
+                + "OFFSET "+PAGEABLE.withPage((int) page).getOffset()+"\n";
         List<FeedPostDTO> posts =  jdbcTemplate.query(sql, (rs, rowNum) -> new FeedPostDTO(
                 rs.getString("profile_picture"),
                 rs.getString("username"),
@@ -103,7 +104,7 @@ public class FeedService extends AbstractService {
             int countComments = jdbcTemplate.queryForObject(sql4, Integer.class);
             postsWithContent.add(new FeedPostWithContentDTO(post,content,countLikes,countComments));
         }
-        return new PageImpl<>(postsWithContent, PAGEABLE.withPage(page),
+        return new PageImpl<>(postsWithContent, PAGEABLE.withPage((int) page),
                 count(loggedUserId, insertOrder)).get().collect(Collectors.toList());
     }
     

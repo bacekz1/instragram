@@ -23,13 +23,13 @@ public class MessageController extends AbstractController {
     List<MessageInfoDTO> getReceivedMessages() {
         return messageService.getReceivedMessages(getLoggedUserId());
     }
-    
+    //todo: add endpoint for sending message with id of the receiver
     @PostMapping("/{username}")
     MessageInfoDTO sendMessage(@PathVariable String username, @RequestBody MessageCreateDTO message) {
         
         return messageService.sendMessage(getLoggedUserId(), username, message.getText());
     }
-    
+    //todo: add endpoint for getting conversation with id of the receiver
     @GetMapping("/conversation/{username}")
     MessageConversationDTO getConversation(@PathVariable String username) {
         return messageService.getConversation(getLoggedUserId(), username);

@@ -1,6 +1,8 @@
 package com.s14ittalents.insta.exception;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Constant {
     public static long mb = 1024000;
@@ -17,7 +19,7 @@ public class Constant {
     public static final String THE_FILE_ALREADY_EXISTS = "The file already exists";
     public static final int MAX_ALLOWED_FILES_TO_UPLOAD = 10;
     public static final String COMMENT_NOT_FOUND = "Comment not found";
-    public static final String CAN_NOT_REPLY_YOURSELF = "Can not reply yourself";
+    public static final String CAN_NOT_REPLY_YOURSELF = "Can not reply to yourself";
 
 
     public static final String CONTENT_NOT_FOUND = "Content not found";
@@ -28,6 +30,8 @@ public class Constant {
     public static final String DEFAULT_PROFILE_PICTURE =
             PATH_TO_STATIC + "default_profile_picture" + File.separator + "default_profile_picture.jpg";
 
-    public static final String YOU_ALREADY_REPLY_THIS_COMMENT = "You already reply this comment";
+    public static final String YOU_ALREADY_REPLY_THIS_COMMENT = "You already replied to this comment";
     public static final String WRONG_CREDENTIALS = "Wrong credentials!";
+    
+    public static final String REPLACE_IN_DELETED = ("del-" + LocalDateTime.now()).substring(0, 30);
 }

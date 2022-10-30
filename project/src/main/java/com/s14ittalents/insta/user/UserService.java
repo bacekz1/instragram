@@ -25,11 +25,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.s14ittalents.insta.exception.Constant.*;
@@ -58,6 +57,11 @@ public class UserService extends AbstractService {
 
     UserNoPasswordDTO getUserByUsernameToDTO(String username) {
         Optional<User> user = Optional.of(userRepository.findByUsername(username)
+                .orElseThrow(() -> new DataNotFoundException("User not found")));
+        return modelMapper.map(user, UserNoPasswordDTO.class);
+    }
+    UserNoPasswordDTO getUserByIdToDTO(long id) {
+        Optional<User> user = Optional.of(userRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("User not found")));
         return modelMapper.map(user, UserNoPasswordDTO.class);
     }
@@ -384,55 +388,66 @@ public class UserService extends AbstractService {
     }
 
     @Transactional
-    public String deleteUser(long userId, UserDeleteDTO user, String username) {
+    public String deleteUser(long userId, UserDeleteDTO adminAuth, String account, boolean isUsername) {
         User admin = validateIfUserIsAdminByEmail(userId);
+    
+        User userToDelete = isUsername ? getUserByUsername(account) : getUserByEmail(account);
+    
+        checkAdminPassword(adminAuth, admin);
+        userToDelete.setDeleted(true);
+        String replaceInDeleted = REPLACE_IN_DELETED;
+        userToDelete.setUsername(replaceInDeleted);
+        encodePassword(userToDelete,(REPLACE_IN_DELETED + System.nanoTime()));
+        userToDelete.setEmail(replaceInDeleted);
+        userToDelete.setFirstName("");
+        userToDelete.setLastName("");
+        userToDelete.setGender("del-"+ DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now()));
+        userToDelete.setProfilePicture(replaceInDeleted);
+        userToDelete.setPhoneNum(replaceInDeleted);
+        userToDelete.setBio(replaceInDeleted);
+        userToDelete.setDateOfBirth(LocalDate.parse("1900-01-01"));
+        userToDelete.setVerified(false);
+        userToDelete.setDeactivated(true);
         
-        User userToDelete = getUserByUsername(username);
-        
+        userToDelete.setLikedPosts(new ArrayList<>());
+        userToDelete.setLikedComments(new ArrayList<>());
+        userToDelete.setPosts(new ArrayList<>());
+        userToDelete.setVerificationCode(RandomString.make(13));
+        userToDelete.setFollowers(new ArrayList<>());
+        userToDelete.setFollowing(new ArrayList<>());
+        //the below may be used to clear all posts and comments made by the adminAuth
+        for(Post post : postRepository.findAllByOwner(userToDelete)){
+            postService.deletePostCommentsWhenDeletingUser(post);
+        }
+        //can be used to clear following lists
+        for(User followed : userToDelete.getFollowers()){
+            followed.getFollowing().remove(userToDelete);
+            userRepository.save(followed);
+        }
+        for(User following : userToDelete.getFollowing()){
+            following.getFollowers().remove(userToDelete);
+            userRepository.save(following);
+        }
+        userRepository.save(userToDelete);
+        return "User "+ account +" deleted";
+    }
+    
+    private void checkAdminPassword(UserDeleteDTO user, User admin) {
         String password = validatePassword(user.getPasswordOfAdmin());
         String passwordConfirm = validatePassword(user.getConfirmPasswordOfAdmin());
         if (!password.equals(passwordConfirm)) {
             throw new BadRequestException("Passwords do not match");
         }
         if (!(checkPasswordMatch(admin, user.getPasswordOfAdmin()))) {
-            throw new BadRequestException("Wrong password");
+            throw new NoAuthException("Wrong credentials!");
         }
-        userToDelete.setDeleted(true);
-        String replaceInDeleted = userToDelete.getId() + "-del";
-        userToDelete.setUsername(replaceInDeleted);
-        encodePassword(userToDelete,(replaceInDeleted + System.nanoTime()));
-        userToDelete.setEmail(replaceInDeleted + "-" + LocalDateTime.now());
-        userToDelete.setFirstName(replaceInDeleted);
-        userToDelete.setLastName(replaceInDeleted);
-        userToDelete.setGender(replaceInDeleted);
-        userToDelete.setProfilePicture(replaceInDeleted);
-        userToDelete.setPhoneNum(replaceInDeleted);
-        userToDelete.setBio(replaceInDeleted);
-        userToDelete.setDateOfBirth(null);
-        userToDelete.setVerified(false);
-        userToDelete.setDeactivated(true);
-        
-        //the below may be used to clear all posts and comments made by the user
-//        for(Post post : userToDelete.getPosts()){
-//            postService.deletePost(post.getId());
-//        }
-//        commentRepository.getAllByOwnerId(userToDelete.getId()).forEach(comment -> {
-//            comment.setDeleted(true);
-//            commentRepository.save(comment);
-//        });
-        //can be used to clear following lists
-//        for(User followed : userToDelete.getFollowers()){
-//            followed.getFollowing().remove(userToDelete);
-//            userRepository.save(followed);
-//        }
-//        for(User following : userToDelete.getFollowing()){
-//            following.getFollowers().remove(userToDelete);
-//            userRepository.save(following);
-//        }
-        userRepository.save(userToDelete);
-        return "User "+ username +" deleted";
     }
-
+    
+    private User getUserByEmail(String account) {
+        return userRepository.findByEmail(account)
+                .orElseThrow(() -> new NoAuthException("User with email " + account + " not found"));
+    }
+    
     public String setDefaultProfilePicture(long loggedUserId) {
         User user = getUserById(loggedUserId);
         checkPermission(loggedUserId, user);
@@ -487,16 +502,21 @@ public class UserService extends AbstractService {
                 .collect(Collectors.toList());
     }
 
-    public String banUser(long loggedUserId, String username) {
+    public String banUser(long loggedUserId, String username, Long id) {
         validateIfUserIsAdminByEmail(loggedUserId);
-        User userToBan = getUserByUsername(username);
+        User userToBan;
+        if (id != null) {
+            userToBan = getUserById(id);
+        } else {
+            userToBan = getUserByUsername(username);
+        }
         if (userToBan.getId() == loggedUserId) {
             throw new BadRequestException("You cannot ban yourself");
         }
         userToBan.setBanned(!userToBan.isBanned());
         userRepository.save(userToBan);
-        return userToBan.isBanned() ? "User " + username + " has been banned"
-                : "User's " + username + " ban has been lifted";
+        return userToBan.isBanned() ? "User " + userToBan.getUsername() + " has been banned"
+                : "User's " + userToBan.getUsername() + " ban has been lifted";
     }
 
     public long getIdFromMailUsernameDTO(UserOnlyMailAndUsernameDTO user1) {

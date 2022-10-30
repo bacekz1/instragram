@@ -1,5 +1,6 @@
 package com.s14ittalents.insta.post;
 
+import com.s14ittalents.insta.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndDeletedIsFalseAndExpirationTimeIsNull(long id);
 
     Page<Post> findByOwnerIdAndDeletedIsFalseAndExpirationTimeIsNullOrderByCreatedTimeDesc(long id, Pageable pageable);
+    
+    List<Post> findAllByOwner(User owner);
 
     @Query(
             value = "SELECT * , p.id as postId, COUNT(post_hashtag_id)\n" +

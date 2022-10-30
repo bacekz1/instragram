@@ -46,11 +46,11 @@ public abstract class AbstractService {
     @Autowired
     protected ModelMapper modelMapper;
 
-    protected User getUserById(long id) {
+    public User getUserById(long id) {
         return userRepository.findById(id).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
     }
 
-    protected User getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new DataNotFoundException(Constant.USER_NOT_FOUND));
     }
     
@@ -308,7 +308,7 @@ public abstract class AbstractService {
     protected User validateIfUserIsAdminByEmail(long loggedUserId) {
         User user = getUserById(loggedUserId);
         if (!user.getEmail().split("@")[1].equals("admin.instagram.com")) {
-            throw new BadRequestException("You do not have admin rights");
+            throw new NoAuthException("You do not have admin rights");
         }
         return user;
     }

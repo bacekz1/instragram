@@ -27,9 +27,9 @@ public class StoryController extends AbstractController {
     }
 
     @PutMapping
-    void updatePost(@RequestBody ContentIdDTO contentIdDTO) {
+    void updateStory(@RequestBody ContentIdDTO contentIdDTO) {
         long userId = getLoggedUserId();
-        storyService.updatePost(contentIdDTO, userId);
+        storyService.updateStory(contentIdDTO, userId);
     }
 
     @DeleteMapping()

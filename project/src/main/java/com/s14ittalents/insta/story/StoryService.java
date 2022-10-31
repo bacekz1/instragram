@@ -5,17 +5,20 @@ import com.s14ittalents.insta.content.Content;
 import com.s14ittalents.insta.content.ContentIdDTO;
 import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
+import com.s14ittalents.insta.exception.NoAuthException;
 import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.post.*;
 import com.s14ittalents.insta.post.dto.PostCreateDTO;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.AbstractService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +27,6 @@ import static com.s14ittalents.insta.exception.Constant.*;
 @Service
 public class StoryService extends AbstractService {
     private static final int MAX_SIZE = 50;
-
     @Transactional
     public PostWithoutOwnerDTO createStory(PostCreateDTO storyCreateDTO, long userId) {
         Optional<Post> story = postRepository.findStoryByUserId(userId);
@@ -38,7 +40,7 @@ public class StoryService extends AbstractService {
             addPersonTags(createStory);
             Location location = null;
             String locationName = storyCreateDTO.getLocation();
-            if (locationName != null) {
+            if (locationName != null && !locationName.isEmpty() && !locationName.isBlank()) {
                 location = locationRepository.findByName(locationName)
                         .orElseGet(() -> locationRepository.save(new Location(locationName)));
             }
@@ -73,24 +75,22 @@ public class StoryService extends AbstractService {
         Post story = findStoryByUserId(userId);
         return modelMapper.map(story, PostWithoutOwnerDTO.class);
     }
-
-//TODO
-    public void updatePost(ContentIdDTO contentIdDTO, long userId) {
+    
+    public void updateStory(ContentIdDTO contentIdDTO, long userId) {
         Post story = findStoryByUserId(userId);
         Content content = contentRepository
                 .findById(contentIdDTO.getId()).orElseThrow(() -> new DataNotFoundException(CONTENT_NOT_FOUND));
-        story.getContents().remove(content);
-        postRepository.save(story);
+        if(!story.getContents().contains(content)) {
+            throw new NoAuthException(PERMISSION_DENIED);
+        }
+        contentRepository.delete(content);
     }
 
     public boolean deleteStory(long userId) {
         Post story = findStoryByUserId(userId);
         checkPermission(userId, story);
-        List<Comment> comments = story.getComments().stream().toList();
-        comments.forEach(comment -> comment.setDeleted(true));
-        commentRepository.saveAll(comments);
         story.setDeleted(true);
-        story.setCaption("deleted at" + LocalDateTime.now());
+        story.setCaption(REPLACE_IN_DELETED);
         postRepository.save(story);
         return true;
     }

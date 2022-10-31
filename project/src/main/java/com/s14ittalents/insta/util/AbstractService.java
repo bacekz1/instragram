@@ -71,7 +71,7 @@ public abstract class AbstractService {
                 .orElseThrow(() -> new DataNotFoundException(STORY_NOT_FOUND));
     }
     protected Post findStoryByUserId(long userId) {
-        return postRepository.findStoryById(userId)
+        return postRepository.findStoryByUserId(userId)
                 .orElseThrow(() -> new DataNotFoundException(STORY_NOT_FOUND));
     }
 

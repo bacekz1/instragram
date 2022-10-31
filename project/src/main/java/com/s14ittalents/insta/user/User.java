@@ -84,16 +84,11 @@ public class User implements Ownerable {
     @OneToMany(mappedBy = "owner")
     List<Post> posts;
 
-    @ManyToMany
-    @JoinTable(name = "like_post",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id"))
-    List<Post> likedPosts;
 
-    @ManyToMany
-    @JoinTable(name = "like_comments",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    @ManyToMany(mappedBy = "likes")
+    List<Post> likedPosts;
+    
+    @ManyToMany(mappedBy = "likes")
     List<Comment> likedComments;
 
 

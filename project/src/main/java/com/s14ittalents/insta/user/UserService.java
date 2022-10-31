@@ -37,7 +37,6 @@ import static com.s14ittalents.insta.exception.Constant.*;
 public class UserService extends AbstractService {
     
     
-
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -56,13 +55,13 @@ public class UserService extends AbstractService {
 
 
     UserNoPasswordDTO getUserByUsernameToDTO(String username) {
-        Optional<User> user = Optional.of(userRepository.findByUsername(username)
-                .orElseThrow(() -> new DataNotFoundException("User not found")));
+        User user = getUserByUsername(username);
+        checkPermission(user);
         return modelMapper.map(user, UserNoPasswordDTO.class);
     }
     UserNoPasswordDTO getUserByIdToDTO(long id) {
-        Optional<User> user = Optional.of(userRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("User not found")));
+        User user = getUserById(id);
+        checkPermission(user);
         return modelMapper.map(user, UserNoPasswordDTO.class);
     }
 
@@ -80,7 +79,6 @@ public class UserService extends AbstractService {
                 .ifPresent(u -> {
                     throw new UserNotCreatedException("Email already exists");
                 });
-        if (Objects.equals(user.getPassword(), user.getConfirmPassword())) {
             User newUser = new User();
             checkIfPasswordAndConfirmPasswordMatch(user.getPassword().trim(), user.getConfirmPassword().trim());
             newUser.setPassword(encodePassword(user.getPassword().trim()));
@@ -89,7 +87,6 @@ public class UserService extends AbstractService {
             if(user.getBio() != null) {
                 newUser.setBio(validateBio(user.getBio()));
             }
-            System.out.println(user.getDateOfBirth().toString());
             newUser.setDateOfBirth(validateDateOfBirth(user.getDateOfBirth()));
             newUser.setFirstName(validateName(user.getFirstName(), "First"));
             newUser.setLastName(validateName(user.getLastName(), "Last"));
@@ -102,15 +99,11 @@ public class UserService extends AbstractService {
             newUser.setVerified(false);
             sendVerificationEmail(newUser, siteURL);
             newUser.setCreatedAt(LocalDateTime.now());
-            userRepository.save(newUser);
-            User userToCheckProfilePicture = userRepository.findByUsername(newUser.getUsername()).get();
+            User userToCheckProfilePicture = userRepository.save(newUser);
             if (user.getProfilePicture() != null && !user.getProfilePicture().isEmpty()) {
                 updateProfilePicture(user.getProfilePicture(), getUserId(userToCheckProfilePicture.getUsername()));
             }
             return modelMapper.map(newUser, UserNoPasswordDTO.class);
-        } else {
-            throw new UserNotCreatedException("Passwords do not match");
-        }
     }
     
     @Transactional
@@ -119,78 +112,76 @@ public class UserService extends AbstractService {
         validateEmail(user.getEmail());
         User userToFix = userRepository.findByUsername(user.getUsername())
                 .orElseGet(() -> userRepository.findByEmail(user.getEmail())
-                        .orElseThrow(() -> new UserNotCreatedException("User not found")));
+                        .orElseThrow(() -> new UserNotCreatedException(USER_NOT_FOUND)));
             sendForgottenPasswordEmail(userToFix, siteURL);
             userRepository.save(userToFix);
             return "Please check your email and use the code to change your password";
     }
     
-
-    void sendVerificationEmail(User user, String siteURL){
-            new Thread(()-> {try{
-        String toAddress = user.getEmail();
-        String fromAddress = "itTalentsInstagramProject@gmail.com";
-        String senderName = "ItTalents Project";
-        String subject = "Please verify your registration";
-        String content = "Dear [[name]],<br>" + "Please click the link below to verify your registration:<br>" +
-                "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank you,<br>" + "-ItTalents Team.";
-        
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-        
-        helper.setFrom(fromAddress, senderName);
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
-        
-        content = content.replace("[[name]]", user.getFirstName() + " " + user.getLastName());
-        String verifyURL = siteURL + "/users/verify?code=" + user.getVerificationCode();
-        
-        content = content.replace("[[URL]]", verifyURL);
-        
-        helper.setText(content, true);
-        
-        mailSender.send(message);
-    } catch(MessagingException | UnsupportedEncodingException e){
-                throw new UserNotCreatedException("Error while sending verification email");
-    }}).start();
     
-        
+    void sendVerificationEmail(User user, String siteURL) {
+        new Thread(() -> {
+            try {
+                String toAddress = user.getEmail();
+                String fromAddress = "itTalentsInstagramProject@gmail.com";
+                String senderName = "ItTalents Project";
+                String subject = "Please verify your registration";
+                String content = "Dear [[name]],<br>" + "Please click the link below to verify your " +
+                        "registration:<br>" + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank " +
+                        "you,<br>" + "-ItTalents Team.";
+                
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message);
+                
+                helper.setFrom(fromAddress, senderName);
+                helper.setTo(toAddress);
+                helper.setSubject(subject);
+                
+                content = content.replace("[[name]]", user.getFirstName() + " " + user.getLastName());
+                String verifyURL = siteURL + "/users/verify?code=" + user.getVerificationCode();
+                
+                content = content.replace("[[URL]]", verifyURL);
+                
+                helper.setText(content, true);
+                
+                mailSender.send(message);
+            } catch (MessagingException | UnsupportedEncodingException e) {
+                throw new UserNotCreatedException(ERROR_WHILE_SENDING_VERIFICATION_EMAIL);
+            }
+        }).start();
     }
     
-    @Async
-    void sendForgottenPasswordEmail(User user, String siteURL){
-        try{
-            String toAddress = user.getEmail();
-            String fromAddress = "itTalentsInstagramProject@gmail.com";
-            String senderName = "ItTalents Project";
-            String subject = "Forgotten Password";
-            String content = "Dear [[name]],<br>" + "Please click the link below to verify its' you " +
-                    "so you can set your new password:<br>" +
-                    "<h3><a href=\"[[URL]]\" target=\"_self\">GET CODE</a></h3>" + "Thank you,<br>" + "-ItTalents Team.";
-            
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message);
-            
-            helper.setFrom(fromAddress, senderName);
-            helper.setTo(toAddress);
-            helper.setSubject(subject);
-            
-            content = content.replace("[[name]]", user.getFirstName() + " " + user.getLastName());
-            String forgottenPassword = siteURL + "/users/passwordRecovery?code=" + user.getVerificationCode();
-            
-            content = content.replace("[[URL]]", forgottenPassword);
-            
-            helper.setText(content, true);
-            
-            mailSender.send(message);
-        } catch(MessagingException | UnsupportedEncodingException e){
-            throw new UserNotCreatedException("Error while sending forgotten password email");
-        }
-        
-        
+    void sendForgottenPasswordEmail(User user, String siteURL) {
+        new Thread(() -> {
+            try {
+                String toAddress = user.getEmail();
+                String fromAddress = "itTalentsInstagramProject@gmail.com";
+                String senderName = "ItTalents Project";
+                String subject = "Forgotten Password";
+                String content = "Dear [[name]],<br>" + "Please click the link below to verify its' you " + "so you " +
+                        "can set your new password:<br>" + "<h3><a href=\"[[URL]]\" target=\"_self\">GET " +
+                        "CODE</a></h3>" + "Thank you,<br>" + "-ItTalents Team.";
+                
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message);
+                
+                helper.setFrom(fromAddress, senderName);
+                helper.setTo(toAddress);
+                helper.setSubject(subject);
+                
+                content = content.replace("[[name]]", user.getFirstName() + " " + user.getLastName());
+                String forgottenPassword = siteURL + "/users/passwordRecovery?code=" + user.getVerificationCode();
+                
+                content = content.replace("[[URL]]", forgottenPassword);
+                
+                helper.setText(content, true);
+                
+                mailSender.send(message);
+            } catch (MessagingException | UnsupportedEncodingException e) {
+                throw new UserNotCreatedException("Error while sending forgotten password email");
+            }
+        }).start();
     }
-    
-    
     
     public boolean verify(String verificationCode){
         Optional<User> user = userRepository.getUserByVerificationCode(verificationCode);
@@ -249,7 +240,7 @@ public class UserService extends AbstractService {
     @Transactional
     public UserNoPasswordDTO updateUserCredentials(UserUpdateDTO user, long userId) {
         User user1 = getUserById(userId);
-        checkPermission(userId, user1);
+        checkPermission(user1);
         if (!checkPasswordMatch(user1, user.getPassword())) {
             throw new NoAuthException("Wrong password, enter correct password to confirm changes");
         }
@@ -293,7 +284,7 @@ public class UserService extends AbstractService {
     @Transactional
     public UserNoPasswordDTO editUserInfo(UserEditDTO user, long userId) {
         User user1 = getUserById(userId);
-        checkPermission(userId, user1);
+        checkPermission(getUserById(userId), user1);
         if (user.getFirstName() != null && !user.getFirstName().isBlank()) {
             user1.setFirstName(validateName(user.getFirstName(), "First"));
         }
@@ -326,7 +317,7 @@ public class UserService extends AbstractService {
             throw new NoAuthException("All fields are required");
         }
         User user1 = getUserById(userId);
-        checkPermission(userId, user1);
+        checkPermission(getUserById(userId), user1);
         if (checkPasswordMatch(user1, user.getOldPassword().trim())) {
             if (user.getOldPassword().equals(user.getNewPassword())) {
                 throw new NoAuthException("New password cannot be the same as the old one");
@@ -397,38 +388,31 @@ public class UserService extends AbstractService {
     
         checkAdminPassword(adminAuth, admin);
         userToDelete.setDeleted(true);
-        String replaceInDeleted = REPLACE_IN_DELETED;
-        userToDelete.setUsername(replaceInDeleted);
+        userToDelete.setUsername(REPLACE_IN_DELETED);
         encodePassword(userToDelete,(REPLACE_IN_DELETED + System.nanoTime()));
-        userToDelete.setEmail(replaceInDeleted);
+        userToDelete.setEmail(REPLACE_IN_DELETED);
         userToDelete.setFirstName("");
         userToDelete.setLastName("");
-        userToDelete.setGender("del-"+ DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDate.now()));
-        userToDelete.setProfilePicture(replaceInDeleted);
-        userToDelete.setPhoneNum(replaceInDeleted);
-        userToDelete.setBio(replaceInDeleted);
+        userToDelete.setGender("");
+        userToDelete.setProfilePicture("");
+        userToDelete.setPhoneNum("");
+        userToDelete.setBio("");
         userToDelete.setDateOfBirth(LocalDate.parse("1900-01-01"));
         userToDelete.setVerified(false);
         userToDelete.setDeactivated(true);
         
-        userToDelete.setLikedPosts(new ArrayList<>());
-        userToDelete.setLikedComments(new ArrayList<>());
-        userToDelete.setPosts(new ArrayList<>());
         userToDelete.setVerificationCode(RandomString.make(13));
-        userToDelete.setFollowers(new ArrayList<>());
-        userToDelete.setFollowing(new ArrayList<>());
-        //the below may be used to clear all posts and comments made by the adminAuth
+        userToDelete.getFollowing().clear();
+        userToDelete.getFollowers().clear();
+        
+        
+        userToDelete.getPosts().forEach(p-> {
+            p.getLikes().clear();
+            postRepository.save(p);
+        }
+        );
         for(Post post : postRepository.findAllByOwner(userToDelete)){
             postService.deletePostCommentsWhenDeletingUser(post);
-        }
-        //can be used to clear following lists
-        for(User followed : userToDelete.getFollowers()){
-            followed.getFollowing().remove(userToDelete);
-            userRepository.save(followed);
-        }
-        for(User following : userToDelete.getFollowing()){
-            following.getFollowers().remove(userToDelete);
-            userRepository.save(following);
         }
         userRepository.save(userToDelete);
         return "User "+ account +" deleted";
@@ -452,17 +436,11 @@ public class UserService extends AbstractService {
     
     public String setDefaultProfilePicture(long loggedUserId) {
         User user = getUserById(loggedUserId);
-        checkPermission(loggedUserId, user);
         user.setProfilePicture(DEFAULT_PROFILE_PICTURE);
         userRepository.save(user);
         return "Default profile picture set";
     }
-
-    protected Optional<User> checkIfUserExists(String usermame) {
-        return Optional.of(userRepository.findByUsername(usermame)
-                .orElseGet(() -> userRepository.findByEmail(usermame)
-                        .orElseThrow(() -> new DataNotFoundException("User not found"))));
-    }
+    
     
     protected Optional<User> checkIfUserExistsLogin(String usermame) {
         return Optional.of(userRepository.findByUsername(usermame)
@@ -472,9 +450,6 @@ public class UserService extends AbstractService {
     public String followUser(String username, long loggedUserId) {
         User userToFollow = userRepository.findByUsername(username.toLowerCase().trim())
                 .orElseThrow(() -> new DataNotFoundException("Follow unsuccessful, user not found"));
-        if (userToFollow.getId() == loggedUserId) {
-            throw new BadRequestException("You cannot follow yourself");
-        }
         User user = getUserById(loggedUserId);
         if (userToFollow.getId() == loggedUserId) {
             throw new BadRequestException("You cannot follow yourself");

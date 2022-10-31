@@ -43,7 +43,10 @@ public class Comment implements Ownerable, Commentable {
     List<Comment> replies;
     @Column(name = "is_deleted")
     private boolean deleted;
-    @ManyToMany(mappedBy = "likedComments")
+    @ManyToMany
+    @JoinTable(name = "like_comments",
+            joinColumns = @JoinColumn(name = "comment_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> likes;
     @Column
     @NotNull

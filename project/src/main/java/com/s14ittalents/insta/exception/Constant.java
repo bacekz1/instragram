@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Constant {
+    public static final String ERROR_WHILE_SENDING_VERIFICATION_EMAIL = "Error while sending verification email";
     public static long mb = 1024000;
     //1mb
     public static final String DATA_NOT_FOUND = "Data not found";
@@ -36,7 +37,7 @@ public class Constant {
     public static final String FILE_SHOULD_NOT_BE_EMPTY = "File should not be empty";
     
     public static final String REPLACE_IN_DELETED = ("del- "
-            + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now())).substring(0, 30);
+            + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()));
     public static final String SQL_TO_COUNT_ALL_FROM_SELECTION_FOR_FEED =
                     "SELECT \n" + "    COUNT(*)\n"
                     + "FROM\n"

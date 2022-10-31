@@ -57,7 +57,7 @@ public class PostService extends AbstractService {
 
     public PostWithoutOwnerDTO updatePost(long posId, PostUpdateDTO postUpdate, long userId) {
         Post post = findPost(posId);
-        checkPermission(userId, post);
+        checkPermission(getUserById(userId), post);
         post.setCaption(postUpdate.getCaption());
         post.getHashtags().clear();
         post.getPersonTags().clear();
@@ -70,10 +70,11 @@ public class PostService extends AbstractService {
     @Transactional
     public void deletePostComments(long postId, long userId) {
         Post post = findPost(postId);
-        checkPermission(userId, post);
+        checkPermission(getUserById(userId), post);
         post.setDeleted(true);
         post.setCaption(REPLACE_IN_DELETED);
         deletePostComments(post);
+        post.getLikes().clear();
         postRepository.save(post);
     }
     
@@ -95,7 +96,7 @@ public class PostService extends AbstractService {
             user.getLikedPosts().add(post);
             post.getLikes().add(user);
         }
-        userRepository.save(user);
+        postRepository.save(post);
         return post.getLikes().size();
     }
 
@@ -104,6 +105,7 @@ public class PostService extends AbstractService {
             for (int i = 0; i < post.getComments().size(); i++) {
                 post.getComments().get(i).setDeleted(true);
                 post.getComments().get(i).setComment("deleted at" + LocalDateTime.now());
+                post.getComments().forEach(c-> c.getLikes().clear());
             }
         }
     }

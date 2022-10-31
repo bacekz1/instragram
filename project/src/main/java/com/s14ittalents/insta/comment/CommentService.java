@@ -62,7 +62,7 @@ public class CommentService extends AbstractService {
 
     public CreateCommentDTO editComment(CreateCommentDTO dto, long commentId) {
         Comment comment = findComment(commentId);
-        checkPermission(dto.getOwnerId(), comment);
+        checkPermission(getUserById(dto.getOwnerId()), comment);
         Post post = comment.getPost();
         post.getComments().remove(comment);
         comment.setComment(dto.getComment());
@@ -78,7 +78,7 @@ public class CommentService extends AbstractService {
 
     public void deleteComment(long userId, long commentId) {
         Comment comment = findComment(commentId);
-        checkPermission(userId, comment);
+        checkPermission(getUserById(userId), comment);
         deleteComment(comment);
         if (comment.getReplies() != null) {
             comment.getReplies().forEach(this::deleteComment);

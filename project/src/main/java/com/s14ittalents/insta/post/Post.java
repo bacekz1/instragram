@@ -41,7 +41,10 @@ public class Post implements Ownerable, Commentable {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;
-    @ManyToMany(mappedBy = "likedPosts")
+    @ManyToMany
+    @JoinTable(name = "like_post",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> likes;
     @Column
     private LocalDateTime expirationTime;

@@ -127,21 +127,17 @@ public abstract class AbstractService {
             }
         }
     }
+    
 
-
-    protected List<PostWithoutOwnerDTO> getAllPostWithHashtag(String tagName) {
-        if (hashtagRepository.findByTagName(tagName).isPresent()) {
-            return hashtagRepository.findByTagName(tagName).get().getPostList().stream()
-                    .map(post -> modelMapper.map(post, PostWithoutOwnerDTO.class))
-                    .filter(post -> !post.is_deleted()).collect(Collectors.toList());
-        } else {
-            throw new DataNotFoundException("This hashtag has not been used yet");
+    protected static void checkPermission(User user, Ownerable object) {
+        if (object.ownerId() != user.getId() || user.isBanned() || user.isDeactivated() || user.isDeleted()) {
+            throw new NoAuthException(PERMISSION_DENIED);
         }
     }
-
-
-    protected static void checkPermission(long userId, Ownerable owner) {
-        if (owner.ownerId() != userId) {
+    
+    
+    protected static void checkPermission(User user) {
+        if (user.isBanned() || user.isDeactivated() || user.isDeleted()) {
             throw new NoAuthException(PERMISSION_DENIED);
         }
     }

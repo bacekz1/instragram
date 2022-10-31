@@ -88,7 +88,7 @@ public class StoryService extends AbstractService {
 
     public boolean deleteStory(long userId) {
         Post story = findStoryByUserId(userId);
-        checkPermission(userId, story);
+        checkPermission(getUserById(userId), story);
         story.setDeleted(true);
         story.setCaption(REPLACE_IN_DELETED);
         postRepository.save(story);

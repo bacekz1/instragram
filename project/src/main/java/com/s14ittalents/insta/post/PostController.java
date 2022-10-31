@@ -47,11 +47,10 @@ public class PostController extends AbstractController {
         long userId = getLoggedUserId();
         postService.deletePostComments(postId, userId);
     }
-
+//TODO
     @PostMapping("/{postId:[0-9]+}/")
     int likePost(@PathVariable long postId) {
         long userId = getLoggedUserId();
-        System.out.println("opa");
         return postService.likePost(postId, userId);
     }
     /*

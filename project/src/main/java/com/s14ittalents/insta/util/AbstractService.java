@@ -55,7 +55,7 @@ public abstract class AbstractService {
     }
     
     protected User getUserByUsernameLogin(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new DataNotFoundException(Constant.WRONG_CREDENTIALS));
+        return userRepository.findByUsername(username).orElseThrow(() -> new NoAuthException(Constant.WRONG_CREDENTIALS));
     }
 
     protected long getUserId(String username) {
@@ -160,7 +160,7 @@ public abstract class AbstractService {
         List<Content> contents = new ArrayList<>();
         for (MultipartFile file : files) {
             if (file.getSize() > maxSize * mb) {
-                throw new BadRequestException(MAX_SIZE_PER_FILE_IS_10_MB);
+                throw new BadRequestException(MAX_SIZE_PER_FILE_IS_5_MB);
             }
             try {
                 String ext = Objects.requireNonNull(file.getOriginalFilename()).
@@ -190,6 +190,9 @@ public abstract class AbstractService {
     }
 
     protected String validatePassword(String password) {
+        if (password==null){
+            throw new BadRequestException("Something went wrong!");
+        }
         if (password.length() < 8) {
             throw new BadRequestException("Password must be at least 8 characters long");
         }
@@ -278,11 +281,11 @@ public abstract class AbstractService {
     }
 
     protected String validateGender(String gender) {
-        if (gender.length() < 2) {
-            throw new BadRequestException("Gender must be at least 2 characters long");
+        if (gender.length() < 1) {
+            throw new BadRequestException("Gender must be at least 1 characters long");
         }
         if (gender.length() > 15) {
-            throw new BadRequestException("Gender name must be less than 30 characters long");
+            throw new BadRequestException("Gender name must be less than 15 characters long");
         }
         if (!gender.matches("[a-zA-Z]+")) {
             throw new BadRequestException("Gender name must contain only letters");

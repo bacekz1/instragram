@@ -14,14 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public class PostService extends AbstractService {
-    private static final int MAX_SIZE = 5;
+    private static final int MAX_SIZE = 4;
     
     @Transactional
     public PostWithoutOwnerDTO createPost(PostCreateDTO postCreateDTO, long userId) {

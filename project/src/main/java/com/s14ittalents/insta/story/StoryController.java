@@ -1,7 +1,6 @@
 package com.s14ittalents.insta.story;
 
 import com.s14ittalents.insta.content.ContentIdDTO;
-import com.s14ittalents.insta.exception.NoAuthException;
 import com.s14ittalents.insta.post.dto.PostCreateDTO;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.util.AbstractController;
@@ -33,13 +32,10 @@ public class StoryController extends AbstractController {
         storyService.updatePost(contentIdDTO, userId);
     }
 
-    @DeleteMapping("/{storyId:[0-9]+}")
-    boolean deleteStory(@PathVariable long storyId) {
+    @DeleteMapping()
+    boolean deleteStory() {
         long userId = getLoggedUserId();
-        if (userId <= 0) {
-            throw new NoAuthException("You are not logged in");
-        }
-        return storyService.deleteStory(storyId, userId);
+        return storyService.deleteStory(userId);
     }
 
     @PostMapping("/{storyId:[0-9]+}")

@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @RestController
-public class CommentController extends AbstractController {
+public class    CommentController extends AbstractController {
     @Autowired
     private CommentService commentService;
 
@@ -46,7 +46,7 @@ public class CommentController extends AbstractController {
         commentService.deleteComment(userId, commentId);
     }
 
-    @PostMapping("/comments/{id:[0-9]+}")
+    @PostMapping("/comments/{id:[0-9]+}/")
     int likePost(@PathVariable long id) {
         long userId = getLoggedUserId();
         return commentService.likeComment(id, userId);

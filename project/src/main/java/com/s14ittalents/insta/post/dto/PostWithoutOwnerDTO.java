@@ -1,6 +1,6 @@
 package com.s14ittalents.insta.post.dto;
 
-import com.s14ittalents.insta.comment.Comment;
+import com.s14ittalents.insta.comment.dto.CommentWithRepliesDTO;
 import com.s14ittalents.insta.content.ContentWithoutUser;
 import com.s14ittalents.insta.location.LocationWithoutPost;
 import com.s14ittalents.insta.user.dto.UserWithoutPostsDTO;
@@ -12,11 +12,9 @@ import java.util.List;
 @Data
 public class PostWithoutOwnerDTO {
     private long id;
-    private long user_id;
     private String caption;
-    private Long location_id;
     private boolean is_deleted;
-    private List<Comment> comments;
+    private List<CommentWithRepliesDTO> comments;
     private UserWithoutPostsDTO owner;
     private List<ContentWithoutUser> contents;
     private LocationWithoutPost location;

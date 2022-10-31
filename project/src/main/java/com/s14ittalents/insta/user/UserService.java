@@ -93,6 +93,8 @@ public class UserService extends AbstractService {
             newUser.setDateOfBirth(validateDateOfBirth(user.getDateOfBirth()));
             newUser.setFirstName(validateName(user.getFirstName(), "First"));
             newUser.setLastName(validateName(user.getLastName(), "Last"));
+            newUser.setGender(validateGender(user.getGender()));
+            newUser.setPhoneNum(validatePhoneNum(user.getPhoneNum()));
             newUser.setProfilePicture(DEFAULT_PROFILE_PICTURE);
             
             String randomCode = RandomString.make(64);
@@ -123,9 +125,9 @@ public class UserService extends AbstractService {
             return "Please check your email and use the code to change your password";
     }
     
-    @Async
+
     void sendVerificationEmail(User user, String siteURL){
-            try{
+            new Thread(()-> {try{
         String toAddress = user.getEmail();
         String fromAddress = "itTalentsInstagramProject@gmail.com";
         String senderName = "ItTalents Project";
@@ -150,7 +152,7 @@ public class UserService extends AbstractService {
         mailSender.send(message);
     } catch(MessagingException | UnsupportedEncodingException e){
                 throw new UserNotCreatedException("Error while sending verification email");
-    }
+    }}).start();
     
         
     }
@@ -232,10 +234,10 @@ public class UserService extends AbstractService {
         checkIfUserExistsLogin(user1.getUsername());
         User user = getUserByUsernameLogin(user1.getUsername());
         if(!user.isVerified()){
-            throw new BadRequestException("You have not verified your account, please check your email");
+            throw new NoAuthException("You have not verified your account, please check your email");
         }
         if (user.isBanned()) {
-            throw new BadRequestException("You are banned");
+            throw new NoAuthException("You are banned");
         }
         user.setDeactivated(false);
         if (checkPasswordMatch(user, user1.getPassword())) {
@@ -465,7 +467,7 @@ public class UserService extends AbstractService {
     protected Optional<User> checkIfUserExistsLogin(String usermame) {
         return Optional.of(userRepository.findByUsername(usermame)
                 .orElseGet(() -> userRepository.findByEmail(usermame)
-                        .orElseThrow(() -> new DataNotFoundException("Wrong credentials!"))));
+                        .orElseThrow(() -> new NoAuthException("Wrong credentials!"))));
     }
     public String followUser(String username, long loggedUserId) {
         User userToFollow = userRepository.findByUsername(username.toLowerCase().trim())

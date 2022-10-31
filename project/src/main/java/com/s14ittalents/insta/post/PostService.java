@@ -20,7 +20,7 @@ import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public class PostService extends AbstractService {
-    private static final int MAX_SIZE = 4;
+    private static final int MAX_SIZE = 5;
     
     @Transactional
     public PostWithoutOwnerDTO createPost(PostCreateDTO postCreateDTO, long userId) {

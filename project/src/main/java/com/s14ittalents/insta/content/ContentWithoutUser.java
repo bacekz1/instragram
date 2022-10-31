@@ -8,5 +8,4 @@ import lombok.Setter;
 public class ContentWithoutUser {
     private long id;
     private String media;
-    private long userId;
 }

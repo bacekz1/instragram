@@ -8,6 +8,7 @@ import javax.validation.constraints.Positive;
 @Getter
 @Setter
 public class CreateCommentDTO {
+    private long id;
     private String comment;
     @Positive
     private long ownerId;

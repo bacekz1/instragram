@@ -29,8 +29,6 @@ import static com.s14ittalents.insta.exception.Constant.*;
 
 @Service
 public abstract class AbstractService {
-    
-    
     @Autowired
     protected UserRepository userRepository;
     @Autowired
@@ -159,8 +157,11 @@ public abstract class AbstractService {
     protected static List<Content> uploadFiles(List<MultipartFile> files, long userId, Post createdPost, int maxSize) {
         List<Content> contents = new ArrayList<>();
         for (MultipartFile file : files) {
+            if (file.isEmpty()){
+                throw new BadRequestException(FILE_SHOULD_NOT_BE_EMPTY);
+            }
             if (file.getSize() > maxSize * mb) {
-                throw new BadRequestException(MAX_SIZE_PER_FILE_IS_5_MB);
+                throw new BadRequestException(String.format(MAX_SIZE_PER_FILE_IS_MB, maxSize));
             }
             try {
                 String ext = Objects.requireNonNull(file.getOriginalFilename()).

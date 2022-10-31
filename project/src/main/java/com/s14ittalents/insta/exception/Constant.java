@@ -14,7 +14,7 @@ public class Constant {
     public static final String PERMISSION_DENIED = "Permission denied";
     public static final String FILE_DOES_NOT_EXIST = "File does not exist";
     public static final String YOU_CAN_ONLY_CHOOSE_10_OR_FEWER_FILES = "You can only choose 10 or fewer files";
-    public static final String MAX_SIZE_PER_FILE_IS_5_MB = "Max size per file is 5mb";
+    public static final String MAX_SIZE_PER_FILE_IS_MB = "Max size per file is %dmb";
     public static final String THE_FILE_ALREADY_EXISTS = "The file already exists";
     public static final int MAX_ALLOWED_FILES_TO_UPLOAD = 10;
     public static final String COMMENT_NOT_FOUND = "Comment not found";
@@ -31,6 +31,8 @@ public class Constant {
 
     public static final String YOU_ALREADY_REPLY_THIS_COMMENT = "You already replied to this comment";
     public static final String WRONG_CREDENTIALS = "Wrong credentials!";
+
+    public static final String FILE_SHOULD_NOT_BE_EMPTY = "File should not be empty";
     
     public static final String REPLACE_IN_DELETED = ("del-" + LocalDateTime.now()).substring(0, 30);
     public static final String SQL_TO_COUNT_ALL_FROM_SELECTION_FOR_FEED =

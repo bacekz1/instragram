@@ -47,13 +47,11 @@ public class PostController extends AbstractController {
         long userId = getLoggedUserId();
         postService.deletePostComments(postId, userId);
     }
-//TODO
+
+    //TODO
     @PostMapping("/{postId:[0-9]+}/")
     int likePost(@PathVariable long postId) {
         long userId = getLoggedUserId();
         return postService.likePost(postId, userId);
     }
-    /*
-            if new session is set - its from another client/ file with requests/ can make APIHttp  or Postman
-     */
 }

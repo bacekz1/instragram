@@ -68,7 +68,6 @@ public class UserController extends AbstractController {
             return "Password reset failed";
         }
     }
-    //todo: fully test /accountCredentials endpoint and /accountInfo endpoint
     @PutMapping("/accountCredentials")
     UserNoPasswordDTO updateUserCred(@ModelAttribute UserUpdateDTO user) {
         long userId = getLoggedUserId();
@@ -123,7 +122,6 @@ public class UserController extends AbstractController {
         return "You have been logged out";
     }
     
-    //mapping for change password
     @PutMapping("/password")
     String changePassword(@RequestBody UserChangePasswordDTO user) {
         long userId = getLoggedUserId();

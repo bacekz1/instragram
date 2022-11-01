@@ -64,9 +64,7 @@ public class User implements Ownerable {
 
     @Column(name = "is_verified")
     private boolean verified;
-
-    @Column(name = "is_private")
-    private boolean privateAccount;
+    
     @Column(name = "is_banned")
     private boolean banned;
 

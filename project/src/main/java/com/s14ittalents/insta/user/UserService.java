@@ -387,7 +387,6 @@ public class UserService extends AbstractService {
         User userToDelete = isUsername ? getUserByUsername(account) : getUserByEmail(account);
     
         checkAdminPassword(adminAuth, admin);
-        userToDelete.setDeleted(true);
         userToDelete.setUsername(REPLACE_IN_DELETED);
         encodePassword(userToDelete,(REPLACE_IN_DELETED + System.nanoTime()));
         userToDelete.setEmail(REPLACE_IN_DELETED);
@@ -398,8 +397,6 @@ public class UserService extends AbstractService {
         userToDelete.setPhoneNum("");
         userToDelete.setBio("");
         userToDelete.setDateOfBirth(LocalDate.parse("1900-01-01"));
-        userToDelete.setVerified(false);
-        userToDelete.setDeactivated(true);
         
         userToDelete.setVerificationCode(RandomString.make(13));
         userToDelete.getFollowing().clear();
@@ -414,6 +411,9 @@ public class UserService extends AbstractService {
         for(Post post : postRepository.findAllByOwner(userToDelete)){
             postService.deletePostCommentsWhenDeletingUser(post);
         }
+        userToDelete.setDeleted(true);
+        userToDelete.setVerified(false);
+        userToDelete.setDeactivated(true);
         userRepository.save(userToDelete);
         return "User "+ account +" deleted";
     }

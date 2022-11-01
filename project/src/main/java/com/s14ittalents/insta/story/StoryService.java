@@ -11,6 +11,7 @@ import com.s14ittalents.insta.post.dto.PostCreateDTO;
 import com.s14ittalents.insta.story.dto.StoryWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.AbstractService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,7 @@ import static com.s14ittalents.insta.exception.Constant.*;
 @Service
 public class StoryService extends AbstractService {
     private static final int MAX_SIZE = 50;
+    private static final int HOUR = 1000 * 60 * 60;
 
     @Transactional
     public StoryWithoutOwnerDTO createStory(PostCreateDTO storyCreateDTO, long userId) {
@@ -110,6 +112,12 @@ public class StoryService extends AbstractService {
         }
         userRepository.save(user);
         return story.getLikes().size();
+    }
+
+    @Scheduled(fixedDelay = HOUR)
+    @Transactional
+    public void deleteExpiredStories(){
+        postRepository.deleteExpiredStories(REPLACE_IN_DELETED);
     }
 
 }

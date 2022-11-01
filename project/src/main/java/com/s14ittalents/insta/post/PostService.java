@@ -104,16 +104,6 @@ public class PostService extends AbstractService {
         return post.getLikes().size();
     }
 
-    private void deletePostComments(Post post) {
-        if (post.getComments() != null) {
-            for (int i = 0; i < post.getComments().size(); i++) {
-                post.getComments().get(i).setDeleted(true);
-                post.getComments().get(i).setComment("deleted at" + LocalDateTime.now());
-                post.getComments().forEach(c -> c.getLikes().clear());
-            }
-        }
-    }
-
     public Page<PostWithoutOwnerDTO> getMyPosts(long userId, int page) {
         Pageable pages = PageRequest.of(page, 12);
         List<PostWithoutOwnerDTO> list = postRepository
@@ -122,5 +112,15 @@ public class PostService extends AbstractService {
                 .map(p -> modelMapper.map(p, PostWithoutOwnerDTO.class)).toList();
         return new PageImpl<>(list);
 
+    }
+
+    private void deletePostComments(Post post) {
+        if (post.getComments() != null) {
+            for (int i = 0; i < post.getComments().size(); i++) {
+                post.getComments().get(i).setDeleted(true);
+                post.getComments().get(i).setComment("deleted at" + LocalDateTime.now());
+                post.getComments().forEach(c -> c.getLikes().clear());
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.s14ittalents.insta.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -58,5 +59,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     "WHERE id = :postId AND expiration_time >= CURDATE() AND is_deleted = 0 AND created_time IS NOT NULL",
             nativeQuery = true)
     Optional<Post> findStoryById(@Param("postId") long postId);
+    @Modifying
+    @Query(
+            value = "UPDATE post " +
+                    "SET is_deleted=true, caption = :now " +
+                    "WHERE expiration_time<CURDATE()",
+            nativeQuery = true)
+    void deleteExpiredStories(@Param("now") String now);
 
 }

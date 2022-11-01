@@ -222,8 +222,7 @@ public class UserService extends AbstractService {
             validateUsername(user1.getUsername());
         }
         validatePassword(user1.getPassword());
-        checkIfUserExistsLogin(user1.getUsername());
-        User user = getUserByUsernameLogin(user1.getUsername());
+        User user = checkIfUserExistsLogin(user1.getUsername());
         if(!user.isVerified()){
             throw new NoAuthException("You have not verified your account, please check your email");
         }
@@ -233,8 +232,9 @@ public class UserService extends AbstractService {
         user.setDeactivated(false);
         if (checkPasswordMatch(user, user1.getPassword())) {
             return modelMapper.map(user, UserOnlyMailAndUsernameDTO.class);
+        }else {
+            throw new NoAuthException("Wrong credentials!");
         }
-        throw new NoAuthException("Wrong credentials!");
     }
 
     @Transactional
@@ -442,10 +442,10 @@ public class UserService extends AbstractService {
     }
     
     
-    protected Optional<User> checkIfUserExistsLogin(String usermame) {
-        return Optional.of(userRepository.findByUsername(usermame)
+    protected User checkIfUserExistsLogin(String usermame) {
+        return userRepository.findByUsername(usermame)
                 .orElseGet(() -> userRepository.findByEmail(usermame)
-                        .orElseThrow(() -> new NoAuthException("Wrong credentials!"))));
+                        .orElseThrow(() -> new NoAuthException("Wrong credentials!")));
     }
     public String followUser(String username, long loggedUserId) {
         User userToFollow = userRepository.findByUsername(username.toLowerCase().trim())

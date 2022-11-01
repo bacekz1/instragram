@@ -1,6 +1,8 @@
 package com.s14ittalents.insta.messages;
 
 
+import com.s14ittalents.insta.messages.dto.MessageConversationDTO;
+import com.s14ittalents.insta.messages.dto.MessageInfoDTO;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

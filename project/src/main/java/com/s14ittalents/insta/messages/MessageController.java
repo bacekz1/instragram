@@ -1,7 +1,9 @@
 package com.s14ittalents.insta.messages;
 
+import com.s14ittalents.insta.messages.dto.MessageConversationDTO;
+import com.s14ittalents.insta.messages.dto.MessageCreateDTO;
+import com.s14ittalents.insta.messages.dto.MessageInfoDTO;
 import com.s14ittalents.insta.util.AbstractController;
-import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

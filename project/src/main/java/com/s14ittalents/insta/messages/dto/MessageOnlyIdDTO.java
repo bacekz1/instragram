@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.messages;
+package com.s14ittalents.insta.messages.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

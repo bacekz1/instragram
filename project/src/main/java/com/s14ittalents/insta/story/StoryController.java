@@ -1,6 +1,6 @@
 package com.s14ittalents.insta.story;
 
-import com.s14ittalents.insta.content.ContentIdDTO;
+import com.s14ittalents.insta.content.dto.ContentIdDTO;
 import com.s14ittalents.insta.post.dto.PostCreateDTO;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.util.AbstractController;

@@ -20,8 +20,9 @@ import static com.s14ittalents.insta.exception.Constant.*;
 @Service
 public class CommentService extends AbstractService {
 
-    List<CommentWithRepliesDTO> getCommentWithReplies(long id) {
-        Optional<Comment> comment = commentRepository.findById(id);
+    List<CommentWithRepliesDTO> getCommentWithReplies(long commentId, long userId) {
+        checkPermission(getUserById(userId));
+        Optional<Comment> comment = commentRepository.findById(commentId);
         comment.orElseThrow(() -> new DataNotFoundException(Constant.DATA_NOT_FOUND));
         return comment.stream()
                 .map(comment1 -> modelMapper.map(comment1, CommentWithRepliesDTO.class))
@@ -29,6 +30,7 @@ public class CommentService extends AbstractService {
     }
 
     public CreateCommentDTO createComment(CreateCommentDTO dto, long postId) {
+        checkPermission(getUserById(dto.getOwnerId()));
         Comment comment = modelMapper.map(dto, Comment.class);
         comment.setOwnerId(dto.getOwnerId());
         Post post = findPost(postId);
@@ -41,6 +43,7 @@ public class CommentService extends AbstractService {
     }
 
     public CreateCommentDTO replyComment(CreateCommentDTO dto, long commentId) {
+        checkPermission(getUserById(dto.getOwnerId()));
         Comment comment = modelMapper.map(dto, Comment.class);
         Comment replyComment = findComment(commentId);
         if (replyComment.ownerId() == dto.getOwnerId()) {
@@ -89,6 +92,7 @@ public class CommentService extends AbstractService {
     public int likeComment(long id, long userId) {
         Comment comment = findComment(id);
         User user = getUserById(userId);
+        checkPermission(user, comment);
         if (user.getLikedComments().contains(comment)) {
             user.getLikedComments().remove(comment);
             comment.getLikes().remove(user);

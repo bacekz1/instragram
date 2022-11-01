@@ -1,4 +1,4 @@
-package com.s14ittalents.insta.content;
+package com.s14ittalents.insta.content.dto;
 
 import lombok.Getter;
 import lombok.Setter;

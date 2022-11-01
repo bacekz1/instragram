@@ -1,8 +1,7 @@
 package com.s14ittalents.insta.story;
 
-import com.s14ittalents.insta.comment.Comment;
 import com.s14ittalents.insta.content.Content;
-import com.s14ittalents.insta.content.ContentIdDTO;
+import com.s14ittalents.insta.content.dto.ContentIdDTO;
 import com.s14ittalents.insta.exception.BadRequestException;
 import com.s14ittalents.insta.exception.DataNotFoundException;
 import com.s14ittalents.insta.exception.NoAuthException;
@@ -12,13 +11,11 @@ import com.s14ittalents.insta.post.dto.PostCreateDTO;
 import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.AbstractService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +24,11 @@ import static com.s14ittalents.insta.exception.Constant.*;
 @Service
 public class StoryService extends AbstractService {
     private static final int MAX_SIZE = 50;
+
     @Transactional
     public PostWithoutOwnerDTO createStory(PostCreateDTO storyCreateDTO, long userId) {
+        User user = getUserById(userId);
+        checkPermission(user);
         Optional<Post> story = postRepository.findStoryByUserId(userId);
         if (story.isEmpty()) {
             Post createStory = new Post();
@@ -73,14 +73,16 @@ public class StoryService extends AbstractService {
 
     public PostWithoutOwnerDTO getStory(long userId) {
         Post story = findStoryByUserId(userId);
+        checkPermission(story.getOwner(), story);
         return modelMapper.map(story, PostWithoutOwnerDTO.class);
     }
-    
+
     public void updateStory(ContentIdDTO contentIdDTO, long userId) {
         Post story = findStoryByUserId(userId);
+        checkPermission(story.getOwner(), story);
         Content content = contentRepository
                 .findById(contentIdDTO.getId()).orElseThrow(() -> new DataNotFoundException(CONTENT_NOT_FOUND));
-        if(!story.getContents().contains(content)) {
+        if (!story.getContents().contains(content)) {
             throw new NoAuthException(PERMISSION_DENIED);
         }
         contentRepository.delete(content);
@@ -88,7 +90,7 @@ public class StoryService extends AbstractService {
 
     public boolean deleteStory(long userId) {
         Post story = findStoryByUserId(userId);
-        checkPermission(getUserById(userId), story);
+        checkPermission(story.getOwner(), story);
         story.setDeleted(true);
         story.setCaption(REPLACE_IN_DELETED);
         postRepository.save(story);
@@ -98,6 +100,7 @@ public class StoryService extends AbstractService {
     public int likeStory(long storyId, long userId) {
         Post story = findStoryById(storyId);
         User user = getUserById(userId);
+        checkPermission(user, story);
         if (user.getLikedPosts().contains(story)) {
             user.getLikedPosts().remove(story);
             story.getLikes().remove(user);

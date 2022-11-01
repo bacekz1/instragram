@@ -24,6 +24,7 @@ public class PostService extends AbstractService {
     
     @Transactional
     public PostWithoutOwnerDTO createPost(PostCreateDTO postCreateDTO, long userId) {
+        checkPermission(getUserById(userId));
         Post post = new Post();
         post.setCaption(postCreateDTO.getCaption());
         post.setOwner(getUserById(userId));
@@ -50,8 +51,9 @@ public class PostService extends AbstractService {
         return modelMapper.map(createdPost, PostWithoutOwnerDTO.class);
     }
 
-    public PostWithoutOwnerDTO getPost(long id) {
-        Post post = findPost(id);
+    public PostWithoutOwnerDTO getPost(long postId) {
+        Post post = findPost(postId);
+        checkPermission(post.getOwner());
         return modelMapper.map(post, PostWithoutOwnerDTO.class);
     }
 
@@ -80,6 +82,7 @@ public class PostService extends AbstractService {
     
     @Transactional
     public void deletePostCommentsWhenDeletingUser(Post post) {
+        checkPermission(post.getOwner());
         post.setDeleted(true);
         post.setCaption(REPLACE_IN_DELETED);
         deletePostComments(post);
@@ -89,6 +92,7 @@ public class PostService extends AbstractService {
     public int likePost(long postId, long userId) {
         Post post = findPost(postId);
         User user = getUserById(userId);
+        checkPermission(user,post);
         if (user.getLikedPosts().contains(post)) {
             user.getLikedPosts().remove(post);
             post.getLikes().remove(user);

@@ -14,9 +14,10 @@ public class    CommentController extends AbstractController {
     @Autowired
     private CommentService commentService;
 
-    @GetMapping({"/comments/{id:[0-9]+}"})
-    List<CommentWithRepliesDTO> getCommentWithReplies(@RequestBody @PathVariable long id) {
-        return commentService.getCommentWithReplies(id);
+    @GetMapping({"/comments/{commentId:[0-9]+}"})
+    List<CommentWithRepliesDTO> getCommentWithReplies(@RequestBody @PathVariable long commentId) {
+        long userId = getLoggedUserId();
+        return commentService.getCommentWithReplies(commentId, userId);
     }
 
     @PostMapping("/posts/{postId}")

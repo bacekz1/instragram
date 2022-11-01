@@ -37,7 +37,7 @@ public class PostController extends AbstractController {
 
     @PutMapping("/{postId:[0-9]+}")
     @ResponseBody
-    PostWithoutOwnerDTO updatePost(@PathVariable long postId, @RequestBody PostUpdateDTO postUpdate) {
+    PostUpdateDTO updatePost(@PathVariable long postId, @RequestBody PostUpdateDTO postUpdate) {
         long userId = getLoggedUserId();
         return postService.updatePost(postId, postUpdate, userId);
     }

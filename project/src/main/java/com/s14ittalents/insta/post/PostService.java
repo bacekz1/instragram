@@ -21,7 +21,7 @@ import static com.s14ittalents.insta.exception.Constant.*;
 @Service
 public class PostService extends AbstractService {
     private static final int MAX_SIZE = 5;
-    
+
     @Transactional
     public PostWithoutOwnerDTO createPost(PostCreateDTO postCreateDTO, long userId) {
         checkPermission(getUserById(userId));
@@ -57,7 +57,7 @@ public class PostService extends AbstractService {
         return modelMapper.map(post, PostWithoutOwnerDTO.class);
     }
 
-    public PostWithoutOwnerDTO updatePost(long posId, PostUpdateDTO postUpdate, long userId) {
+    public PostUpdateDTO updatePost(long posId, PostUpdateDTO postUpdate, long userId) {
         Post post = findPost(posId);
         checkPermission(getUserById(userId), post);
         post.setCaption(postUpdate.getCaption());
@@ -66,7 +66,7 @@ public class PostService extends AbstractService {
         addHashtags(post);
         addPersonTags(post);
         postRepository.save(post);
-        return modelMapper.map(post, PostWithoutOwnerDTO.class);
+        return modelMapper.map(post, PostUpdateDTO.class);
     }
 
     @Transactional
@@ -79,7 +79,7 @@ public class PostService extends AbstractService {
         post.getLikes().clear();
         postRepository.save(post);
     }
-    
+
     @Transactional
     public void deletePostCommentsWhenDeletingUser(Post post) {
         checkPermission(post.getOwner());
@@ -92,7 +92,7 @@ public class PostService extends AbstractService {
     public int likePost(long postId, long userId) {
         Post post = findPost(postId);
         User user = getUserById(userId);
-        checkPermission(user,post);
+        checkPermission(user, post);
         if (user.getLikedPosts().contains(post)) {
             user.getLikedPosts().remove(post);
             post.getLikes().remove(user);
@@ -109,7 +109,7 @@ public class PostService extends AbstractService {
             for (int i = 0; i < post.getComments().size(); i++) {
                 post.getComments().get(i).setDeleted(true);
                 post.getComments().get(i).setComment("deleted at" + LocalDateTime.now());
-                post.getComments().forEach(c-> c.getLikes().clear());
+                post.getComments().forEach(c -> c.getLikes().clear());
             }
         }
     }

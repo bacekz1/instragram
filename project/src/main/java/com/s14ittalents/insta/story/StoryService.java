@@ -8,7 +8,7 @@ import com.s14ittalents.insta.exception.NoAuthException;
 import com.s14ittalents.insta.location.Location;
 import com.s14ittalents.insta.post.*;
 import com.s14ittalents.insta.post.dto.PostCreateDTO;
-import com.s14ittalents.insta.post.dto.PostWithoutOwnerDTO;
+import com.s14ittalents.insta.story.dto.StoryWithoutOwnerDTO;
 import com.s14ittalents.insta.user.User;
 import com.s14ittalents.insta.util.AbstractService;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class StoryService extends AbstractService {
     private static final int MAX_SIZE = 50;
 
     @Transactional
-    public PostWithoutOwnerDTO createStory(PostCreateDTO storyCreateDTO, long userId) {
+    public StoryWithoutOwnerDTO createStory(PostCreateDTO storyCreateDTO, long userId) {
         User user = getUserById(userId);
         checkPermission(user);
         Optional<Post> story = postRepository.findStoryByUserId(userId);
@@ -55,7 +55,7 @@ public class StoryService extends AbstractService {
                 List<Content> createdContents = contentRepository.saveAll(contents);
                 createdStory.setContents(createdContents);
             }
-            return modelMapper.map(createdStory, PostWithoutOwnerDTO.class);
+            return modelMapper.map(createdStory, StoryWithoutOwnerDTO.class);
 
         } else {
             List<MultipartFile> files = storyCreateDTO.getContents();
@@ -67,14 +67,14 @@ public class StoryService extends AbstractService {
                 List<Content> createdContents = contentRepository.saveAll(contents);
                 story.get().getContents().addAll(createdContents);
             }
-            return modelMapper.map(story.get(), PostWithoutOwnerDTO.class);
+            return modelMapper.map(story.get(), StoryWithoutOwnerDTO.class);
         }
     }
 
-    public PostWithoutOwnerDTO getStory(long userId) {
+    public StoryWithoutOwnerDTO getStory(long userId) {
         Post story = findStoryByUserId(userId);
         checkPermission(story.getOwner(), story);
-        return modelMapper.map(story, PostWithoutOwnerDTO.class);
+        return modelMapper.map(story, StoryWithoutOwnerDTO.class);
     }
 
     public void updateStory(ContentIdDTO contentIdDTO, long userId) {

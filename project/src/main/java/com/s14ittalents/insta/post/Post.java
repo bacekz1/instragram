@@ -23,6 +23,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @Table(name = "post")
+
 public class Post implements Ownerable, Commentable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

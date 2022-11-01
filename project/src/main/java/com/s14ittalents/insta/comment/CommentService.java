@@ -92,7 +92,6 @@ public class CommentService extends AbstractService {
     public int likeComment(long id, long userId) {
         Comment comment = findComment(id);
         User user = getUserById(userId);
-        checkPermission(user, comment);
         if (user.getLikedComments().contains(comment)) {
             user.getLikedComments().remove(comment);
             comment.getLikes().remove(user);

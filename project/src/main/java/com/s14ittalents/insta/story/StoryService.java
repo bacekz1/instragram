@@ -102,7 +102,6 @@ public class StoryService extends AbstractService {
     public int likeStory(long storyId, long userId) {
         Post story = findStoryById(storyId);
         User user = getUserById(userId);
-        checkPermission(user, story);
         if (user.getLikedPosts().contains(story)) {
             user.getLikedPosts().remove(story);
             story.getLikes().remove(user);

@@ -92,7 +92,6 @@ public class PostService extends AbstractService {
     public int likePost(long postId, long userId) {
         Post post = findPost(postId);
         User user = getUserById(userId);
-        checkPermission(user, post);
         if (user.getLikedPosts().contains(post)) {
             user.getLikedPosts().remove(post);
             post.getLikes().remove(user);

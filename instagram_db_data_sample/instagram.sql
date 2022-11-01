@@ -29,16 +29,15 @@ CREATE TABLE `comments` (
   `comment` varchar(500) NOT NULL,
   `reply_id` int DEFAULT NULL,
   `is_deleted` tinyint NOT NULL,
-  `created_at` datetime NOT NULL,
+  `created_at` timestamp NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `reply_owner_comment_unique` (`reply_id`,`owner_id`,`post_id`),
   KEY `user_id_idx` (`owner_id`),
   KEY `reply_id_idx` (`reply_id`),
   KEY `fk_post_id_post_idx` (`post_id`),
   CONSTRAINT `fk_post_id_post` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`),
   CONSTRAINT `fk_reply_id_user_id` FOREIGN KEY (`reply_id`) REFERENCES `comments` (`id`),
   CONSTRAINT `fk_user_id_reply_id` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,7 +46,7 @@ CREATE TABLE `comments` (
 
 LOCK TABLES `comments` WRITE;
 /*!40000 ALTER TABLE `comments` DISABLE KEYS */;
-INSERT INTO `comments` VALUES (1,3,1,'wow #beautiful',NULL,0,'0000-00-00 00:00:00'),(2,3,2,'thank you',1,0,'0000-00-00 00:00:00'),(6,3,2,'test123',NULL,0,'0000-00-00 00:00:00'),(7,4,1,'opa',1,0,'0000-00-00 00:00:00'),(10,4,2,'wow',7,0,'0000-00-00 00:00:00'),(11,4,1,'ebasi',10,0,'0000-00-00 00:00:00'),(15,3,2,'aaa',NULL,0,'0000-00-00 00:00:00'),(16,3,2,'sisi@abv.bg',NULL,0,'0000-00-00 00:00:00'),(17,3,2,'sisi@abv.bg',NULL,0,'0000-00-00 00:00:00'),(18,3,2,'sisi@abv.bg',NULL,0,'0000-00-00 00:00:00'),(19,3,2,'sisi@abv.bg',NULL,0,'0000-00-00 00:00:00'),(20,62,8,'deleted at2022-10-24T20:08:36.024237900',NULL,1,'2022-10-24 19:02:10'),(21,62,8,'test',NULL,0,'2022-10-24 18:27:53'),(22,62,8,'deleted at2022-10-24T19:44:39.609198200',NULL,1,'2022-10-24 19:00:48'),(23,62,8,'deleted at2022-10-24T20:08:36.027241500',20,1,'2022-10-24 20:01:16'),(24,63,8,'deleted at2022-10-24T20:31:25.796625700',NULL,1,'2022-10-24 20:29:41'),(25,63,8,'deleted at2022-10-24T20:31:25.796625700',NULL,1,'2022-10-24 20:29:42'),(26,63,8,'deleted at2022-10-24T20:31:25.796625700',NULL,1,'2022-10-24 20:29:43'),(27,63,8,'deleted at2022-10-24T20:31:25.796625700',NULL,1,'2022-10-24 20:29:44'),(28,63,8,'deleted at2022-10-24T20:31:25.796625700',NULL,1,'2022-10-24 20:29:44'),(29,63,8,'deleted at2022-10-24T20:31:25.796625700',NULL,1,'2022-10-24 20:29:45'),(30,63,8,'deleted at2022-10-24T20:31:25.796625700',28,1,'2022-10-24 20:30:01'),(32,63,8,'#daliraboti ',NULL,0,'2022-10-24 23:47:15'),(33,63,9,'#daliraboti ',NULL,0,'2022-10-24 23:47:48'),(34,63,9,'#daliraboti ',NULL,0,'2022-10-24 23:49:04'),(35,62,9,'#dalirabotiaaa ',21,0,'2022-10-24 23:49:55');
+INSERT INTO `comments` VALUES (52,113,12,'deleted at2022-10-31T11:02:31.641372119',NULL,1,'2022-10-31 07:22:09'),(53,113,14,'deleted at2022-10-31T11:02:31.641506771',52,1,'2022-10-31 07:27:53'),(54,137,14,'deleted at2022-10-31T19:19:13.274337100',NULL,1,'2022-10-31 09:25:28'),(55,140,14,'deleted at2022-10-31T19:20:17.747642700',NULL,1,'2022-10-31 16:20:22'),(56,140,13,'deleted at2022-10-31T19:20:17.747642700',NULL,1,'2022-10-31 16:21:46'),(57,140,13,'deleted at2022-10-31T19:20:17.747642700',55,1,'2022-10-31 16:31:06'),(58,149,23,'deleted at2022-11-01T15:26:14.776677100',NULL,1,'2022-11-01 12:58:34'),(59,149,13,'deleted at2022-11-01T15:26:14.782555100',58,1,'2022-11-01 13:01:42'),(60,149,23,'deleted at2022-11-01T15:26:14.782555100',59,1,'2022-11-01 13:06:10'),(61,149,23,'deleted at2022-11-01T15:26:14.782555100',NULL,1,'2022-11-01 13:08:49');
 /*!40000 ALTER TABLE `comments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -61,6 +60,7 @@ DROP TABLE IF EXISTS `following`;
 CREATE TABLE `following` (
   `user_id` int NOT NULL,
   `follower_id` int NOT NULL,
+  PRIMARY KEY (`user_id`,`follower_id`),
   UNIQUE KEY `user_follower_unique` (`user_id`,`follower_id`),
   KEY `id_idx` (`follower_id`),
   CONSTRAINT `following_user_fk` FOREIGN KEY (`follower_id`) REFERENCES `users` (`id`),
@@ -74,36 +74,8 @@ CREATE TABLE `following` (
 
 LOCK TABLES `following` WRITE;
 /*!40000 ALTER TABLE `following` DISABLE KEYS */;
-INSERT INTO `following` VALUES (2,1),(1,2);
+INSERT INTO `following` VALUES (16,15);
 /*!40000 ALTER TABLE `following` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `hashtag_following`
---
-
-DROP TABLE IF EXISTS `hashtag_following`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `hashtag_following` (
-  `user_id` int NOT NULL,
-  `hashtag_id` int NOT NULL,
-  UNIQUE KEY `fk_hashtag_following_unique` (`user_id`,`hashtag_id`),
-  KEY `fk_hashtag_following_1_idx` (`user_id`),
-  KEY `fk_hashtag_following_2_idx` (`hashtag_id`),
-  CONSTRAINT `fk_hashtag_following_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_hashtag_following_2` FOREIGN KEY (`hashtag_id`) REFERENCES `hashtags` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `hashtag_following`
---
-
-LOCK TABLES `hashtag_following` WRITE;
-/*!40000 ALTER TABLE `hashtag_following` DISABLE KEYS */;
-INSERT INTO `hashtag_following` VALUES (1,1),(2,1);
-/*!40000 ALTER TABLE `hashtag_following` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -117,8 +89,9 @@ CREATE TABLE `hashtags` (
   `id` int NOT NULL AUTO_INCREMENT,
   `tag_name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `tag_name_UNIQUE` (`tag_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb3;
+  UNIQUE KEY `tag_name_UNIQUE` (`tag_name`),
+  KEY `tag_name` (`tag_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,7 +100,7 @@ CREATE TABLE `hashtags` (
 
 LOCK TABLES `hashtags` WRITE;
 /*!40000 ALTER TABLE `hashtags` DISABLE KEYS */;
-INSERT INTO `hashtags` VALUES (17,' #wdalirabotaiwow '),(13,' #wdaliraboti '),(16,' #wdalirabotiwow '),(15,' daliraboti '),(12,'#daliraboti'),(18,'#dalirabotiaaa'),(10,'#gwat'),(11,'#kor'),(9,'#kur'),(8,'#test'),(2,'#wowkor'),(3,'#yesvbe'),(1,'food'),(14,'test');
+INSERT INTO `hashtags` VALUES (26,' #wdalirabotaiwow '),(22,'#amazing'),(24,'#moje'),(28,'#moje da... '),(21,'#story'),(27,'#test'),(23,'#testaa'),(20,'#wow'),(25,'amazing comment '),(29,'amazing comment 2 ');
 /*!40000 ALTER TABLE `hashtags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -139,8 +112,9 @@ DROP TABLE IF EXISTS `hashtags_posts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `hashtags_posts` (
-  `post_hashtag_id` int NOT NULL,
   `tag_id` int NOT NULL,
+  `post_hashtag_id` int NOT NULL,
+  PRIMARY KEY (`post_hashtag_id`,`tag_id`),
   UNIQUE KEY `fk_hashtag_post_post_unique` (`post_hashtag_id`,`tag_id`),
   KEY `post_id_idx` (`post_hashtag_id`),
   KEY `tag_id_idx` (`tag_id`),
@@ -155,7 +129,7 @@ CREATE TABLE `hashtags_posts` (
 
 LOCK TABLES `hashtags_posts` WRITE;
 /*!40000 ALTER TABLE `hashtags_posts` DISABLE KEYS */;
-INSERT INTO `hashtags_posts` VALUES (3,1),(14,2),(14,3),(15,2),(15,3),(16,2),(16,3),(53,8),(54,8),(55,8),(56,8),(56,9),(57,8),(57,9),(58,8),(58,9),(58,10),(59,8),(59,9),(59,10),(60,8),(60,9),(60,10),(61,8),(61,11),(62,8),(62,11),(62,14),(62,15),(62,17),(62,18),(63,8),(63,11),(63,12),(63,18);
+INSERT INTO `hashtags_posts` VALUES (20,113),(22,113),(20,114),(21,115),(20,122),(20,123),(20,124),(20,125),(20,126),(20,127),(20,130),(20,131),(20,132),(20,133),(21,134),(21,135),(20,136),(20,137),(23,137),(20,138),(20,139),(20,140),(24,140),(20,141),(20,142),(20,143),(25,149),(26,149),(27,149),(28,149),(29,149);
 /*!40000 ALTER TABLE `hashtags_posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -169,6 +143,7 @@ DROP TABLE IF EXISTS `like_comments`;
 CREATE TABLE `like_comments` (
   `user_id` int NOT NULL,
   `comment_id` int NOT NULL,
+  PRIMARY KEY (`user_id`,`comment_id`),
   UNIQUE KEY `user_id_like_id_unique` (`user_id`,`comment_id`),
   KEY `like_id_idx` (`comment_id`),
   KEY `user_id_idx` (`user_id`) /*!80000 INVISIBLE */,
@@ -183,7 +158,7 @@ CREATE TABLE `like_comments` (
 
 LOCK TABLES `like_comments` WRITE;
 /*!40000 ALTER TABLE `like_comments` DISABLE KEYS */;
-INSERT INTO `like_comments` VALUES (1,2);
+INSERT INTO `like_comments` VALUES (14,54),(13,56),(13,57);
 /*!40000 ALTER TABLE `like_comments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -197,6 +172,7 @@ DROP TABLE IF EXISTS `like_post`;
 CREATE TABLE `like_post` (
   `user_id` int NOT NULL,
   `post_id` int NOT NULL,
+  PRIMARY KEY (`user_id`,`post_id`),
   UNIQUE KEY `post_id_user_id_unique` (`user_id`,`post_id`),
   UNIQUE KEY `user_post_unique` (`user_id`,`post_id`),
   KEY `post_id_idx` (`post_id`) /*!80000 INVISIBLE */,
@@ -211,7 +187,7 @@ CREATE TABLE `like_post` (
 
 LOCK TABLES `like_post` WRITE;
 /*!40000 ALTER TABLE `like_post` DISABLE KEYS */;
-INSERT INTO `like_post` VALUES (2,4);
+INSERT INTO `like_post` VALUES (14,114),(14,140),(16,114),(23,150);
 /*!40000 ALTER TABLE `like_post` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -223,12 +199,12 @@ DROP TABLE IF EXISTS `locations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `locations` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`),
-  KEY `location_id_idx` (`id`),
-  CONSTRAINT `id` FOREIGN KEY (`id`) REFERENCES `post` (`location_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -237,7 +213,7 @@ CREATE TABLE `locations` (
 
 LOCK TABLES `locations` WRITE;
 /*!40000 ALTER TABLE `locations` DISABLE KEYS */;
-INSERT INTO `locations` VALUES (1,'Sofia');
+INSERT INTO `locations` VALUES (5,'fail'),(10,'Kazanluk'),(13,'nowhere'),(12,'Pazardjik'),(4,'Plovdiv'),(6,'probaly fail'),(3,'Sofia'),(9,'Varna');
 /*!40000 ALTER TABLE `locations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -251,7 +227,7 @@ DROP TABLE IF EXISTS `person_tag`;
 CREATE TABLE `person_tag` (
   `user_tag_id` int NOT NULL,
   `post_persontag_id` int NOT NULL,
-  UNIQUE KEY `post_id_unique` (`user_tag_id`,`post_persontag_id`),
+  PRIMARY KEY (`user_tag_id`,`post_persontag_id`),
   KEY `user_id_idx` (`user_tag_id`),
   KEY `post_id_idx` (`post_persontag_id`),
   CONSTRAINT `post_id_fk` FOREIGN KEY (`post_persontag_id`) REFERENCES `post` (`id`),
@@ -265,7 +241,7 @@ CREATE TABLE `person_tag` (
 
 LOCK TABLES `person_tag` WRITE;
 /*!40000 ALTER TABLE `person_tag` DISABLE KEYS */;
-INSERT INTO `person_tag` VALUES (1,3),(1,4),(1,60),(1,61),(1,62),(1,63),(2,60),(4,15),(4,16);
+INSERT INTO `person_tag` VALUES (12,113),(12,114),(12,115),(12,122),(12,123),(12,124),(12,125),(12,126),(12,127),(12,131),(12,132),(12,133),(12,134),(12,135);
 /*!40000 ALTER TABLE `person_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -285,10 +261,11 @@ CREATE TABLE `post` (
   `is_deleted` tinyint NOT NULL,
   `created_time` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `post_user_fk` (`user_id`),
-  KEY `location_id_idx` (`location_id`),
+  KEY `post_user_fk_idx` (`user_id`),
+  KEY `post_location_idx` (`location_id`),
+  CONSTRAINT `post_location_fk` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`),
   CONSTRAINT `post_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -297,7 +274,7 @@ CREATE TABLE `post` (
 
 LOCK TABLES `post` WRITE;
 /*!40000 ALTER TABLE `post` DISABLE KEYS */;
-INSERT INTO `post` VALUES (3,1,'hi',1,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(4,2,'hello',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(5,1,'wow',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(6,1,'woww',NULL,'2022-10-22 16:43:49',0,'2022-10-21 16:43:49'),(7,1,'woww',NULL,'2022-10-22 16:44:21',0,'2022-10-21 16:44:21'),(8,1,'woww',NULL,'2022-10-21 16:44:21',0,'2022-10-21 16:44:21'),(14,4,'#wowkor #yesvbe @go6ogeq ',NULL,'2022-10-23 18:04:53',0,'2022-10-22 18:04:53'),(15,4,'deleted at2022-10-22T18:42:45.145775',NULL,'2022-10-23 18:05:11',1,'2022-10-22 18:05:11'),(16,4,'deleted at2022-10-22T18:24:05.800117800',NULL,'2022-10-23 18:23:11',1,'2022-10-22 18:23:11'),(17,4,'@test #test',NULL,NULL,0,'2022-10-23 15:47:38'),(18,4,'@test #test',NULL,NULL,0,'2022-10-23 16:06:21'),(19,4,'@test #test',NULL,NULL,0,'2022-10-23 17:28:36'),(20,4,'@test #test',NULL,NULL,0,'2022-10-23 17:31:03'),(21,4,'@test #test',NULL,NULL,0,'2022-10-23 17:35:20'),(22,4,'@test #test',NULL,NULL,0,'2022-10-23 17:35:51'),(23,4,'@test #test',NULL,NULL,0,'2022-10-23 17:45:07'),(24,4,'@test #test',NULL,NULL,0,'2022-10-23 17:46:35'),(25,4,'@test #test',NULL,NULL,0,'2022-10-23 17:51:13'),(26,4,'@test #test',NULL,NULL,0,'2022-10-23 17:56:22'),(27,4,'@test #test',NULL,NULL,0,'2022-10-23 18:32:24'),(28,4,'@test #test',NULL,NULL,0,'2022-10-23 18:43:56'),(30,4,'@test #test',NULL,NULL,0,'2022-10-23 18:53:57'),(31,4,'@test #test',NULL,NULL,0,'2022-10-23 18:59:16'),(32,4,'@test #test',NULL,NULL,0,'2022-10-23 19:01:44'),(33,4,'@test #test',NULL,NULL,0,'2022-10-23 19:04:35'),(36,4,'@test #test',NULL,NULL,0,'2022-10-23 19:07:23'),(37,4,'@test #test',NULL,NULL,0,'2022-10-23 19:11:20'),(39,4,'@test #test',NULL,NULL,0,'2022-10-23 19:11:54'),(42,4,'@test #test',NULL,NULL,0,'2022-10-23 19:24:28'),(44,4,'@test #test',NULL,NULL,0,'2022-10-23 19:30:01'),(45,4,'@test #test',NULL,NULL,0,'2022-10-23 19:32:01'),(46,4,'@test #test',NULL,NULL,0,'2022-10-23 19:32:15'),(49,4,'@test #test',NULL,NULL,0,'2022-10-23 21:42:52'),(50,4,'@test #test',NULL,NULL,0,'2022-10-23 21:44:28'),(53,4,'@test #test #test #test',NULL,NULL,0,'2022-10-24 17:34:51'),(54,4,'@test #test #test #test #kur',NULL,NULL,0,'2022-10-24 17:35:35'),(55,4,'@test #test #test #test #kur',NULL,NULL,0,'2022-10-24 17:36:19'),(56,4,'@test #test #test #test #kur #gwat',NULL,NULL,0,'2022-10-24 17:36:32'),(57,4,'@test #test #test #test #kur #gwat',NULL,NULL,0,'2022-10-24 17:38:41'),(58,4,'@test #test #test #test #kur #gwat ',NULL,NULL,0,'2022-10-24 17:39:12'),(59,4,'@test #test #test #test #kur #gwat @pe',NULL,NULL,0,'2022-10-24 17:39:56'),(60,4,'@test #test #test #test #kur #gwat @pe6o @pe6o @pe6o @pe6o @go6o ',NULL,NULL,0,'2022-10-24 17:40:32'),(61,4,'#test #kor @pe6o asfkbasfkb ',NULL,NULL,0,'2022-10-24 17:45:39'),(62,4,'#test #kor @pe6o asfkbasfkb ',1,NULL,0,'2022-10-24 17:45:50'),(63,8,'deleted at2022-10-24T20:31:25.795625',1,NULL,0,'2022-10-24 20:26:24');
+INSERT INTO `post` VALUES (113,12,'del-2022-10-31T11:02:31.467907',3,NULL,1,'2022-10-28 10:11:48'),(114,14,'amazing #wow @user1 test',3,NULL,0,'2022-10-31 09:08:36'),(115,12,'del-2022-10-31T11:02:31.467907',4,'2022-11-01 09:20:09',1,'2022-10-31 09:20:09'),(116,14,'fail',5,NULL,0,'2022-10-31 09:33:51'),(117,14,'fail',5,NULL,0,'2022-10-31 09:35:15'),(118,14,'fail',5,NULL,0,'2022-10-31 09:37:43'),(119,14,'probaly fail',6,NULL,0,'2022-10-31 09:39:39'),(122,16,'amazing #wow @user1 test',3,NULL,0,'2022-10-31 10:26:13'),(123,16,'amazing #wow @user1 test',3,NULL,0,'2022-10-31 10:26:16'),(124,16,'amazing #wow @user1 test',3,NULL,0,'2022-10-31 10:26:17'),(125,16,'amazing #wow @user1 test',3,NULL,0,'2022-10-31 10:26:18'),(126,16,'amazing #wow @user1 test',3,NULL,0,'2022-10-31 10:26:19'),(127,16,'amazing #wow @user1 test',3,NULL,0,'2022-10-31 10:26:20'),(130,16,'#wow @hello amazing',9,NULL,0,'2022-10-31 10:28:34'),(131,16,'amazing #wow @user1 test',3,NULL,0,'2022-10-31 10:39:13'),(132,16,'amazing #wow @user1 test',10,NULL,0,'2022-10-31 10:41:05'),(133,16,'amazing #wow @user1 test',10,NULL,0,'2022-10-31 10:42:26'),(134,16,'#story @user1 ',4,'2022-11-01 10:42:52',0,'2022-10-31 10:42:52'),(135,15,'#story @user1 ',4,'2022-11-01 10:45:51',0,'2022-10-31 10:45:51'),(136,12,'amazing #wow @user1 test',10,NULL,0,'2022-10-31 11:03:01'),(137,14,'amazing #wow @user1 test',10,NULL,0,'2022-10-31 11:24:27'),(138,13,'amazing #wow @user1 ',12,NULL,0,'2022-10-31 18:05:59'),(139,13,'amazing #wow @user1 ',12,NULL,0,'2022-10-31 18:17:50'),(140,14,'del-2022-10-31T19:20:17.745640',12,NULL,0,'2022-10-31 18:18:52'),(141,13,'amazing #wow @user1 ',12,NULL,0,'2022-10-31 18:25:41'),(142,13,'amazing #wow @user1 ',12,NULL,0,'2022-10-31 18:26:01'),(143,13,'amazing #wow @user1 ',12,NULL,0,'2022-10-31 18:28:06'),(149,23,'del- 2022-11-01 15:26:14',12,NULL,0,'2022-11-01 14:55:58'),(150,23,'yea #baby',13,'2022-11-02 15:31:10',0,'2022-11-01 15:31:10');
 /*!40000 ALTER TABLE `post` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -316,7 +293,7 @@ CREATE TABLE `post_content` (
   UNIQUE KEY `media_post_unique` (`media`,`post_id`),
   KEY `post_id_idx` (`post_id`),
   CONSTRAINT `post_id_maiak` FOREIGN KEY (`post_id`) REFERENCES `post` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=139 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -325,7 +302,7 @@ CREATE TABLE `post_content` (
 
 LOCK TABLES `post_content` WRITE;
 /*!40000 ALTER TABLE `post_content` DISABLE KEYS */;
-INSERT INTO `post_content` VALUES (1,'google.bg',3),(2,'hi',3),(32,'uploads\\1066419690004.jpg',49),(34,'uploads\\194032597567004.jpg',53),(35,'uploads\\194466645459004.jpg',54),(36,'uploads\\194906075945004.jpg',55),(37,'uploads\\195041059030004.jpg',56),(38,'uploads\\196327429469004.jpg',57),(39,'uploads\\196635957495004.jpg',58),(40,'uploads\\197074655179004.jpg',59),(41,'uploads\\197437082547004.jpg',60),(33,'uploads\\2029433623004.jpg',50),(3,'uploads\\241119256881004.jpg',30),(4,'uploads\\241119294823004.jpg',30),(5,'uploads\\241119300299004.jpg',30),(6,'uploads\\244307098516004.jpg',31),(7,'uploads\\244307140418004.jpg',31),(8,'uploads\\244307147543004.jpg',31),(9,'uploads\\245792726790004.jpg',32),(10,'uploads\\245792767520004.jpg',32),(11,'uploads\\245792776227004.jpg',32),(12,'uploads\\247500665499004.jpg',33),(13,'uploads\\247500706739004.jpg',33),(14,'uploads\\247500714821004.jpg',33),(15,'uploads\\251547303150004.jpg',37),(16,'uploads\\251547344229004.jpg',37),(17,'uploads\\251547351055004.jpg',37),(18,'uploads\\251893753164004.jpg',39),(19,'uploads\\251893761682004.jpg',39),(20,'uploads\\251893767754004.jpg',39),(21,'uploads\\251893773703004.jpg',39),(22,'uploads\\251893778478004.jpg',39),(23,'uploads\\251893785074004.jpg',39),(24,'uploads\\251893793793004.png',39),(25,'uploads\\251893804039004.jpg',39),(26,'uploads\\251893811261004.jpg',39),(27,'uploads\\251893817676004.png',39),(28,'uploads\\259426639773004.jpg',42),(29,'uploads\\262756033894004.jpg',44),(30,'uploads\\263960630697004.jpg',45),(31,'uploads\\264101703942004.jpg',46);
+INSERT INTO `post_content` VALUES (109,'src/main/resources/static/post/128978784521414.png',114),(108,'src/main/resources/static/post/163826942544212.png',113),(111,'src/main/resources/static/post/594665139669216.png',122),(112,'src/main/resources/static/post/594965500164216.png',123),(113,'src/main/resources/static/post/595080169671716.png',124),(114,'src/main/resources/static/post/595180690460716.png',125),(115,'src/main/resources/static/post/595279772233816.png',126),(116,'src/main/resources/static/post/595385892498516.png',127),(117,'src/main/resources/static/post/608750489246116.png',130),(118,'src/main/resources/static/post/672647846298916.png',131),(119,'src/main/resources/static/post/683807168801816.png',132),(120,'src/main/resources/static/post/691893301154116.png',133),(123,'src/main/resources/static/post/815414865017412.png',136),(124,'src/main/resources/static/post/943997986195114.png',137),(110,'src/main/resources/static/story/198242617833112.png',115),(121,'src/main/resources/static/story/694572353171216.png',134),(122,'src/main/resources/static/story/712481231168215.png',135),(125,'src\\main\\resources\\static\\post\\439078855950013.jpg',143),(126,'src\\main\\resources\\static\\story\\1667420776869923.jpg',150),(127,'src\\main\\resources\\static\\story\\1671066588570023.jpg',150),(128,'src\\main\\resources\\static\\story\\1671066697669923.jpg',150),(129,'src\\main\\resources\\static\\story\\1671066810390023.jpg',150),(131,'src\\main\\resources\\static\\story\\1673506395490023.jpg',150),(132,'src\\main\\resources\\static\\story\\1673506521440023.jpg',150),(133,'src\\main\\resources\\static\\story\\1673506648430023.jpg',150),(134,'src\\main\\resources\\static\\story\\1673506801290023.jpg',150),(135,'src\\main\\resources\\static\\story\\1677709101070023.jpg',150),(136,'src\\main\\resources\\static\\story\\1677709234229923.jpg',150),(137,'src\\main\\resources\\static\\story\\1677709356910023.jpg',150),(138,'src\\main\\resources\\static\\story\\1677709461830023.jpg',150);
 /*!40000 ALTER TABLE `post_content` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -357,7 +334,6 @@ CREATE TABLE `private_message` (
 
 LOCK TABLES `private_message` WRITE;
 /*!40000 ALTER TABLE `private_message` DISABLE KEYS */;
-INSERT INTO `private_message` VALUES (1,1,2,'hello','2021-02-03 00:00:00',0),(2,2,1,'um hi','2021-03-09 00:00:00',0);
 /*!40000 ALTER TABLE `private_message` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -385,12 +361,15 @@ CREATE TABLE `users` (
   `is_banned` tinyint NOT NULL,
   `is_deleted` tinyint NOT NULL,
   `created_at` datetime NOT NULL,
-  `is_private` tinyint DEFAULT '0',
+  `is_deactivated` tinyint DEFAULT NULL,
+  `verification_code` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`) /*!80000 INVISIBLE */,
-  KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3;
+  KEY `username` (`username`),
+  KEY `email` (`email`),
+  KEY `verification_code` (`verification_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -399,7 +378,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,0,'bksdv@ubef.com','pe6o',NULL,NULL,'adf','1999-01-01','07','m','',1,'123',0,0,'2022-10-21 23:33:24',0),(2,0,'busdfb@bsukdfb.com','go6o',NULL,NULL,NULL,'1998-02-02','02','m','',1,'test',0,0,'2022-10-21 23:33:26',0),(3,0,'wefw4r24r@efw4.com','hillow',NULL,NULL,'wew','2022-10-19','3855843','m',NULL,1,'123456',0,0,'2022-10-21 23:32:26',0),(4,0,'user@user.com','user1234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$IXZrDlovnaGmJpf4yX2ZyucDVaRpJF79vMR162ZpiYlNGEI6VqO8u',0,0,'2022-10-22 18:04:13',0),(5,0,'user@1user.com','user11234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$Er4ApYjsLEGG3MB.IepqNuv7gyxYYWVHy1X9ZzA1ayxVAyqDWvkGy',0,0,'2022-10-23 17:58:10',0),(6,0,'user@11user.com','user111234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$qK1T/aLO5HQYH352lm57G.vp83Lvvc33nrAY.Iv0YtJ94W4zlMRH.',0,0,'2022-10-23 17:59:00',0),(7,0,'user@111user.com','user1111234',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$UXDGBbRN/D8537Zo.JvSben1ykC6iVJ6JcNDWicLy5ZwXQu6RqtZe',0,0,'2022-10-23 18:00:27',0),(8,0,'inguofdsl@gm.coms','gifgiasigd7erqw',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$0gg4Aq9B9lcylYBWTwlmeeDLjDkxf0jD4qahcNfCb/Eihm7ZvaAPa',0,0,'2022-10-24 18:02:16',0),(9,0,'inguofdsl@gm.com1s','gifgiasigd7erqw1',NULL,NULL,NULL,NULL,NULL,NULL,'default_profile_picture\\default_profile_picture.jpg',0,'$2a$10$kjWldusVVeyTDVv1c9KeBOiperuSl20WyVU0EFiERQ/ZaR5lJz4U.',0,0,'2022-10-24 23:47:03',0);
+INSERT INTO `users` VALUES (12,0,'del-2022-10-31T11:02:31.467907','del-2022-10-31T11:02:31.467907','','','del-2022-10-31T11:02:31.467907','1900-01-01','del-2022-10-31T11:02:31.467907','del-2022-10-31','del-2022-10-31T11:02:31.467907',0,'$2a$10$/Pinxm3HbrINY2W3sEw63.nCB8y6a7NrwSUAbe8vij1XAJsxj.OQi',0,1,'2022-10-28 09:41:27',1,'0XT4JQJyJsd5y'),(13,0,'user1@use12.com','user12','User','One','Hello This IS user 1','2000-06-06',NULL,NULL,'src/main/resources/static/pfp/988196439791-13-.png',1,'$2a$10$5EsQLQkTLlZ8S1ay3d8k3OESZ83iBQ3pCRgQ50BLBwrw73X2xuIzO',0,0,'2022-10-28 09:42:39',0,'2yDaXU8NVmD4GrU9jHDY1nywiazBhhI4f55cvsE8yuZdZmXLrezv8VhnvJmEKRan'),(14,0,'user1@use121.com','user123','User','One','Hello This IS user 1','2000-06-06',NULL,NULL,'src/main/resources/static/pfp/856068321764-14-.png',1,'$2a$10$oH1PoHoU87QqWogDeATlSeaQAJ1zdSyiStBov7gM7op1NX3jy9SPe',0,0,'2022-10-31 09:01:23',0,'Htcl0qNHAXINUMLSTgocjcaTtAMdK04Sy0RH3NrPxs7LNA4zAgWFyDGphuAeMB3V'),(15,0,'user3@use121.com','user124','User','One','Hello This IS user 1','2000-06-06',NULL,NULL,'src/main/resources/static/pfp/5412364907938-15-.png',1,'$2a$10$K8Q9s1HCLpfZ3wdNBAFKlOJDPayavVuuoQ8fpR5mzcKHGPyPCA.KS',0,0,'2022-10-31 10:17:19',0,'1PkczQbSlrZ6DjpT64Ub4V9twbGxc8ISByNRJol1kBmxyjTbIxML08i860BlWi9h'),(16,0,'user4@use121.com','user126','User','One','Hello This IS user 1','2000-06-06','3468759620','male','src/main/resources/static/pfp/5780235595823-16-.png',1,'$2a$10$v/q3uhE/dskI5/jtWnmfTOaBbc355TZsnQdF6riagQHkfyj.Ksttq',1,0,'2022-10-31 10:23:27',0,'pOEu3Li1a91WuNlcPTydcXSJ6NLp4whYGicd4BDvmururpv88pt01lhYMWfkEIK5'),(17,0,'user5@use121.com','user127','User','One','Hello This IS user 1','2000-06-06','3468759620','male','src/main/resources/static/pfp/5815856295670-17-.png',1,'$2a$10$rVA35Hdndg9H3NE5ndXLxuRme4EkXWN1XVnwBkISXpy/7K08mGcBq',0,0,'2022-10-31 10:24:02',0,'m5grqfsxkWMDxQp9nJlEjohr352mJxlQDPNxLvk3Hl1dEKAGTguWKz6CLqZ6IR9m'),(18,0,'vasildincev@gmail.com','user1271','User','One','Hello This IS user 1','2000-06-06','3468759620','male','src/main/resources/static/pfp/6545632742225-18-.png',1,'$2a$10$VhzCoEtHhOPp2JJxlPyybOKVPK/R21tLYv3x3Hr8suNnMbnCnpEgy',0,0,'2022-10-31 10:36:12',0,'tZrulBcz4tTOJmZBSMY8xnj7yHINUNTTIZwD3tSOpIECN0OSDwvLkN80O5llq7v5'),(19,0,'vasildinchev@gmail.com','user12712','User','One','Hello This IS user 1','2000-06-06','3468759620','male','src/main/resources/static/pfp/8930964304769-19-.png',1,'$2a$10$NIceAOQ1sMzl8B5WZUW0xusixs0mmjY396Azl8WGTp/W6JrDgXnuW',0,0,'2022-10-31 11:15:58',0,'OIyGU1wPXMcBTKyWwZlUFtIoFUNL623l8Bch7U6TT6zTPSQLibilTSCpYhswILdq'),(20,0,'vasildinchevs@gmail.com','user127123','User','One','Hello This IS user 1','2000-06-06','3468759620','male','src/main/resources/static/pfp/8961338084413-20-.png',0,'$2a$10$FeUdmiQsmheMpwEAz6t6z.p5vcbnO9PVbE1XWGE9EJ1XGPxlBe.4m',0,0,'2022-10-31 11:16:28',0,'3kDrSlW0U0zAYerzTYQk5rypi2SGCcL7ibuzso4wCYRwdwpieDUrZORL7MPjhcHg'),(21,0,'vasildinchevss@gmail.com','user1271238','User','One','Hello This IS user 1','2000-06-06','3468759620','male','src/main/resources/static/pfp/9311457266793-21-.png',0,'$2a$10$nAIwEoVwYuAk/BsIkPv64ucJKD0NAVz9Of9g9Z3xzADhACfZS9bfe',0,0,'2022-10-31 11:22:18',0,'wYtWtqi1sOuH1IzAveY9eORnJUIbc18fOBETsJjnSUuDDc1rQiwUmQtRvH2F7aJj'),(22,0,'vasildinchevss3@gmail.com','user12712383','User','One','Hello This IS user 1','2000-06-06','3468759620','male','src/main/resources/static/pfp/9322229735738-22-.png',0,'$2a$10$2dO0BwIPPUt60m5rHfO5pOgDRphsyZuPvzx.ICBNRFAGFQIC0KRRu',0,0,'2022-10-31 11:22:29',0,'PJV3Y3gBSGLIaoG0vxWBKCX3IzYlVU8FAOx6f0gypbNFbNhhudCMnUX2TV3Aa2uU'),(23,0,'user1@use1.com','user15','User','One','Hello This IS user 1','2000-06-06','3468759620','m','src\\main\\resources\\static\\pfp\\14382399817900-23-.jpg',1,'$2a$10$JtpF8srpkRV6ISPNSClE.u3/EW0WO0DT/K16kohNLGTNIu69HGe5K',0,0,'2022-11-01 14:52:58',0,'eKZCiE0hZdq0JcJxYDIGuzxzLOSFsOjpPyFlVuchcxNqqhj4fxRiJmLKNpJiBZRZ');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -412,4 +391,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-24 23:51:21
+-- Dump completed on 2022-11-01 16:55:15
